@@ -15,12 +15,12 @@ The FAUST compiler embedded in a Pd external
 or
 - port install pkgconfig
 - port install llvm-5.0 +universal
-then
+
 - git submodule update --init --recursive
 - mkdir faust/build/forpd && cd faust/build/forpd
 - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -C../backends/backends.cmake
 - make
 - mkdir ../../../build && cd ../../../build
-- cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64"
+- cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64" -DLLVM_DIR=/opt/local/libexec/llvm-5.0 
 ```
 - linux
