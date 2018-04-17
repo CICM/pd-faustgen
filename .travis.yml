@@ -19,6 +19,10 @@ matrix:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off
       - make --quiet
+      - mkdir ../../../build && cd ../../../build
+      - cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64"
+      - cmake --build . --config Release
+      - cmake --build . --config Release
   - os: linux
     compiler: gcc
     env: plateform='linux32'
@@ -29,6 +33,9 @@ matrix:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32
       - make --quiet
+      - mkdir ../../../build && cd ../../../build
+      - cmake .. -DCMAKE_C_FLAGS=-m32
+      - cmake --build . --config Release
   - os: linux
     compiler: gcc
     env: plateform='linux64'
@@ -39,3 +46,6 @@ matrix:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
       - make --quiet
+      - mkdir ../../../build && cd ../../../build
+      - cmake .. -DCMAKE_C_FLAGS=-m64
+      - cmake --build . --config Release
