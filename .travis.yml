@@ -17,7 +17,7 @@ matrix:
       - brew install pkg-config
     script:
       - mkdir faust/build/personal && cd faust/build/personal
-      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off
+      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -C../backends/backends.cmake
       - make --quiet
       - mkdir ../../../build && cd ../../../build
       - cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64"
@@ -31,7 +31,7 @@ matrix:
       - sudo apt-get install -y gcc-multilib libc6-dev-i386 pkg-config
     script:
       - mkdir faust/build/personal && cd faust/build/personal
-      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32
+      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32 -C../backends/backends.cmake
       - make --quiet
       - mkdir ../../../build && cd ../../../build
       - cmake .. -DCMAKE_C_FLAGS=-m32
@@ -44,7 +44,7 @@ matrix:
       - sudo apt-get install -y pkg-config
     script:
       - mkdir faust/build/personal && cd faust/build/personal
-      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
+      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64 -C../backends/backends.cmake
       - make --quiet
       - mkdir ../../../build && cd ../../../build
       - cmake .. -DCMAKE_C_FLAGS=-m64

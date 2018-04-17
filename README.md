@@ -11,9 +11,10 @@ The FAUST compiler embedded in a Pd external
 - macos
 ```
 - brew install pkg-config
+#- port install llvm-5.0 +universal
 - git submodule update --init --recursive
 - mkdir faust/build/personal && cd faust/build/personal
-- cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off
+- cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -C../backends/backends.cmake
 - make
 - mkdir ../../../build && cd ../../../build
 - cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64"
