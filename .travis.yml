@@ -18,7 +18,7 @@ matrix:
     script:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off
-      - make --silent
+      - make --quiet
   - os: linux
     compiler: gcc
     env: plateform='linux32'
@@ -28,7 +28,7 @@ matrix:
     script:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32
-      - make --silent
+      - make --quiet
   - os: linux
     compiler: gcc
     env: plateform='linux64'
@@ -38,4 +38,4 @@ matrix:
     script:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
-      - make --silent
+      - make --quiet
