@@ -15,5 +15,7 @@ The FAUST compiler embedded in a Pd external
 - mkdir faust/build/personal && cd faust/build/personal
 - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off
 - make
+- mkdir ../../../build && cd ../../../build
+- cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64"
 ```
 - linux

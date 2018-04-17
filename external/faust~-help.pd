@@ -1,0 +1,4 @@
+#N canvas 671 311 450 300 10;
+#X obj 117 91 faust~ \$0-code;
+#X obj 33 27 text define -k \$0-code;
+#A set;
