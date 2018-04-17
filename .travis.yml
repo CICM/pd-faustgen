@@ -11,10 +11,31 @@ matrix:
   include:
   - os: osx
     compiler: clang
+    env: plateform='macos'
     install:
       - git submodule update --init --recursive
       - brew install pkg-config
     script:
       - mkdir faust/build/personal && cd faust/build/personal
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off
-      - make
+      - make --silent
+  - os: linux
+    compiler: gcc
+    env: plateform='linux32'
+    install:
+      - git submodule update --init --recursive
+      - sudo apt-get install -y gcc-multilib libc6-dev-i386 pkg-config
+    script:
+      - mkdir faust/build/personal && cd faust/build/personal
+      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32
+      - make --silent
+  - os: linux
+    compiler: gcc
+    env: plateform='linux64'
+    install:
+      - git submodule update --init --recursive
+      - sudo apt-get install -y pkg-config
+    script:
+      - mkdir faust/build/personal && cd faust/build/personal
+      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
+      - make --silent
