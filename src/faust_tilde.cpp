@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2016 Pierre Guillot.
+// Copyright (c) 2018 Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 */
@@ -7,7 +7,6 @@
 #include <m_pd.h>
 #include <faust/dsp/llvm-dsp.h>
 #include <faust/dsp/interpreter-dsp.h>
-
 
 typedef struct _faust_tilde
 {
@@ -31,9 +30,9 @@ static void faust_tilde_delete_factory(t_faust_tilde *x)
 static void faust_tilde_create_factory(t_faust_tilde *x)
 {
     std::string errors;
-    char const* argv = "-llvm";
+    char const* argv[] = {"-llvm", "-interp"};
     faust_tilde_delete_factory(x);
-    x->f_dsp_factory = createDSPFactoryFromString("", "", 1, &argv, std::string(), errors);
+    x->f_dsp_factory = createDSPFactoryFromString("", "", 2, argv, std::string(), errors);
     if(!errors.empty())
     {
         pd_error(x, "%s", errors.c_str());
