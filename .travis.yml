@@ -14,8 +14,8 @@ matrix:
     env: plateform='macos'
     install:
       - git submodule update --init --recursive
-      - port install pkgconfig
-      - port install llvm-5.0 +universal
+      - brew install pkg-config
+      #- port install llvm-5.0 +universal
     script:
       - mkdir faust/build/forpd && cd faust/build/forpd
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -C../backends/backends.cmake
