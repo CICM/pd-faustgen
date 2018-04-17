@@ -5,8 +5,8 @@
 */
 
 #include <m_pd.h>
-#include <faust/dsp/llvm-dsp.h>
-#include <faust/dsp/interpreter-dsp.h>
+//#include <faust/dsp/llvm-dsp.h>
+#include <faust/dsp/llvm-c-dsp.h>
 
 typedef struct _faust_tilde
 {
@@ -22,20 +22,21 @@ static void faust_tilde_delete_factory(t_faust_tilde *x)
 {
     if(x->f_dsp_factory)
     {
-        deleteDSPFactory(x->f_dsp_factory);
+        deleteCDSPFactory(x->f_dsp_factory);
         x->f_dsp_factory = NULL;
     }
 }
 
 static void faust_tilde_create_factory(t_faust_tilde *x)
 {
-    std::string errors;
+    char* errors  = NULL;
+    char const* target  = NULL;
     char const* argv[] = {"-llvm", "-interp"};
     faust_tilde_delete_factory(x);
-    x->f_dsp_factory = createDSPFactoryFromString("", "", 2, argv, std::string(), errors);
-    if(!errors.empty())
+    //x->f_dsp_factory = createCDSPFactoryFromFile("", "", 2, argv, target, errors);
+    if(!errors)
     {
-        pd_error(x, "%s", errors.c_str());
+        pd_error(x, "%s", errors);
     }
 }
 
@@ -57,23 +58,26 @@ static void *faust_tilde_new(t_symbol* s)
         x->f_name           = s;
         x->f_dsp_factory    = NULL;
         x->f_dsp_instance   = NULL;
+        
+        FILE *file;
+        file = sys_fopen("test.txt", "r");
+        if (file)
+        {
+            sys_fclose(file);
+        }
+        //faust_tilde_create_factory(x);
     }
     return x;
 }
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-EXTERN void faust_tilde_setup(void)
+extern "C" void faust_tilde_setup(void)
 {
     t_class* c = class_new(gensym("faust~"), (t_newmethod)faust_tilde_new, (t_method)faust_tilde_free, sizeof(t_faust_tilde), CLASS_NOINLET, A_SYMBOL, 0);
     if(c)
     {
         class_addmethod(c, (t_method)faust_tilde_dsp, gensym("dsp"), A_CANT);
     }
+    post("faust~ compiler version: %s", getCLibFaustVersion());
     faust_tilde_class = c;
 }
-#ifdef __cplusplus
-}
-#endif
+
