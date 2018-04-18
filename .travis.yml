@@ -18,6 +18,8 @@ matrix:
       - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
       - brew install pkg-config
     script:
+      - export PATH=$PATH:="./llvm/bin"
+      - export CXXFLAGS="-I./llvm/include"
       - mkdir faust/build/forpd && cd faust/build/forpd
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake -DLLVM_DIR=./llvm/lib/cmake/llvm
       - make --quiet
