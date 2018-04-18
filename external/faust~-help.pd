@@ -1,4 +1,5 @@
-#N canvas 671 311 450 300 10;
-#X obj 117 91 faust~ \$0-code;
-#X obj 33 27 text define -k \$0-code;
-#A set;
+#N canvas 764 279 450 300 10;
+#X msg 104 63 reload;
+#X msg 114 33 reload;
+#X obj 119 149 faust~ moogVCF;
+#X connect 0 0 2 0;

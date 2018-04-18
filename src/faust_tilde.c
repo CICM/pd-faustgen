@@ -5,15 +5,29 @@
 */
 
 #include <m_pd.h>
+#include <m_imp.h>
+#include <g_canvas.h>
 #include <string.h>
 #include <faust/dsp/llvm-c-dsp.h>
+
+struct _inlet
+{
+    t_pd i_pd;
+    struct _inlet *i_next;
+};
+
+struct _outlet
+{
+    t_object *o_owner;
+    struct _outlet *o_next;
+};
 
 typedef struct _faust_tilde
 {
     t_object            f_obj;
     llvm_dsp_factory*   f_dsp_factory;
     llvm_dsp*           f_dsp_instance;
-    
+    t_canvas*           f_canvas;
     t_symbol*           f_dsp_name;
     size_t              f_filepath_size;
     char*               f_filepath;
@@ -25,13 +39,53 @@ typedef struct _faust_tilde
 
 static t_class *faust_tilde_class;
 
-static void faust_tilde_delete_factory(t_faust_tilde *x)
+static void faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int const nouts)
 {
-    if(x->f_dsp_factory)
+    int i;
+    struct _inlet *icurrent = NULL, *inext = NULL;
+    struct _outlet *ocurrent = NULL, *onext = NULL;
+    int const rnins   = nins > 1 ? nins : 1;
+    int const rnouts  = nouts > 0 ? nouts : 0;
+    int const cinlts  = obj_nsiginlets((t_object *)x) > 1 ? obj_nsiginlets((t_object *)x) : 1;
+    int const coutlts = obj_nsigoutlets((t_object *)x);
+    
+    for(i = cinlts; i <= rnins; i++)
     {
-        deleteCDSPFactory(x->f_dsp_factory);
-        x->f_dsp_factory = NULL;
+        signalinlet_new((t_object *)x, 0);
     }
+    icurrent = ((t_object *)x)->te_inlet;
+    for(i = 0; i < rnins && icurrent; ++i)
+    {
+        icurrent = icurrent->i_next;
+    }
+    for(; i < cinlts && icurrent; ++i)
+    {
+        inext = icurrent->i_next;
+        inlet_free(icurrent);
+        icurrent = inext;
+    }
+    
+    for(i = coutlts; i < rnouts; i++)
+    {
+        outlet_new((t_object *)x, &s_signal);
+    }
+    ocurrent = ((t_object *)x)->te_outlet;
+    for(i = 0; i < rnouts && ocurrent; ++i)
+    {
+        ocurrent = ocurrent->o_next;
+    }
+    for(; i < coutlts && ocurrent; ++i)
+    {
+        onext = ocurrent->o_next;
+        outlet_free(ocurrent);
+        ocurrent = onext;
+    }
+    if(!rnouts)
+    {
+        ((t_object *)x)->te_outlet = NULL;
+    }
+
+    canvas_fixlinesfor(x->f_canvas, (t_text *)x);
 }
 
 static void faust_tilde_delete_instance(t_faust_tilde *x)
@@ -43,6 +97,16 @@ static void faust_tilde_delete_instance(t_faust_tilde *x)
     }
 }
 
+static void faust_tilde_delete_factory(t_faust_tilde *x)
+{
+    if(x->f_dsp_factory)
+    {
+        faust_tilde_delete_instance(x);
+        deleteCDSPFactory(x->f_dsp_factory);
+        x->f_dsp_factory = NULL;
+    }
+}
+
 static void faust_tilde_reload(t_faust_tilde *x)
 {
     char errors[4096];
@@ -50,6 +114,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
     int dspstate = canvas_suspend_dsp();
     if(x->f_filepath)
     {
+        faust_tilde_delete_instance(x);
         faust_tilde_delete_factory(x);
         x->f_dsp_factory = createCDSPFactoryFromFile(x->f_filepath, 2, argv, "", errors, -1);
         if(strnlen(errors, 4096))
@@ -58,9 +123,19 @@ static void faust_tilde_reload(t_faust_tilde *x)
         }
         else
         {
-            faust_tilde_delete_instance(x);
             x->f_dsp_instance = createCDSPInstance(x->f_dsp_factory);
-            logpost(x, 3, "faust~: dsp %s compiled", x->f_dsp_name->s_name);
+            if(x->f_dsp_instance)
+            {
+                faust_tilde_resize_ioputs(x,
+                                          getNumInputsCDSPInstance(x->f_dsp_instance),
+                                          getNumOutputsCDSPInstance(x->f_dsp_instance));
+                 logpost(x, 3, "faust~: dsp %s compiled", x->f_dsp_name->s_name);
+            }
+            else
+            {
+             
+               
+            }
         }
     }
     else
@@ -117,7 +192,10 @@ static void faust_tilde_get_include_path(t_faust_tilde *x)
 
 static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
 {
-    ;
+    if(x->f_dsp_instance)
+    {
+        initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
+    }
 }
 
 
@@ -138,9 +216,11 @@ static void *faust_tilde_new(t_symbol* s)
     {
         x->f_dsp_factory    = NULL;
         x->f_dsp_instance   = NULL;
+        x->f_canvas         = canvas_getcurrent();
         x->f_dsp_name       = s;
         x->f_filepath_size  = 0;
         x->f_filepath       = NULL;
+        
         faust_tilde_get_dsp_file(x);
         faust_tilde_get_include_path(x);
         faust_tilde_reload(x);
@@ -148,7 +228,7 @@ static void *faust_tilde_new(t_symbol* s)
     return x;
 }
 
-extern "C" void faust_tilde_setup(void)
+void faust_tilde_setup(void)
 {
     t_class* c = class_new(gensym("faust~"),
                            (t_newmethod)faust_tilde_new, (t_method)faust_tilde_free,

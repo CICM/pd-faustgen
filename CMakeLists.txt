@@ -7,10 +7,10 @@ set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 
 include(pd.build/pd.cmake)
 
-project(faust~ CXX)
+project(faust~ C)
 set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
 set_pd_external_path("${PROJECT_SOURCE_DIR}/external/")
-add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde.cpp)
+add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde.c)
 
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
