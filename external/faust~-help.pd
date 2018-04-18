@@ -1,21 +1,18 @@
 #N canvas 364 336 450 300 10;
-#X msg 214 160 reload;
 #X obj 201 240 dac~ 1 2;
-#X obj 201 127 faust~ noise;
+#X obj 201 167 faust~ noise;
 #X obj 4 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
-#X obj 201 187 faust~ volume;
-#X msg 214 100 reload;
-#X obj 323 54 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 0.25 256;
-#X obj 323 114 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 -53.77 256;
-#X msg 323 73 Volume \$1;
-#X connect 0 0 4 0;
-#X connect 2 0 4 0;
-#X connect 4 0 1 0;
-#X connect 4 0 1 1;
-#X connect 5 0 2 0;
-#X connect 6 0 8 0;
-#X connect 7 0 4 0;
-#X connect 8 0 2 0;
+#X msg 201 140 reload;
+#X obj 253 120 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 19 256;
+#X msg 253 139 Volume \$1;
+#X obj 28 141 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X msg 28 161 \; pd dsp \$1;
+#X connect 1 0 0 0;
+#X connect 1 0 0 1;
+#X connect 3 0 1 0;
+#X connect 4 0 5 0;
+#X connect 5 0 1 0;
+#X connect 6 0 7 0;

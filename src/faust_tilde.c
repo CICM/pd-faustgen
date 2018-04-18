@@ -193,6 +193,7 @@ static void faust_tilde_delete_params(t_faust_tilde *x)
 static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int const type, FAUSTFLOAT* zone,
                                    FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
 {
+    char temp[MAXPDSTRING];
     t_faust_param *newmemory;
     size_t size = x->f_nparams;
     if(x->f_params)
@@ -215,7 +216,9 @@ static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int cons
     }
     if(strnlen(label, MAXPDSTRING) == 0 || label[0] == '0')
     {
-        newmemory[size].p_label = &s_;
+        sprintf(temp, "param%i", (int)size+1);
+        newmemory[size].p_label = gensym(temp);
+        logpost(x, 3, "faust~: parameter has no label, empty string replace with '%s'", temp);
     }
     else
     {
@@ -460,13 +463,6 @@ static void faust_tilde_bang(t_faust_tilde *x, t_float f)
     faust_tilde_anything(x, &s_, 0, NULL);
 }
 
-static void faust_tilde_float(t_faust_tilde *x, t_float f)
-{
-    t_atom argv;
-    SETFLOAT(&argv, f);
-    faust_tilde_anything(x, &s_, 1, &argv);
-}
-
 static void faust_tilde_symbol(t_faust_tilde *x, t_symbol* s)
 {
     faust_tilde_anything(x, s, 0, NULL);
@@ -571,7 +567,6 @@ void faust_tilde_setup(void)
         class_addmethod(c, (t_method)faust_tilde_dsp, gensym("dsp"), A_CANT);
         class_addmethod(c, (t_method)faust_tilde_reload, gensym("reload"), A_NULL);
         class_addbang(c, (t_method)faust_tilde_bang);
-        class_addfloat(c, (t_method)faust_tilde_float);
         class_addsymbol(c, (t_method)faust_tilde_symbol);
         class_addlist(c, (t_method)faust_tilde_list);
         class_addanything(c, (t_method)faust_tilde_anything);
