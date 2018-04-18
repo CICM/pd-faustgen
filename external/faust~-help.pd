@@ -1,18 +1,34 @@
-#N canvas 364 336 450 300 10;
-#X obj 201 240 dac~ 1 2;
-#X obj 201 167 faust~ noise;
-#X obj 4 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
+#N canvas 364 336 390 438 10;
+#X obj 7 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
-#X msg 201 140 reload;
-#X obj 253 120 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 19 256;
-#X msg 253 139 Volume \$1;
-#X obj 28 141 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X text 5 28 The FAUST compiler embedded in a Pd external.;
+#X obj 251 197 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 28 161 \; pd dsp \$1;
-#X connect 1 0 0 0;
-#X connect 1 0 0 1;
-#X connect 3 0 1 0;
-#X connect 4 0 5 0;
-#X connect 5 0 1 0;
-#X connect 6 0 7 0;
+#X msg 251 217 \; pd dsp \$1;
+#X obj 27 310 dac~ 1 2;
+#X obj 27 257 faust~ noise;
+#X msg 57 220 reload;
+#X obj 27 170 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X msg 27 189 Volume \$1;
+#X obj 27 128 loadbang;
+#X msg 27 149 0;
+#X text 90 167 Controls the parameters with their names, f 15;
+#X text 108 218 Reloads the patch;
+#X text 5 48 The first argument is the name of the file FAUST DSP file
+to read. The path is relative to the patch. Extra arguments can be
+used to define compilation options \, see the FAUST documentation for
+further information. Use the debug level 3 to displays information
+about the code in the Pd console.;
+#X text 22 357 Faust website: faust.grame.fr;
+#X text 22 371 Faust development: GRAME;
+#X text 22 385 faust~ external: Pierre Guillot;
+#X text 22 400 fuats~ website: github.com/pierreguillot/faust-pd;
+#X connect 2 0 3 0;
+#X connect 5 0 4 0;
+#X connect 5 0 4 1;
+#X connect 6 0 5 0;
+#X connect 7 0 8 0;
+#X connect 8 0 5 0;
+#X connect 9 0 10 0;
+#X connect 10 0 7 0;
