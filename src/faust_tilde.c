@@ -8,6 +8,7 @@
 #include <m_imp.h>
 #include <g_canvas.h>
 #include <string.h>
+
 #include <faust/dsp/llvm-c-dsp.h>
 
 struct _inlet
@@ -27,6 +28,8 @@ typedef struct _faust_tilde
     t_object            f_obj;
     llvm_dsp_factory*   f_dsp_factory;
     llvm_dsp*           f_dsp_instance;
+    t_sample**          f_signals;
+    t_float             f_f;
     t_canvas*           f_canvas;
     t_symbol*           f_dsp_name;
     size_t              f_filepath_size;
@@ -35,9 +38,20 @@ typedef struct _faust_tilde
     char**              f_compile_option;
     size_t              f_include_option_size;
     char*               f_include_option;
+    
 } t_faust_tilde;
 
 static t_class *faust_tilde_class;
+
+static int faust_tilde_get_ninlets(t_faust_tilde *x)
+{
+    return obj_nsiginlets((t_object *)x) > 1 ? obj_nsiginlets((t_object *)x) : 1;
+}
+
+static int faust_tilde_get_noutlets(t_faust_tilde *x)
+{
+    return obj_nsigoutlets((t_object *)x);
+}
 
 static void faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int const nouts)
 {
@@ -46,10 +60,10 @@ static void faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
     struct _outlet *ocurrent = NULL, *onext = NULL;
     int const rnins   = nins > 1 ? nins : 1;
     int const rnouts  = nouts > 0 ? nouts : 0;
-    int const cinlts  = obj_nsiginlets((t_object *)x) > 1 ? obj_nsiginlets((t_object *)x) : 1;
-    int const coutlts = obj_nsigoutlets((t_object *)x);
+    int const cinlts  = faust_tilde_get_ninlets(x);
+    int const coutlts = faust_tilde_get_noutlets(x);
     
-    for(i = cinlts; i <= rnins; i++)
+    for(i = cinlts; i < rnins; i++)
     {
         signalinlet_new((t_object *)x, 0);
     }
@@ -84,7 +98,17 @@ static void faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
     {
         ((t_object *)x)->te_outlet = NULL;
     }
-
+    
+    if(x->f_signals)
+    {
+        freebytes(x->f_signals, (cinlts + coutlts) * sizeof(t_sample *));
+        x->f_signals = NULL;
+    }
+    x->f_signals = getbytes((rnins + rnouts) * sizeof(t_sample *));
+    if(!x->f_signals)
+    {
+        pd_error(x, "faust~: memory allocation failed - signals");
+    }
     canvas_fixlinesfor(x->f_canvas, (t_text *)x);
 }
 
@@ -105,6 +129,15 @@ static void faust_tilde_delete_factory(t_faust_tilde *x)
         deleteCDSPFactory(x->f_dsp_factory);
         x->f_dsp_factory = NULL;
     }
+}
+
+static void faust_tilde_print(t_faust_tilde *x)
+{
+    logpost(x, 3, "faust~: compilation from source %s succeeded", x->f_dsp_name->s_name);
+    logpost(x, 3, "        source location %s", x->f_filepath);
+    logpost(x, 3, "        include location %s", x->f_include_option);
+    logpost(x, 3, "        number of inputs %i", getNumInputsCDSPInstance(x->f_dsp_instance));
+    logpost(x, 3, "        number of outputs %i", getNumOutputsCDSPInstance(x->f_dsp_instance));
 }
 
 static void faust_tilde_reload(t_faust_tilde *x)
@@ -129,7 +162,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
                 faust_tilde_resize_ioputs(x,
                                           getNumInputsCDSPInstance(x->f_dsp_instance),
                                           getNumOutputsCDSPInstance(x->f_dsp_instance));
-                 logpost(x, 3, "faust~: dsp %s compiled", x->f_dsp_name->s_name);
+                faust_tilde_print(x);
             }
             else
             {
@@ -181,7 +214,7 @@ static void faust_tilde_get_include_path(t_faust_tilde *x)
         }
         else
         {
-            pd_error(x, "faust~: memory allocation failed");
+            pd_error(x, "faust~: memory allocation failed - include path");
         }
     }
     else
@@ -190,11 +223,30 @@ static void faust_tilde_get_include_path(t_faust_tilde *x)
     }
 }
 
+t_int *faust_tilde_perform(t_int *w)
+{
+    computeCDSPInstance((llvm_dsp *)w[1], (int)w[2], (float **)w[3], (float **)w[4]);
+    return (w+5);
+}
+
+
 static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
 {
+    int i;
+    int const ninlets = faust_tilde_get_ninlets(x);
+    int const noutlets = faust_tilde_get_noutlets(x);
     if(x->f_dsp_instance)
     {
-        initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
+        if(x->f_signals)
+        {
+            initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
+            for(i = 0; i < ninlets + noutlets; ++i)
+            {
+                x->f_signals[i] = sp[i]->s_vec;
+            }
+            dsp_add((t_perfroutine)faust_tilde_perform, 4,
+                    x->f_dsp_instance, sp[0]->s_n, x->f_signals, x->f_signals+ninlets);
+        }
     }
 }
 
@@ -237,6 +289,7 @@ void faust_tilde_setup(void)
     {
         class_addmethod(c, (t_method)faust_tilde_dsp, gensym("dsp"), A_CANT);
         class_addmethod(c, (t_method)faust_tilde_reload, gensym("reload"), A_NULL);
+        CLASS_MAINSIGNALIN(c, t_faust_tilde, f_f);
     }
     post("faust~ compiler version: %s", getCLibFaustVersion());
     faust_tilde_class = c;
