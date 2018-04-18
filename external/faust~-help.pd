@@ -1,5 +1,21 @@
-#N canvas 764 279 450 300 10;
-#X msg 104 63 reload;
-#X msg 114 33 reload;
-#X obj 119 149 faust~ moogVCF;
-#X connect 0 0 2 0;
+#N canvas 364 336 450 300 10;
+#X msg 214 160 reload;
+#X obj 201 240 dac~ 1 2;
+#X obj 201 127 faust~ noise;
+#X obj 4 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
+0;
+#X obj 201 187 faust~ volume;
+#X msg 214 100 reload;
+#X obj 323 54 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0.25 256;
+#X obj 323 114 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 -53.77 256;
+#X msg 323 73 Volume \$1;
+#X connect 0 0 4 0;
+#X connect 2 0 4 0;
+#X connect 4 0 1 0;
+#X connect 4 0 1 1;
+#X connect 5 0 2 0;
+#X connect 6 0 8 0;
+#X connect 7 0 4 0;
+#X connect 8 0 2 0;
