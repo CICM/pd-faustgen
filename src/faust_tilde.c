@@ -33,13 +33,9 @@ typedef struct _faust_tilde
     
     t_canvas*           f_canvas;
     t_symbol*           f_dsp_name;
-    size_t              f_filepath_size;
-    char*               f_filepath;
-    size_t              f_compile_option_size;
-    char**              f_compile_option;
-    size_t              f_include_option_size;
-    char*               f_include_option;
     
+    size_t              f_ncompile_options;
+    char**              f_compile_options;
 } t_faust_tilde;
 
 static t_class *faust_tilde_class;
@@ -134,6 +130,158 @@ static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
     canvas_fixlinesfor(x->f_canvas, (t_text *)x);
     return 0;
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//                                          FILE LOCALIZATION                                   //
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
+{
+    char* file = NULL;
+    t_symbol const* name = x->f_dsp_name;
+    t_symbol const* path;
+    if(x->f_canvas)
+    {
+        path = canvas_getdir(x->f_canvas);
+        if(path && path->s_name && name && name->s_name)
+        {
+            file = (char *)malloc(strnlen(path->s_name, 4096) + strnlen(name->s_name, 4096) + 5);
+            if(file)
+            {
+                sprintf(file, "%s/%s.dsp", path->s_name, name->s_name);
+                return file;
+            }
+            else
+            {
+                pd_error(x, "faust~: memory allocation failed");
+            }
+        }
+        else
+        {
+            pd_error(x, "faust~: invalid canvas directory or DSP file name");
+        }
+    }
+    else
+    {
+        pd_error(x, "faust~: invalid canvas");
+    }
+    return NULL;
+}
+
+static char* faust_tilde_get_default_include_path(t_faust_tilde *x)
+{
+    char* inlcudepath;
+    char const* path = class_gethelpdir(faust_tilde_class);
+    if(path)
+    {
+        inlcudepath = (char *)malloc(strnlen(path, 4096) + strnlen("/libs", 5));
+        if(inlcudepath)
+        {
+            sprintf(inlcudepath, "%s/libs", path);
+            return inlcudepath;
+        }
+        else
+        {
+            pd_error(x, "faust~: memory allocation failed - include path");
+        }
+    }
+    else
+    {
+        pd_error(x, "faust~: cannot locate the include path");
+    }
+    return NULL;
+}
+
+static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom* argv)
+{
+    int i = 0;
+    char has_include = 0;
+    int const nsize = argc + 2;
+    x->f_compile_options = (char **)malloc(nsize * sizeof(char *));
+    if(x->f_compile_options)
+    {
+        for(i = 0; i < argc; ++i)
+        {
+            x->f_compile_options[i] = (char *)malloc(MAXPDSTRING * sizeof(char));
+            if(x->f_compile_options[i])
+            {
+                if(argv[i].a_type == A_FLOAT)
+                {
+                    sprintf(x->f_compile_options[i], "%i", (int)argv[i].a_w.w_float);
+                }
+                else if(argv[i].a_type == A_SYMBOL && argv[i].a_w.w_symbol)
+                {
+                    sprintf(x->f_compile_options[i], "%s", argv[i].a_w.w_symbol->s_name);
+                    if(!strncmp(x->f_compile_options[i], "-I", MAXPDSTRING))
+                    {
+                        has_include = 1;
+                    }
+                }
+                else
+                {
+                    pd_error(x, "faust~: option type invalid");
+                    sprintf(x->f_compile_options[i], "");
+                }
+            }
+            else
+            {
+                pd_error(x, "faust~: memory allocation failed - compile option");
+                x->f_ncompile_options = i;
+                return;
+            }
+        }
+        if(!has_include)
+        {
+            x->f_compile_options[i] = (char *)malloc(MAXPDSTRING * sizeof(char));
+            if(x->f_compile_options[i])
+            {
+                sprintf(x->f_compile_options[i], "-I");
+            }
+            else
+            {
+                pd_error(x, "faust~: memory allocation failed - compile option");
+                x->f_ncompile_options = i;
+                return;
+            }
+            ++i;
+            x->f_compile_options[i] = faust_tilde_get_default_include_path(x);
+            if(!x->f_compile_options[i])
+            {
+                pd_error(x, "faust~: memory allocation failed - compile option");
+                x->f_ncompile_options = i;
+                return;
+            }
+            x->f_ncompile_options = i+1;
+        }
+        else
+        {
+            x->f_ncompile_options = argc;
+        }
+    }
+    else
+    {
+        pd_error(x, "faust~: memory allocation failed - compile options");
+    }
+}
+
+static void faust_tilde_free_compile_options(t_faust_tilde *x)
+{
+    int i;
+    if(x->f_compile_options)
+    {
+        for(i = 0; i < x->f_ncompile_options; ++i)
+        {
+            if(x->f_compile_options[i])
+            {
+                free(x->f_compile_options[i]);
+            }
+        }
+        free(x->f_compile_options);
+    }
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          FAUST INTERFACE                                     //
@@ -298,14 +446,15 @@ static void faust_tilde_reload(t_faust_tilde *x)
 {
     int i;
     char errors[4096];
-    char const* argv[] = {"-I", x->f_include_option};
     int dspstate = canvas_suspend_dsp();
-    if(x->f_filepath)
+    char* filepath = faust_tilde_get_dsp_file_path(x);
+    if(filepath)
     {
         faust_tilde_delete_instance(x);
         faust_tilde_delete_factory(x);
         faust_tilde_delete_params(x);
-        x->f_dsp_factory = createCDSPFactoryFromFile(x->f_filepath, 2, argv, "", errors, -1);
+        x->f_dsp_factory = createCDSPFactoryFromFile(filepath, x->f_ncompile_options, x->f_compile_options,
+                                                     "", errors, -1);
         if(strnlen(errors, 4096))
         {
             pd_error(x, "faust~: %s", errors);
@@ -339,61 +488,13 @@ static void faust_tilde_reload(t_faust_tilde *x)
                pd_error(x, "faust~: memory allocation failed - instance");
             }
         }
+        free(filepath);
     }
     else
     {
         pd_error(x, "faust~: source file not defined");
     }
     canvas_resume_dsp(dspstate);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          FILE LOCALIZATION                                   //
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-static void faust_tilde_get_dsp_file(t_faust_tilde *x)
-{
-    t_symbol const* file = x->f_dsp_name;
-    t_symbol const* path = canvas_getcurrentdir();
-    if(path && path->s_name && file && file->s_name)
-    {
-        x->f_filepath_size = strnlen(path->s_name, 4096) + strnlen(file->s_name, 4096) + 3;
-        x->f_filepath = (char *)getbytes(x->f_filepath_size);
-        if(x->f_filepath)
-        {
-            sprintf(x->f_filepath, "%s/%s.dsp", path->s_name, file->s_name);
-        }
-        else
-        {
-            pd_error(x, "faust~: memory allocation failed");
-        }
-    }
-    else
-    {
-        pd_error(x, "faust~: invalid canvas directory or DSP file name");
-    }
-}
-
-static void faust_tilde_get_include_path(t_faust_tilde *x)
-{
-    char const* path = class_gethelpdir(faust_tilde_class);
-    if(path)
-    {
-        x->f_include_option_size = strnlen(path, 4096) + strnlen("/libs", 5);
-        x->f_include_option = (char *)getbytes(x->f_include_option_size);
-        if(x->f_include_option)
-        {
-            sprintf(x->f_include_option, "%s/libs", path);
-        }
-        else
-        {
-            pd_error(x, "faust~: memory allocation failed - include path");
-        }
-    }
-    else
-    {
-        pd_error(x, "faust~: cannot locate the include path");
-    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -506,10 +607,8 @@ static void faust_tilde_free(t_faust_tilde *x)
 {
     faust_tilde_delete_instance(x);
     faust_tilde_delete_factory(x);
-    if(x->f_filepath)
-    {
-        freebytes(x->f_filepath, x->f_filepath_size);
-    }
+    faust_tilde_delete_params(x);
+    faust_tilde_free_compile_options(x);
 }
 
 static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
@@ -547,11 +646,10 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         
         x->f_canvas         = canvas_getcurrent();
         x->f_dsp_name       = atom_getsymbolarg(0, argc, argv);
-        x->f_filepath_size  = 0;
-        x->f_filepath       = NULL;
         
-        faust_tilde_get_dsp_file(x);
-        faust_tilde_get_include_path(x);
+        x->f_ncompile_options   = 0;
+        x->f_compile_options    = NULL;
+        faust_tilde_parse_compile_options(x, argc-1, argv+1);
         faust_tilde_reload(x);
     }
     return x;

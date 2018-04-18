@@ -2,14 +2,14 @@
 #X obj 7 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
 #X text 5 28 The FAUST compiler embedded in a Pd external.;
-#X obj 251 197 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 251 197 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X msg 251 217 \; pd dsp \$1;
 #X obj 27 310 dac~ 1 2;
 #X obj 27 257 faust~ noise;
 #X msg 57 220 reload;
-#X obj 27 170 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 0 256;
+#X obj 27 170 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
+-1 -1 0 256;
 #X msg 27 189 Volume \$1;
 #X obj 27 128 loadbang;
 #X msg 27 149 0;
