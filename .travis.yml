@@ -16,12 +16,13 @@ matrix:
       - git submodule update --init --recursive
       - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
       - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
+      - brew install pkg-config
     script:
       - mkdir faust/build/forpd && cd faust/build/forpd
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake -DLLVM_DIR=./llvm/lib/cmake/llvm
       - make --quiet
       - mkdir ../../../build && cd ../../../build
-      - cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64"
+      - cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64" -DLLVM_DIR=./llvm/lib/cmake/llvm
       - cmake --build . --config Release
       - cmake --build . --config Release
   - os: linux
