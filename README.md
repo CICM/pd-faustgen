@@ -1,7 +1,7 @@
 # faust-pd
 The FAUST compiler embedded in a Pd external
 
-The pure-data counterpart of the Max external faustgen~. This project is mainly an testing and experimental ground to embed the FAUST compiler with LLVM inside another application. The final goal is to integrate a similar feature in the application KIWI.
+The pure-data counterpart of the Max external faustgen~. This project is mainly a testing and experimental ground to embed the FAUST compiler with LLVM inside another application. The final goal is to integrate a similar feature in the application KIWI.
 
 ## Dependencies
 - [faust](https://github.com/grame-cncm/faust.git)
