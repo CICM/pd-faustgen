@@ -51,7 +51,7 @@ git submodule update --init --recursive
 mkdir faust/build/forpd && cd faust/build/forpd
 export PATH=$PATH:="./llvm/bin"
 export CXXFLAGS="-I./llvm/include"
-cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
+cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
 make
 mkdir ../../../build && cd ../../../build
 cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64" -DLLVM_DIR=./llvm/lib/cmake/llvm
