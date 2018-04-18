@@ -6,6 +6,10 @@
 
 #include <m_pd.h>
 
+#include <m_imp.h>
+#include <g_canvas.h>
+#include <string.h>
+
 #include <faust/dsp/llvm-c-dsp.h>
 
 typedef struct _faust_param
@@ -16,6 +20,7 @@ typedef struct _faust_param
     FAUSTFLOAT  p_min;
     FAUSTFLOAT  p_max;
     FAUSTFLOAT  p_step;
+    FAUSTFLOAT  p_saved;
 }t_faust_param;
 
 typedef struct _faust_tilde
@@ -43,10 +48,6 @@ static t_class *faust_tilde_class;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                      PURE DATA IO DYNAMIC                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include <m_imp.h>
-#include <g_canvas.h>
-#include <string.h>
 
 struct _inlet
 {
@@ -338,6 +339,24 @@ static void faust_tilde_delete_params(t_faust_tilde *x)
     }
 }
 
+static void faust_tilde_save_params(t_faust_tilde *x)
+{
+    int i;
+    for(i = 0; i < x->f_nparams; ++i)
+    {
+        x->f_params[i].p_saved = *x->f_params[i].p_zone;
+    }
+}
+
+static void faust_tilde_restore_params(t_faust_tilde *x)
+{
+    int i;
+    for(i = 0; i < x->f_nparams; ++i)
+    {
+        *x->f_params[i].p_zone = x->f_params[i].p_saved;
+    }
+}
+
 static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int const type, FAUSTFLOAT* zone,
                                    FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
 {
@@ -453,7 +472,8 @@ static void faust_tilde_reload(t_faust_tilde *x)
         faust_tilde_delete_instance(x);
         faust_tilde_delete_factory(x);
         faust_tilde_delete_params(x);
-        x->f_dsp_factory = createCDSPFactoryFromFile(filepath, x->f_ncompile_options, x->f_compile_options,
+        x->f_dsp_factory = createCDSPFactoryFromFile(filepath,
+                                                     x->f_ncompile_options, (const char**)x->f_compile_options,
                                                      "", errors, -1);
         if(strnlen(errors, 4096))
         {
@@ -591,6 +611,7 @@ static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
     {
         if(x->f_signals)
         {
+            faust_tilde_save_params(x);
             initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
             for(i = 0; i < ninlets + noutlets; ++i)
             {
@@ -598,6 +619,7 @@ static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
             }
             dsp_add((t_perfroutine)faust_tilde_perform, 4,
                     x->f_dsp_instance, sp[0]->s_n, x->f_signals, x->f_signals+ninlets);
+            faust_tilde_restore_params(x);
         }
     }
 }
