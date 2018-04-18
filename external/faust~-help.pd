@@ -1,4 +1,4 @@
-#N canvas 364 336 390 438 10;
+#N canvas 582 298 390 438 10;
 #X obj 7 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
 #X text 5 28 The FAUST compiler embedded in a Pd external.;
@@ -24,6 +24,8 @@ about the code in the Pd console.;
 #X text 22 371 Faust development: GRAME;
 #X text 22 385 faust~ external: Pierre Guillot;
 #X text 22 400 fuats~ website: github.com/pierreguillot/faust-pd;
+#X text 177 268 options example;
+#X obj 177 287 faust~ noise -vec -vs 64;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;
 #X connect 5 0 4 1;
