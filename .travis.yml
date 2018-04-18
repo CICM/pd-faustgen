@@ -16,8 +16,8 @@ matrix:
       - git submodule update --init --recursive
       - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
       - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
-      #- brew install pkg-config
     script:
+      - export PATH=$PATH:="./llvm"
       - export PATH=$PATH:="./llvm/bin"
       - export CXXFLAGS="-I./llvm/include"
       - mkdir faust/build/forpd && cd faust/build/forpd
