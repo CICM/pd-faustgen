@@ -51,8 +51,10 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# CMake
+# CMake & Build System
 /build/
+/llvm/
+*.tar.gz
 
 # pure-data
 *.pd_darwin
