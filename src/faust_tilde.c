@@ -222,7 +222,7 @@ static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom
                 else
                 {
                     pd_error(x, "faust~: option type invalid");
-                    sprintf(x->f_compile_options[i], "");
+                    memset(x->f_compile_options[i], 0, MAXPDSTRING);
                 }
             }
             else
@@ -281,8 +281,6 @@ static void faust_tilde_free_compile_options(t_faust_tilde *x)
         free(x->f_compile_options);
     }
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          FAUST INTERFACE                                     //
