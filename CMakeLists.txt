@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_SUPPRESS_REGENERATION true)
 set(CMAKE_MACOSX_RPATH Off)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
-set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 
 include(pd.build/pd.cmake)
 

@@ -21,24 +21,11 @@ matrix:
       - export PATH=$PATH:="./llvm/bin"
       - export CXXFLAGS="-I./llvm/include"
       - mkdir faust/build/forpd && cd faust/build/forpd
-      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUNIVERSAL=on -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
+      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
       - make --quiet
       - mkdir ../../../build && cd ../../../build
-      - cmake .. -GXcode "-DCMAKE_OSX_ARCHITECTURES=i386;x86_64" -DLLVM_DIR=./llvm/lib/cmake/llvm
+      - cmake .. -GXcode -DLLVM_DIR=./llvm/lib/cmake/llvm
       - cmake --build . --config Release
-      - cmake --build . --config Release
-  - os: linux
-    compiler: gcc
-    env: plateform='linux32'
-    install:
-      - git submodule update --init --recursive
-      - sudo apt-get install -y gcc-multilib g++-multilib libc6-dev-i386 pkg-config libedit-dev
-    script:
-      - mkdir faust/build/forpd && cd faust/build/forpd
-      - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32 -C../backends/backends.cmake
-      - make --quiet
-      - mkdir ../../../build && cd ../../../build
-      - cmake .. -DCMAKE_C_FLAGS=-m32
       - cmake --build . --config Release
   - os: linux
     compiler: gcc
