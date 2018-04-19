@@ -32,7 +32,7 @@ matrix:
     env: plateform='linux32'
     install:
       - git submodule update --init --recursive
-      - sudo apt-get install -y gcc-multilib libc6-dev-i386 pkg-config libedit-dev
+      - sudo apt-get install -y gcc-multilib g++-multilib libc6-dev-i386 pkg-config libedit-dev
     script:
       - mkdir faust/build/forpd && cd faust/build/forpd
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m32 -C../backends/backends.cmake
