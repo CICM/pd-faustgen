@@ -622,6 +622,15 @@ static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
     }
 }
 
+/*
+static void faust_tilde_save(t_object *x, t_binbuf *bb)
+{
+    binbuf_addv(bb, "ssff", &s__X, gensym("obj"), (float)x->te_xpix, (float)x->te_ypix);
+    binbuf_addbinbuf(bb, x->te_binbuf);
+    obj_saveformat(x, bb);
+    binbuf_addsemi(bb);
+}
+ */
 
 static void faust_tilde_free(t_faust_tilde *x)
 {
@@ -688,8 +697,10 @@ void faust_tilde_setup(void)
         class_addsymbol(c, (t_method)faust_tilde_symbol);
         class_addlist(c, (t_method)faust_tilde_list);
         class_addanything(c, (t_method)faust_tilde_anything);
+        //class_setsavefn(c, (t_savefn)faust_tilde_save);
+        
         CLASS_MAINSIGNALIN(c, t_faust_tilde, f_f);
-    
+        
         logpost(NULL, 3, "Faust website: faust.grame.fr");
         logpost(NULL, 3, "Faust development: GRAME");
         
