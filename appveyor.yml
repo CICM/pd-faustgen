@@ -11,7 +11,7 @@ environment:
 
 install:
     - git submodule update --init --recursive
-//
+
 build_script:
   - git submodule update --init --recursive
   - mkdir faust/build/forpd && cd faust/build/forpd
