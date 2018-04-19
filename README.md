@@ -37,8 +37,6 @@ You can also use HomeBrew or MacPorts on MacOS or APT on Linuxthe compilation of
 ```
 git submodule update --init --recursive
 mkdir faust/build/forpd && cd faust/build/forpd
-export PATH=$PATH:="./llvm/bin"
-export CXXFLAGS="-I./llvm/include"
 cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -C../backends/backends.cmake
 make
 mkdir ../../../build && cd ../../../build
