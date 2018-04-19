@@ -1,9 +1,24 @@
-# faust-pd
-The FAUST compiler embedded in a Pd external
+
+<p align="center">
+  <h1 align="center">
+    faust~
+  </h1>
+  <p align="center">
+    The FAUST compiler embedded in a Pd external
+  </p>
+  <p align="center">
+    <a href="https://travis-ci.org/pierreguillot/faust-pd"><img src="https://img.shields.io/travis/pierreguillot/faust-pd.svg?label=travis" alt="Travis CI"></a>
+    <a href="https://ci.appveyor.com/project/pierreguillot/faust-pd/history"><img src="https://img.shields.io/appveyor/ci/pierreguillot/faust-pd.svg?label=appveyor" alt="Appveyor CI"></a>
+  </p>
+</p>
+
+### Presentation
 
 The pure-data counterpart of the Max external faustgen~. This project is mainly a testing and experimental ground to embed the FAUST compiler with LLVM inside another application. The final goal is to integrate a similar feature in the application KIWI.
 
-## Dependencies
+### Dependencies
+
+- [llvm](http://llvm.org)
 - [faust](https://github.com/grame-cncm/faust.git)
 - [pure-data](https://github.com/pure-data/pure-data.git)
 - [pd.build](https://github.com/pierreguillot/pd.build.git)
