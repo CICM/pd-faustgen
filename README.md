@@ -46,17 +46,6 @@ port install llvm-5.0 +universal
 
 - linux:
 
-## Installing pkg-config
-
-The FAUST compiler requires pkg-config. can also use HomeBrew or MacPorts this application:
-```
-brew install pkg-config
-```
-or
-```
-port install pkgconfig
-```
-
 ## Compilation
 
 - macos:
