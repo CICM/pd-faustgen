@@ -16,7 +16,7 @@ install:
 build_script:
   - mkdir faust\build\forpd && cd faust\build\forpd
   - cmake .. -G "%compiler%"  -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
-  - msbuild faust.sln /t:static /nologo /verbosity:quiet
+  - msbuild faust.sln /t:static /nologo /verbosity:quiet /p:OutDir=../lib/
   - mkdir ..\..\..\build && cd ..\..\..\build
   - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm/lib/cmake/llvm
   - cmake --build . --config Release

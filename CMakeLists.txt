@@ -19,9 +19,15 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 add_library(faust STATIC IMPORTED)
-set_target_properties(faust PROPERTIES
-IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/faust/build/lib/libfaust.a
-INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/faust/architecture")
+if(MSVC)
+  set_target_properties(faust PROPERTIES
+  IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/faust/build/lib/faust.lib
+  INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/faust/architecture")
+else()
+  set_target_properties(faust PROPERTIES
+  IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/faust/build/lib/libfaust.a
+  INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/faust/architecture")
+endif()
 target_link_libraries(faust_tilde_project faust)
 llvm_map_components_to_libnames(llvm_libs all)
 target_link_libraries(faust_tilde_project ${llvm_libs})
