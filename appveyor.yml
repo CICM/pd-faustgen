@@ -11,7 +11,7 @@ environment:
 
 install:
     - git submodule update --init --recursive
-    - curl https://github.com/pierreguillot/llvm-win/releases/download/v0.0.1/llvm-x86-release.zip -o llvm.zip
+    - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v0.0.1/llvm-x86-release.zip -o llvm.zip
     - 7z x llvm.zip
 build_script:
   - git submodule update --init --recursive
