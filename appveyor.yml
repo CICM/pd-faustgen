@@ -11,11 +11,12 @@ environment:
 
 install:
     - git submodule update --init --recursive
-
+    - curl https://github.com/pierreguillot/llvm-win/releases/download/v0.0.1/llvm-x86-release.zip -o llvm.zip
+    - 7z x llvm.zip
 build_script:
   - git submodule update --init --recursive
   - mkdir faust\build\forpd && cd faust\build\forpd
-  - cmake .. -G "%compiler%"  -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=C:\Libraries\llvm-5.0.0 -C..\backends\backends.cmake
+  - cmake .. -G "%compiler%"  -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
   - cmake --build .
   - mkdir ..\..\..\build && cd ..\..\..\build
   - cmake .. -G "%compiler%" -DLLVM_DIR=C:\Libraries\llvm-5.0.0
