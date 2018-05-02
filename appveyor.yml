@@ -18,7 +18,7 @@ build_script:
   - cmake .. -G "%compiler%"  -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
   - cmake --build .
   - mkdir ..\..\..\build && cd ..\..\..\build
-  - cmake .. -G "%compiler%" -DLLVM_DIR=C:\Libraries\llvm-5.0.0
+  - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm/lib/cmake/llvm
   - cmake --build . --config Release
 
 notifications:
