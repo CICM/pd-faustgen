@@ -12,7 +12,8 @@ environment:
 install:
     - git submodule update --init --recursive
     - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v0.0.1/llvm-x86-release.zip -o llvm.zip
-    - 7z x llvm.zip
+    - 7z x llvm.zip llvm-release/include llvm-release/lib
+    - rename llvm-release llvm
 build_script:
   - git submodule update --init --recursive
   - mkdir faust\build\forpd && cd faust\build\forpd
