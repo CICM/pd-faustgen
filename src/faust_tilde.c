@@ -670,6 +670,11 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_compile_options    = NULL;
         faust_tilde_parse_compile_options(x, argc-1, argv+1);
         faust_tilde_reload(x);
+        if(!x->f_dsp_instance)
+        {
+            faust_tilde_free(x);
+            return NULL;
+        }
     }
     return x;
 }
