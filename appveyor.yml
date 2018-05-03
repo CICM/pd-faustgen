@@ -5,9 +5,9 @@ environment:
   - platform: Win32
     compiler: "Visual Studio 14 2015"
     configuration: Release
-  - platform: x64
-    compiler: "Visual Studio 14 2015 Win64"
-    configuration: Release
+  #- platform: x64
+  #  compiler: "Visual Studio 14 2015 Win64"
+  #  configuration: Release
 
 install:
   - git submodule update --init --recursive
@@ -34,7 +34,7 @@ after_build:
 
 artifacts:
   - path: '*.zip'
-  
+
 notifications:
 
   - provider: Email
