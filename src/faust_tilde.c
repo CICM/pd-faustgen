@@ -268,7 +268,7 @@ static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom
 
 static void faust_tilde_free_compile_options(t_faust_tilde *x)
 {
-    int i;
+    size_t i;
     if(x->f_compile_options)
     {
         for(i = 0; i < x->f_ncompile_options; ++i)
@@ -461,7 +461,7 @@ static void faust_tilde_meta_declare(t_faust_tilde* x, const char* key, const ch
 
 static void faust_tilde_reload(t_faust_tilde *x)
 {
-    int i;
+    size_t i;
     char errors[4096];
     int dspstate = canvas_suspend_dsp();
     char* filepath = faust_tilde_get_dsp_file_path(x);
