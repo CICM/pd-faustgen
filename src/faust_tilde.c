@@ -339,7 +339,7 @@ static void faust_tilde_delete_params(t_faust_tilde *x)
 
 static void faust_tilde_save_params(t_faust_tilde *x)
 {
-    int i;
+    size_t i;
     for(i = 0; i < x->f_nparams; ++i)
     {
         x->f_params[i].p_saved = *x->f_params[i].p_zone;
@@ -348,7 +348,7 @@ static void faust_tilde_save_params(t_faust_tilde *x)
 
 static void faust_tilde_restore_params(t_faust_tilde *x)
 {
-    int i;
+    size_t i;
     for(i = 0; i < x->f_nparams; ++i)
     {
         *x->f_params[i].p_zone = x->f_params[i].p_saved;
