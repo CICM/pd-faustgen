@@ -14,13 +14,27 @@ install:
   - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v5.0.0/llvm-x86.zip -o llvm.zip
   - 7z x llvm.zip
 build_script:
+  - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir faust\build\forpd && cd faust\build\forpd
   - cmake .. -G "%compiler%"  -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
   - msbuild faust.sln /nologo /verbosity:quiet /p:OutDir=../lib/
   - mkdir ..\..\..\build && cd ..\..\..\build
   - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm/lib/cmake/llvm
   - cmake --build . --config Release
+after_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - del /F /S /Q /A external\*.pdb
+  - del /F /S /Q /A external\*.ilk
+  - del /F /S /Q /A external\*.lib
+  - copy src\faust_tilde.c external\faust_tilde.c
+  - copy README.md external\readme.md
+  - copy LICENSE external\license.txt
+  - rename external faust_tilde
+  - 7z a faust_tilde-win-32.zip faust_tilde
 
+artifacts:
+  - path: '*.zip'
+  
 notifications:
 
   - provider: Email
