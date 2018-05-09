@@ -393,7 +393,8 @@ static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int cons
     newmemory[size].p_zone  = zone;
     newmemory[size].p_min   = min;
     newmemory[size].p_max   = max;
-    newmemory[size].p_step = step;
+    newmemory[size].p_step  = step;
+    *newmemory[size].p_zone = init;
     x->f_params  = (t_faust_param *)newmemory;
     x->f_nparams++;
 }
