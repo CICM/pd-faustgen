@@ -5,20 +5,23 @@ environment:
   - platform: Win32
     compiler: "Visual Studio 14 2015"
     configuration: Release
+  - platform: Win32
+    compiler: "Visual Studio 14 2015"
+    configuration: Debug
   #- platform: x64
   #  compiler: "Visual Studio 14 2015 Win64"
   #  configuration: Release
 
 install:
   - git submodule update --init --recursive
-  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v5.0.0/llvm-x86.zip -o llvm.zip
+  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v5.0.0/llvm-%platform%-%configuration%.zip -o llvm.zip
   - 7z x llvm.zip
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir faust\build\forpd && cd faust\build\forpd
-  - cmake .. -G "%compiler%"  -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
+  - cmake .. -G "%compiler%" -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm-%platform%-%configuration% -C..\backends\backends.cmake
   - msbuild faust.sln /nologo /verbosity:quiet /p:OutDir=../lib/
-  - mkdir ..\..\..\build && cd ..\..\..\build
+  - msbuild faust.sln /target:ALL_BUILD /p:OutDir=../libs #/p:config=%configuration% /p:plateform=%platform%
   - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm/lib/cmake/llvm
   - cmake --build . --config Release
 after_build:
