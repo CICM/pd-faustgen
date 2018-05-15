@@ -497,7 +497,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
                             getNumOutputsCDSPInstance(x->f_dsp_instance));
                     for (i  = 0; i < x->f_nparams; ++i)
                     {
-                        logpost(x, 3, "             parameter %i: %s", i, x->f_params[i].p_label->s_name);
+                        logpost(x, 3, "             parameter %i: %s", (int)i, x->f_params[i].p_label->s_name);
                     }
                 }
                 
