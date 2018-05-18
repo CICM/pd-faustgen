@@ -27,7 +27,7 @@ about the code in the Pd console.;
 #X text 22 400 fauts~ website: github.com/pierreguillot/faust-pd;
 #X text 22 430 This object is inspired by faustgen~ for Max developed
 Martin Di Rollo and Stéphane Letz., f 45;
-#X obj 177 287 faust~ noise -vs 64;
+#X obj 177 287 faust~ noise -vs 64 -vec;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;
 #X connect 5 0 4 1;
