@@ -28,7 +28,7 @@ build_script:
   - cmake --build . --config %configuration%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - remove llvm.zip
+  - del llvm.zip
   - del /F /S /Q /A external\*.pdb
   - del /F /S /Q /A external\*.ilk
   - del /F /S /Q /A external\*.lib
