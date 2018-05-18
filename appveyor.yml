@@ -21,7 +21,7 @@ build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir faust\build\forpd && cd faust\build\forpd
   - cmake .. -G "%compiler%" -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
-  - msbuild faust.sln /nologo /target:staticlib /p:OutDir=..\libs #/p:config=%configuration% /p:plateform=%platform%
+  - msbuild faust.sln /nologo /target:staticlib /p:OutDir=..\libs\ #/p:config=%configuration% /p:plateform=%platform%
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build && cd build
   - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm/lib/cmake/llvm
