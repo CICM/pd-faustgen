@@ -15,7 +15,9 @@ matrix:
     install:
       - git submodule update --init --recursive
       - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
+      # - curl -o ./llvm.tar.gz  http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz
       - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
+      # - tar zxvf ./llvm.tar.gz && mv clang+llvm-6.0.0-x86_64-apple-darwin llvm
     script:
       - mkdir faust/build/forpd && cd faust/build/forpd
       - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
