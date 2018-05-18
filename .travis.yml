@@ -25,6 +25,10 @@ matrix:
       - mkdir ../../../build && cd ../../../build
       - cmake .. -GXcode -DLLVM_DIR=./llvm/lib/cmake/llvm
       - cmake --build . --config Release
+    before_deploy:
+      - cd $TRAVIS_BUILD_DIR
+      - cp -r faust/libraries external/libs
+      - zip -r faust_pd_macos64.zip Camomile
   - os: linux
     compiler: gcc
     env: plateform='linux64'
@@ -38,3 +42,7 @@ matrix:
       - mkdir ../../../build && cd ../../../build
       - cmake .. -DCMAKE_C_FLAGS=-m64
       - cmake --build . --config Release
+    before_deploy:
+      - cd $TRAVIS_BUILD_DIR
+      - cp -r faust/libraries external/libs
+      - zip -r faust_pd_linux64.zip Camomile
