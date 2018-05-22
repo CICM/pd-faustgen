@@ -214,7 +214,7 @@ static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom
                 else if(argv[i].a_type == A_SYMBOL && argv[i].a_w.w_symbol)
                 {
                     sprintf(x->f_compile_options[i], "%s", argv[i].a_w.w_symbol->s_name);
-                    if(!strncmp(x->f_compile_options[i], "-I", MAXPDSTRING))
+                    if(!strncmp(x->f_compile_options[i], "-I", 2))
                     {
                         has_include = 1;
                     }
@@ -460,6 +460,17 @@ static void faust_tilde_meta_declare(t_faust_tilde* x, const char* key, const ch
     logpost(x, 3, "             %s: %s", key, value);
 }
 
+static void faust_tilde_print(t_faust_tilde *x)
+{
+    size_t i;
+    startpost("faust~: compile options\n");
+    for(i = 0; i < x->f_ncompile_options; i++)
+    {
+        poststring(x->f_compile_options[i]);
+    }
+    endpost();
+}
+
 static void faust_tilde_reload(t_faust_tilde *x)
 {
     size_t i;
@@ -472,7 +483,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
         faust_tilde_delete_factory(x);
         faust_tilde_delete_params(x);
         x->f_dsp_factory = createCDSPFactoryFromFile(filepath,
-                                                     x->f_ncompile_options, (const char**)x->f_compile_options,
+                                                     (int)x->f_ncompile_options, (const char**)x->f_compile_options,
                                                      "", errors, -1);
         if(strnlen(errors, 4096))
         {
@@ -689,6 +700,7 @@ EXTERN void faust_tilde_setup(void)
     {
         class_addmethod(c, (t_method)faust_tilde_dsp, gensym("dsp"), A_CANT);
         class_addmethod(c, (t_method)faust_tilde_reload, gensym("reload"), A_NULL);
+        class_addmethod(c, (t_method)faust_tilde_print, gensym("print"), A_NULL);
         class_addbang(c, (t_method)faust_tilde_bang);
         class_addsymbol(c, (t_method)faust_tilde_symbol);
         class_addlist(c, (t_method)faust_tilde_list);
