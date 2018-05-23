@@ -691,7 +691,7 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
     return x;
 }
 
-EXTERN void faust_tilde_setup(void)
+void faust_tilde_setup(void)
 {
     t_class* c = class_new(gensym("faust~"),
                            (t_newmethod)faust_tilde_new, (t_method)faust_tilde_free,
