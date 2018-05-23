@@ -628,7 +628,7 @@ static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
                 x->f_signals[i] = sp[i]->s_vec;
             }
             dsp_add((t_perfroutine)faust_tilde_perform, 4,
-                    x->f_dsp_instance, sp[0]->s_n, x->f_signals, x->f_signals+ninlets);
+                   (t_int)x->f_dsp_instance, (t_int)sp[0]->s_n, (t_int)x->f_signals, (t_int)x->f_signals+ninlets);
             faust_tilde_restore_params(x);
         }
     }

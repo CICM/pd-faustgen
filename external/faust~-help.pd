@@ -1,4 +1,4 @@
-#N canvas 582 298 432 488 10;
+#N canvas 582 298 432 464 10;
 #X obj 7 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
 #X text 5 28 The FAUST compiler embedded in a Pd external.;
@@ -27,7 +27,7 @@ about the code in the Pd console.;
 #X text 22 400 fauts~ website: github.com/pierreguillot/faust-pd;
 #X text 22 430 This object is inspired by faustgen~ for Max developed
 Martin Di Rollo and Stéphane Letz., f 45;
-#X obj 177 287 faust~ noise -vs 64 -vec;
+#X obj 177 287 faust~ noise -vs 64;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;
 #X connect 5 0 4 1;
