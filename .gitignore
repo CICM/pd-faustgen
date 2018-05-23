@@ -53,6 +53,8 @@ dkms.conf
 
 # CMake & Build System
 /build/
+/build64/
+/build32/
 /llvm/
 *.tar.gz
 
