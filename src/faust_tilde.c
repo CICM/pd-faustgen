@@ -6,7 +6,6 @@
 
 #include <m_pd.h>
 
-#include <m_imp.h>
 #include <g_canvas.h>
 #include <string.h>
 
@@ -28,6 +27,7 @@ typedef struct _faust_tilde
     t_object            f_obj;
     llvm_dsp_factory*   f_dsp_factory;
     llvm_dsp*           f_dsp_instance;
+    size_t              f_nsignals;
     t_sample**          f_signals;
     t_float             f_f;
     
@@ -41,6 +41,11 @@ typedef struct _faust_tilde
     
     size_t              f_ncompile_options;
     char**              f_compile_options;
+    
+    size_t              f_ninlets;
+    t_inlet**           f_inlets;
+    size_t              f_noutlets;
+    t_outlet**          f_outlets;
 } t_faust_tilde;
 
 static t_class *faust_tilde_class;
@@ -49,89 +54,75 @@ static t_class *faust_tilde_class;
 //                                      PURE DATA IO DYNAMIC                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct _inlet
+static char faust_tilde_resize_inputs(t_faust_tilde *x, int const nins)
 {
-    t_pd i_pd;
-    struct _inlet *i_next;
-};
-
-struct _outlet
-{
-    t_object *o_owner;
-    struct _outlet *o_next;
-};
-
-static int faust_tilde_get_ninlets(t_faust_tilde *x)
-{
-    return obj_nsiginlets((t_object *)x) > 1 ? obj_nsiginlets((t_object *)x) : 1;
+    t_inlet** ninlets;
+    size_t i;
+    size_t const rnins = (size_t)nins > 1 ? (size_t)nins : 1;
+    for(i = rnins; i < x->f_ninlets; ++i)
+    {
+        inlet_free(x->f_inlets[i]);
+    }
+    ninlets = (t_inlet **)resizebytes(x->f_inlets, sizeof(t_inlet*) * x->f_ninlets, sizeof(t_inlet*) * rnins);
+    if(ninlets)
+    {
+        for(i = x->f_ninlets ? x->f_ninlets : 1; i < rnins; ++i)
+        {
+            ninlets[i] = signalinlet_new((t_object *)x, 0);
+        }
+        x->f_inlets = ninlets;
+        x->f_ninlets = rnins;
+        return 0;
+    }
+    pd_error(x, "faust~: memory allocation failed - inputs");
+    return 1;
 }
 
-static int faust_tilde_get_noutlets(t_faust_tilde *x)
+static char faust_tilde_resize_outputs(t_faust_tilde *x, int const nins)
 {
-    return obj_nsigoutlets((t_object *)x);
+    t_outlet** noutlets;
+    size_t i;
+    size_t const rnouts = (size_t)nins > 0 ? (size_t)nins : 0;
+    for(i = rnouts; i < x->f_noutlets; ++i)
+    {
+        outlet_free(x->f_outlets[i]);
+    }
+    noutlets = (t_outlet **)resizebytes(x->f_outlets, sizeof(t_outlet*) * x->f_noutlets, sizeof(t_outlet*) * rnouts);
+    if(noutlets)
+    {
+        for(i = x->f_noutlets; i < rnouts; ++i)
+        {
+            outlet_new((t_object *)x, &s_signal);
+        }
+        x->f_outlets = noutlets;
+        x->f_noutlets = rnouts;
+        return 0;
+    }
+    pd_error(x, "faust~: memory allocation failed - outputs");
+    return 1;
 }
 
 static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int const nouts)
 {
-    int i;
-    struct _inlet *icurrent = NULL, *inext = NULL;
-    struct _outlet *ocurrent = NULL, *onext = NULL;
-    int const rnins   = nins > 1 ? nins : 1;
-    int const rnouts  = nouts > 0 ? nouts : 0;
-    int const cinlts  = faust_tilde_get_ninlets(x);
-    int const coutlts = faust_tilde_get_noutlets(x);
+    char valid = 0;
+    t_sample** nsignals;
     
-    for(i = cinlts; i < rnins; i++)
+    valid = faust_tilde_resize_inputs(x, nins) ? 1 : valid;
+    valid = faust_tilde_resize_outputs(x, nouts) ? 1 : valid;
+    nsignals = (t_sample **)resizebytes(x->f_signals,
+                                        x->f_nsignals * sizeof(t_sample *),
+                                        (x->f_noutlets + x->f_ninlets) * sizeof(t_sample *));
+    if(nsignals)
     {
-        signalinlet_new((t_object *)x, 0);
+        x->f_nsignals = x->f_noutlets + x->f_ninlets;
+        x->f_signals  = nsignals;
+        canvas_fixlinesfor(x->f_canvas, (t_text *)x);
+        return valid;
     }
-    icurrent = ((t_object *)x)->te_inlet;
-    for(i = 0; i < rnins && icurrent; ++i)
-    {
-        icurrent = icurrent->i_next;
-    }
-    for(; i < cinlts && icurrent; ++i)
-    {
-        inext = icurrent->i_next;
-        inlet_free(icurrent);
-        icurrent = inext;
-    }
-    
-    for(i = coutlts; i < rnouts; i++)
-    {
-        outlet_new((t_object *)x, &s_signal);
-    }
-    ocurrent = ((t_object *)x)->te_outlet;
-    for(i = 0; i < rnouts && ocurrent; ++i)
-    {
-        ocurrent = ocurrent->o_next;
-    }
-    for(; i < coutlts && ocurrent; ++i)
-    {
-        onext = ocurrent->o_next;
-        outlet_free(ocurrent);
-        ocurrent = onext;
-    }
-    if(!rnouts)
-    {
-        ((t_object *)x)->te_outlet = NULL;
-    }
-    
-    if(x->f_signals)
-    {
-        freebytes(x->f_signals, (cinlts + coutlts) * sizeof(t_sample *));
-        x->f_signals = NULL;
-    }
-    x->f_signals = getbytes((rnins + rnouts) * sizeof(t_sample *));
-    if(!x->f_signals)
-    {
-        pd_error(x, "faust~: memory allocation failed - signals");
-        return 1;
-    }
+    pd_error(x, "faust~: memory allocation failed - signals");
     canvas_fixlinesfor(x->f_canvas, (t_text *)x);
-    return 0;
+    return 1;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          FILE LOCALIZATION                                   //
@@ -504,7 +495,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
                     
                     logpost(x, 3, "             %s: %i", "number of inputs",
                             getNumInputsCDSPInstance(x->f_dsp_instance));
-                    logpost(x, 3, "             %s: %i", "number of inputs",
+                    logpost(x, 3, "             %s: %i", "number of outputs",
                             getNumOutputsCDSPInstance(x->f_dsp_instance));
                     for (i  = 0; i < x->f_nparams; ++i)
                     {
@@ -615,8 +606,8 @@ t_int *faust_tilde_perform(t_int *w)
 static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
 {
     int i;
-    int const ninlets = faust_tilde_get_ninlets(x);
-    int const noutlets = faust_tilde_get_noutlets(x);
+    int const ninlets = (int)x->f_ninlets;
+    int const noutlets = (int)x->f_noutlets;
     if(x->f_dsp_instance)
     {
         if(x->f_signals)
@@ -649,6 +640,7 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
     {
         x->f_dsp_factory    = NULL;
         x->f_dsp_instance   = NULL;
+        x->f_nsignals       = 0;
         x->f_signals        = NULL;
         x->f_f              = 0;
         
@@ -680,6 +672,11 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         
         x->f_ncompile_options   = 0;
         x->f_compile_options    = NULL;
+        
+        x->f_ninlets        = 0;
+        x->f_inlets         = NULL;
+        x->f_noutlets       = 0;
+        x->f_outlets        = NULL;
         faust_tilde_parse_compile_options(x, argc-1, argv+1);
         faust_tilde_reload(x);
         if(!x->f_dsp_instance)
