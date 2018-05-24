@@ -16,8 +16,8 @@ matrix:
     - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
     script:
     - mkdir faust/build/forpd && cd faust/build/forpd
-    - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
-    - make --quiet
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
+    - make staticlib
     - mkdir ../../../build && cd ../../../build
     - cmake .. -GXcode -DLLVM_DIR=./llvm/lib/cmake/llvm
     - cmake --build . --config Release
@@ -29,9 +29,9 @@ matrix:
     - sudo apt-get install -y pkg-config libedit-dev
     script:
     - mkdir faust/build/forpd && cd faust/build/forpd
-    - cmake .. -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
       -C../backends/backends.cmake
-    - make --quiet
+    - make staticlib
     - mkdir ../../../build && cd ../../../build
     - cmake .. -DCMAKE_C_FLAGS=-m64
     - cmake --build . --config Release
