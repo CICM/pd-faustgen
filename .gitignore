@@ -52,10 +52,8 @@ Mkfile.old
 dkms.conf
 
 # CMake & Build System
-/build/
-/build64/
-/build32/
-/llvm/
+/build*/
+/llvm*/
 *.tar.gz
 
 # pure-data
