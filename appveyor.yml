@@ -4,28 +4,28 @@ environment:
   matrix:
   - platform: Win32
     compiler: "Visual Studio 14 2015"
-    configuration: Release
-  - platform: Win32
-    compiler: "Visual Studio 14 2015"
     configuration: Debug
-  #- platform: x64
-  #  compiler: "Visual Studio 14 2015 Win64"
-  #  configuration: Release
+    llvm: 6.0.0
+    llvmplateform: x86
+  - platform: x64
+    compiler: "Visual Studio 14 2015 Win64"
+    configuration: Debug
+    llvmversion: 6.0.0
+    llvmplateform: x64
 
 install:
   - git submodule update --init --recursive
-  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v5.0.0/llvm-%platform%-%configuration%.zip -o llvm.zip
+  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/%llvmversion%/llvm%llvmversion%-windows-%llvmplateform%-mtd.zip -o llvm.zip
   - 7z x llvm.zip
-  - rename llvm-%platform%-%configuration% llvm
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - mkdir faust\build\forpd && cd faust\build\forpd
-  - cmake .. -G "%compiler%" -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm/lib/cmake/llvm -C..\backends\backends.cmake
-  - msbuild faust.sln /nologo /target:staticlib /p:OutDir=..\lib\ #/p:config=%configuration% /p:plateform=%platform%
+  - mkdir faust\build\forpd%llvmplateform% && cd faust\build\forpd%llvmplateform%
+  - cmake .. -G %compiler% -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm%llvmversion%-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm -C..\backends\backends.cmake
+  - msbuild faust.sln /nologo /p:OutDir=../lib%llvmplateform%/ /p:config=%configuration% /p:plateform=%platform% /target:staticlib
   - cd %APPVEYOR_BUILD_FOLDER%
-  - mkdir build && cd build
-  - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm/lib/cmake/llvm
-  - cmake --build . --config %configuration%
+  - mkdir build%llvmplateform% && cd build%llvmplateform%
+  - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm%llvmversion%-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm -DLIBFAUST_PATH=./../faust/build/lib%llvmplateform%
+  - msbuild faust~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - del /F /Q llvm.zip
@@ -36,7 +36,7 @@ after_build:
   - copy README.md external\readme.md
   - copy LICENSE external\license.txt
   - rename external faust_tilde
-  - 7z a faust_tilde-win-32.zip faust_tilde
+  - 7z a faust_tilde-win-%llvmplateform%.zip faust_tilde
 
 artifacts:
   - path: '*.zip'
