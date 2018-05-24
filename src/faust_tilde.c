@@ -53,6 +53,27 @@ static t_class *faust_tilde_class;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                      PURE DATA IO DYNAMIC                                    //
 //////////////////////////////////////////////////////////////////////////////////////////////////
+static void faust_tilde_free_ioputs(t_faust_tilde *x)
+{
+    if(x->f_inlets)
+    {
+        freebytes(x->f_inlets, sizeof(t_inlet*) * x->f_ninlets);
+        x->f_inlets  = NULL;
+        x->f_ninlets = 0;
+    }
+    if(x->f_outlets)
+    {
+        freebytes(x->f_outlets, sizeof(t_outlet*) * x->f_noutlets);
+        x->f_outlets  = NULL;
+        x->f_noutlets = 0;
+    }
+    if(x->f_signals)
+    {
+        freebytes(x->f_signals, sizeof(t_sample*) * x->f_nsignals);
+        x->f_signals  = NULL;
+        x->f_nsignals = 0;
+    }
+}
 
 static char faust_tilde_resize_inputs(t_faust_tilde *x, int const nins)
 {
@@ -631,6 +652,7 @@ static void faust_tilde_free(t_faust_tilde *x)
     faust_tilde_delete_factory(x);
     faust_tilde_delete_params(x);
     faust_tilde_free_compile_options(x);
+    faust_tilde_free_ioputs(x);
 }
 
 static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
