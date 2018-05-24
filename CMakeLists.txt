@@ -9,17 +9,13 @@ project(faust~ C)
 
 if(MSVC)
     set(CompilerFlags
-        CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS
-        CMAKE_C_FLAGS_DEBUG
-        CMAKE_C_FLAGS_RELEASE)
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
     foreach(CompilerFlag ${CompilerFlags})
       string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-      string(REPLACE "/MDd" "/MTd" ${CompilerFlag} "${${CompilerFlag}}")
     endforeach()
 endif()
+
 set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
 set_pd_external_path("${PROJECT_SOURCE_DIR}/external/")
 add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde.c)
@@ -56,6 +52,9 @@ target_link_libraries(faust_tilde_project faust)
 llvm_map_components_to_libnames(llvm_libs all)
 list(REMOVE_ITEM llvm_libs LTO)
 target_link_libraries(faust_tilde_project ${llvm_libs})
+
 if(WIN32)
   target_link_libraries(faust_tilde_project ws2_32)
+#  target_link_libraries(faust_tilde_project msvcrt)
+#  target_link_libraries(faust_tilde_project oldnames)
 endif()
