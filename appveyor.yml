@@ -15,7 +15,7 @@ environment:
 
 install:
   - git submodule update --init --recursive
-  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/%llvmversion%/llvm%llvmversion%-windows-%llvmplateform%-mtd.zip -o llvm.zip
+  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v%llvmversion%/llvm%llvmversion%-windows-%llvmplateform%-mtd.zip -o llvm.zip
   - 7z x llvm.zip
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
