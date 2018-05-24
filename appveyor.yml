@@ -20,7 +20,7 @@ install:
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir faust\build\forpd%llvmplateform% && cd faust\build\forpd%llvmplateform%
-  - cmake .. -G %compiler% -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm%llvmversion%-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm -C..\backends\backends.cmake
+  - cmake .. -G "%compiler%" -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm%llvmversion%-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm -C..\backends\backends.cmake
   - msbuild faust.sln /nologo /p:OutDir=../lib%llvmplateform%/ /p:config=%configuration% /p:plateform=%platform% /target:staticlib
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build%llvmplateform% && cd build%llvmplateform%
