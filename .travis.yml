@@ -16,7 +16,7 @@ matrix:
     - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
     script:
     - mkdir build && cd build
-    - cmake .. -GXcode -DLLVM_DIR=./llvm/lib/cmake/llvm
+    - cmake .. -GXcode -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
     - cmake --build . --config Release --target faust_tilde_project
   - os: linux
     compiler: gcc
