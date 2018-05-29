@@ -13,8 +13,10 @@ message(STATUS "Faust Library")
 
 ## Hardcoded targets for faust
 set(INCLUDE_STATIC  ON)
-set(INCLUDE_OSC     OFF)
-set(INCLUDE_HTTP    OFF)
+set(INCLUDE_EXECUTABLE  OFF)
+set(INCLUDE_DYNAMIC     OFF)
+set(INCLUDE_OSC         OFF)
+set(INCLUDE_HTTP        OFF)
 
 ## Save the llvm directory and change it for subdirectory
 if(NOT USE_LLVM_CONFIG)
