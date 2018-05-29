@@ -29,7 +29,7 @@ set(INCLUDE_OSC         OFF)
 set(INCLUDE_HTTP        OFF)
 
 ## Save the llvm directory and change it for subdirectory
-if(NOT USE_LLVM_CONFIG)
+if(NOT (DEFINED LLVM_DIR))
   set(LLVM_DIR_TEMP   ${LLVM_DIR})
   set(LLVM_DIR        "./../.${LLVM_DIR_TEMP}")
 endif()
@@ -51,7 +51,7 @@ set(WASM_BACKEND   OFF                            CACHE STRING  "Include WASM ba
 add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
 
 ## Restore llvm directory
-if(NOT USE_LLVM_CONFIG)
+if(NOT (DEFINED LLVM_DIR))
   set(LLVM_DIR ${LLVM_DIR_TEMP})
 endif()
 
@@ -67,6 +67,19 @@ add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde
 include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
 add_dependencies(faust_tilde_project staticlib)
 target_link_libraries(faust_tilde_project ${staticlib})
+if(WIN32)
+  target_link_libraries(faust_tilde_project ws2_32)
+endif()
+
+if(MSVC)
+    add_library(faust_lib STATIC IMPORTED)
+    set_target_properties(faust_lib PROPERTIES
+    IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/faust/build/lib/faust.lib
+    IMPORTED_LOCATION_DEBUG ${PROJECT_SOURCE_DIR}/faust/build/lib/Debug/faust.lib
+    IMPORTED_LOCATION_RELEASE ${PROJECT_SOURCE_DIR}/faust/build/lib/Release/faust.lib
+    INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/faust/architecture")
+    target_link_libraries(faust_tilde_project faust_lib)
+endif()
 
 ## Link the Pure Data external with llvm
 find_package(LLVM REQUIRED CONFIG)
