@@ -19,7 +19,7 @@ install:
   - 7z x llvm.zip
 build_script:
   - mkdir build%llvmplateform% && cd build%llvmplateform%
-  - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm
+  - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../llvm-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm
   - msbuild faust~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
