@@ -29,7 +29,7 @@ set(INCLUDE_OSC         OFF)
 set(INCLUDE_HTTP        OFF)
 
 ## Save the llvm directory and change it for subdirectory
-if(NOT DEFINED LLVM_DIR)
+if(DEFINED LLVM_DIR)
   set(LLVM_DIR_TEMP   ${LLVM_DIR})
   set(LLVM_DIR        "./../.${LLVM_DIR_TEMP}")
 endif()
@@ -51,7 +51,7 @@ set(WASM_BACKEND   OFF                            CACHE STRING  "Include WASM ba
 add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
 
 ## Restore llvm directory
-if(NOT DEFINED LLVM_DIR)
+if(DEFINED LLVM_DIR)
   set(LLVM_DIR ${LLVM_DIR_TEMP})
 endif()
 
