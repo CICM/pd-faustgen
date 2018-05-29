@@ -15,16 +15,11 @@ environment:
 
 install:
   - git submodule update --init --recursive
-  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v6.0.0/llvm6.0.0-windows-x86-mtd.zip https://github.com/pierreguillot/llvm-win/releases/download/v%llvmversion%/llvm%llvmversion%-windows-%llvmplateform%-mtd.zip -o llvm.zip
+  - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v%llvmversion%/llvm-windows-%llvmplateform%-mtd.zip -o llvm.zip
   - 7z x llvm.zip
 build_script:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - mkdir faust\build\forpd%llvmplateform% && cd faust\build\forpd%llvmplateform%
-  - cmake .. -G "%compiler%" -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./../../llvm%llvmversion%-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm -C..\backends\backends.cmake
-  - msbuild faust.sln /nologo /p:OutDir=../lib%llvmplateform%/ /p:config=%configuration% /p:plateform=%platform% /target:staticlib
-  - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build%llvmplateform% && cd build%llvmplateform%
-  - cmake .. -G "%compiler%" -DLLVM_DIR=./llvm%llvmversion%-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm -DLIBFAUST_PATH=./../faust/build/lib%llvmplateform%
+  - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm-windows-%llvmplateform%-mtd.zip/lib/cmake/llvm
   - msbuild faust~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
