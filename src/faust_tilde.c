@@ -79,15 +79,16 @@ static char faust_tilde_resize_inputs(t_faust_tilde *x, int const nins)
 {
     t_inlet** ninlets;
     size_t i;
+    size_t const cins = x->f_ninlets > 1 ? x->f_ninlets : 1;
     size_t const rnins = (size_t)nins > 1 ? (size_t)nins : 1;
-    for(i = rnins; i < x->f_ninlets; ++i)
+    for(i = rnins; i < cins; ++i)
     {
         inlet_free(x->f_inlets[i]);
     }
-    ninlets = (t_inlet **)resizebytes(x->f_inlets, sizeof(t_inlet*) * x->f_ninlets, sizeof(t_inlet*) * rnins);
+    ninlets = (t_inlet **)resizebytes(x->f_inlets, sizeof(t_inlet*) * cins, sizeof(t_inlet*) * rnins);
     if(ninlets)
     {
-        for(i = x->f_ninlets ? x->f_ninlets : 1; i < rnins; ++i)
+        for(i = cins; i < rnins; ++i)
         {
             ninlets[i] = signalinlet_new((t_object *)x, 0);
         }
@@ -103,15 +104,16 @@ static char faust_tilde_resize_outputs(t_faust_tilde *x, int const nins)
 {
     t_outlet** noutlets;
     size_t i;
+    size_t const couts = x->f_noutlets;
     size_t const rnouts = (size_t)nins > 0 ? (size_t)nins : 0;
-    for(i = rnouts; i < x->f_noutlets; ++i)
+    for(i = rnouts; i < couts; ++i)
     {
         outlet_free(x->f_outlets[i]);
     }
-    noutlets = (t_outlet **)resizebytes(x->f_outlets, sizeof(t_outlet*) * x->f_noutlets, sizeof(t_outlet*) * rnouts);
+    noutlets = (t_outlet **)resizebytes(x->f_outlets, sizeof(t_outlet*) * couts, sizeof(t_outlet*) * rnouts);
     if(noutlets)
     {
-        for(i = x->f_noutlets; i < rnouts; ++i)
+        for(i = couts; i < rnouts; ++i)
         {
             outlet_new((t_object *)x, &s_signal);
         }
@@ -616,33 +618,62 @@ static void faust_tilde_list(t_faust_tilde *x, t_symbol* s, int argc, t_atom* ar
     faust_tilde_anything(x, s, argc, argv);
 }
 
-
-
-t_int *faust_tilde_perform(t_int *w)
+static t_int *faust_tilde_perform(t_int *w)
 {
     computeCDSPInstance((llvm_dsp *)w[1], (int)w[2], (float **)w[3], (float **)w[4]);
     return (w+5);
 }
 
+static char faust_tilde_is_valid(t_faust_tilde *x)
+{
+    size_t fnins, fnouts;
+    if(!x->f_dsp_instance)
+    {
+        return -1;
+    }
+    fnins = (size_t)getNumInputsCDSPInstance(x->f_dsp_instance);
+    fnouts = (size_t)getNumOutputsCDSPInstance(x->f_dsp_instance);
+    if(fnins == 0)
+        fnins = 1;
+    if(fnins != x->f_ninlets)
+    {
+        pd_error(x, "faust~: number of inlets is invalid");
+        return -1;
+    }
+    if(fnouts!= x->f_noutlets)
+    {
+        pd_error(x, "faust~: number of outlets is invalid");
+        return -1;
+    }
+    if(x->f_nsignals != x->f_ninlets + x->f_ninlets)
+    {
+        pd_error(x, "faust~: number of signals is invalid");
+        return -1;
+    }
+    if(!x->f_signals)
+    {
+        pd_error(x, "faust~: signals are not allocated");
+        return -1;
+    }
+    return 0;
+}
+
 static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
 {
-    int i;
-    int const ninlets = (int)x->f_ninlets;
-    int const noutlets = (int)x->f_noutlets;
-    if(x->f_dsp_instance)
+    size_t i;
+    size_t const ninlets = x->f_ninlets;
+    size_t const noutlets = x->f_noutlets;
+    if(!faust_tilde_is_valid(x))
     {
-        if(x->f_signals)
+        faust_tilde_save_params(x);
+        initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
+        for(i = 0; i < ninlets + noutlets; ++i)
         {
-            faust_tilde_save_params(x);
-            initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
-            for(i = 0; i < ninlets + noutlets; ++i)
-            {
-                x->f_signals[i] = sp[i]->s_vec;
-            }
-            dsp_add((t_perfroutine)faust_tilde_perform, 4,
-                   (t_int)x->f_dsp_instance, (t_int)sp[0]->s_n, (t_int)x->f_signals, (t_int)x->f_signals+ninlets);
-            faust_tilde_restore_params(x);
+            x->f_signals[i] = sp[i]->s_vec;
         }
+        dsp_add((t_perfroutine)faust_tilde_perform, 4,
+                (t_int)x->f_dsp_instance, (t_int)sp[0]->s_n, (t_int)x->f_signals, (t_int)(x->f_signals+ninlets));
+        faust_tilde_restore_params(x);
     }
 }
 
