@@ -5,20 +5,24 @@ set(CMAKE_MACOSX_RPATH Off)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
 
 include(pd.build/pd.cmake)
-include(ExternalProject)
 
 project(faust~ C)
 
 ## Create Faust Lib
 message(STATUS "Faust Library")
+
+## Hardcoded targets for faust
 set(INCLUDE_STATIC  ON)
 set(INCLUDE_OSC     OFF)
 set(INCLUDE_HTTP    OFF)
+
+## Save the llvm directory and change it for subdirectory
 if(NOT USE_LLVM_CONFIG)
   set(LLVM_DIR_TEMP   ${LLVM_DIR})
   set(LLVM_DIR        "./../.${LLVM_DIR_TEMP}")
 endif()
 
+## Hardcoded backends for faust
 set(ASMJS_BACKEND  OFF                            CACHE STRING  "Include ASMJS backend" FORCE)
 set(C_BACKEND      OFF                            CACHE STRING  "Include C backend"         FORCE)
 set(CPP_BACKEND    OFF                            CACHE STRING  "Include CPP backend"       FORCE)
@@ -31,7 +35,10 @@ set(OLDCPP_BACKEND OFF                            CACHE STRING  "Include old CPP
 set(RUST_BACKEND   OFF                            CACHE STRING  "Include RUST backend"      FORCE)
 set(WASM_BACKEND   OFF                            CACHE STRING  "Include WASM backend"  FORCE)
 
+## Call the faust cmakelist.txt
 add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
+
+## Restore llvm directory
 if(NOT USE_LLVM_CONFIG)
   set(LLVM_DIR ${LLVM_DIR_TEMP})
 endif()
@@ -39,6 +46,7 @@ endif()
 ## Create Faust~
 message(STATUS "Faust External")
 
+## For Windows use static runtime instead of default dynamic runtime
 if(MSVC)
     set(CompilerFlags
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -48,14 +56,17 @@ if(MSVC)
     endforeach()
 endif()
 
+## Create the Pure Data external
 set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
 set_pd_external_path("${PROJECT_SOURCE_DIR}/external/")
 add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde.c)
 
+## Link the Pure Data external with faustlib
 include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
 add_dependencies(faust_tilde_project staticlib)
 target_link_libraries(faust_tilde_project ${staticlib})
 
+## Link the Pure Data external with llvm
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
