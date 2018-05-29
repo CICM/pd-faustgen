@@ -14,10 +14,6 @@ message(STATUS "Faust Library")
 set(INCLUDE_STATIC  ON)
 set(INCLUDE_OSC     OFF)
 set(INCLUDE_HTTP    OFF)
-if(NOT USE_LLVM_CONFIG)
-  set(LLVM_DIR_TEMP   ${LLVM_DIR})
-  set(LLVM_DIR        "./../.${LLVM_DIR_TEMP}")
-endif()
 
 set(ASMJS_BACKEND  OFF                            CACHE STRING  "Include ASMJS backend" FORCE)
 set(C_BACKEND      OFF                            CACHE STRING  "Include C backend"         FORCE)
@@ -32,12 +28,9 @@ set(RUST_BACKEND   OFF                            CACHE STRING  "Include RUST ba
 set(WASM_BACKEND   OFF                            CACHE STRING  "Include WASM backend"  FORCE)
 
 add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
-if(NOT USE_LLVM_CONFIG)
-  set(LLVM_DIR ${LLVM_DIR_TEMP})
-endif()
 
 ## Create Faust~
-message(STATUS "Faust Library")
+message(STATUS "Faust External")
 
 if(MSVC)
     set(CompilerFlags
