@@ -52,14 +52,16 @@ set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
 set_pd_external_path("${PROJECT_SOURCE_DIR}/external/")
 add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde.c)
 
+include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
+add_dependencies(faust_tilde_project staticlib)
+target_link_libraries(faust_tilde_project ${staticlib})
+
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
-include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
-target_link_libraries(faust_tilde_project staticlib)
 llvm_map_components_to_libnames(llvm_libs all)
 list(REMOVE_ITEM llvm_libs LTO)
 target_link_libraries(faust_tilde_project ${llvm_libs})
