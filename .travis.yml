@@ -15,12 +15,9 @@ matrix:
     - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
     - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
     script:
-    - mkdir faust/build/forpd && cd faust/build/forpd
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DUSE_LLVM_CONFIG=off -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DLLVM_DIR=./../../llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -C../backends/backends.cmake
-    - make staticlib
-    - mkdir ../../../build && cd ../../../build
+    - mkdir build && cd build
     - cmake .. -GXcode -DLLVM_DIR=./llvm/lib/cmake/llvm
-    - cmake --build . --config Release
+    - cmake --build . --config Release --target faust_tilde_project
   - os: linux
     compiler: gcc
     env: release='faust_tilde_linux64'
@@ -28,13 +25,9 @@ matrix:
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
     script:
-    - mkdir faust/build/forpd && cd faust/build/forpd
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DINCLUDE_STATIC=on -DINCLUDE_OSC=off -DINCLUDE_HTTP=off -DCMAKE_C_FLAGS=-m64
-      -C../backends/backends.cmake
-    - make staticlib
-    - mkdir ../../../build && cd ../../../build
+    - mkdir build && cd build
     - cmake .. -DCMAKE_C_FLAGS=-m64
-    - cmake --build . --config Release
+    - cmake --build . --config Release --target faust_tilde_project
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
   - cp -r faust/libraries external/libs
