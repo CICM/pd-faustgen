@@ -1,4 +1,4 @@
-#N canvas 582 298 432 464 10;
+#N canvas 582 298 433 477 10;
 #X obj 7 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
 #X text 5 28 The FAUST compiler embedded in a Pd external.;
@@ -9,7 +9,7 @@
 #X obj 27 257 faust~ noise;
 #X msg 57 220 reload;
 #X obj 27 170 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 0 256;
+-1 -1 0.15 256;
 #X msg 27 189 Volume \$1;
 #X obj 27 128 loadbang;
 #X msg 27 149 0;
