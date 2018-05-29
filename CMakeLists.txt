@@ -8,6 +8,16 @@ include(pd.build/pd.cmake)
 
 project(faust~ C)
 
+## For Windows use static runtime instead of default dynamic runtime
+if(MSVC)
+    set(CompilerFlags
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
+    foreach(CompilerFlag ${CompilerFlags})
+      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+    endforeach()
+endif()
+
 ## Create Faust Lib
 message(STATUS "Faust Library")
 
@@ -47,16 +57,6 @@ endif()
 
 ## Create Faust~
 message(STATUS "Faust External")
-
-## For Windows use static runtime instead of default dynamic runtime
-if(MSVC)
-    set(CompilerFlags
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
-    foreach(CompilerFlag ${CompilerFlags})
-      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-    endforeach()
-endif()
 
 ## Create the Pure Data external
 set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
