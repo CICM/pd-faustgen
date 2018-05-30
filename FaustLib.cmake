@@ -9,6 +9,11 @@ if(MSVC)
     foreach(CompilerFlag ${CompilerFlags})
       string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
     endforeach()
+    message(STATUS "MSVC GENERATOR ACTIVATED")
+endif()
+
+if(${MSVC})
+    message(STATUS "2nd MSVC GENERATOR ACTIVATED")
 endif()
 
 ## Save the llvm directory and change it for subdirectory
