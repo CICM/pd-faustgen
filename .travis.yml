@@ -31,7 +31,7 @@ matrix:
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
   - cp -r faust/libraries external/libs
-  - cp faust_tilde.c external\faust_tilde.c
+  - cp src/faust_tilde.c external\faust_tilde.c
   - cp README.md external/README.txt
   - cp LICENSE external/LICENSE.txt
   - mv external faust_tilde
