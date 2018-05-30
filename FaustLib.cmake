@@ -41,8 +41,7 @@ set(WASM_BACKEND   OFF                            CACHE STRING  "Include WASM ba
 add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
 
 if(MSVC)
-    #set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
-    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
+    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc /D WIN32 -D_SCL_SECURE_NO_WARNINGS")
 endif()
 
 ## Restore llvm directory
