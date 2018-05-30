@@ -43,10 +43,16 @@ add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
 if(MSVC)
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
-    get_property(STATIC_LIB_COMPILE_FLAGS TARGET staticlib PROPERTY COMPILE_FLAGS)
-    string(REPLACE "/MD" "/MT" ${STATIC_LIB_COMPILE_FLAGS} "${${STATIC_LIB_COMPILE_FLAGS}}")
-    set_property(TARGET staticlib PROPERTY COMPILE_FLAGS ${STATIC_LIB_COMPILE_FLAGS})
-    message(STATUS "Compile flags: ${STATIC_LIB_COMPILE_FLAGS}")
+
+    set(CompilerFlags
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
+    foreach(CompilerFlag ${CompilerFlags})
+        get_property(STATIC_LIB_${CompilerFlags} TARGET staticlib PROPERTY ${CompilerFlags})
+        string(REPLACE "/MD" "/MT" STATIC_LIB_${CompilerFlags} "${STATIC_LIB_${CompilerFlags}}")
+        set_property(TARGET staticlib PROPERTY ${CompilerFlags} ${STATIC_LIB_COMPILE_FLAGS})
+        message(STATUS "${CompilerFlags}: ${STATIC_LIB_COMPILE_FLAGS}")
+    endforeach()
 endif()
 
 ## Restore llvm directory
