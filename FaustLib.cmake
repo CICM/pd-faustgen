@@ -21,7 +21,7 @@ endif()
 set(INCLUDE_STATIC      ON  CACHE STRING  "Include static library"      FORCE)
 set(INCLUDE_EXECUTABLE  OFF CACHE STRING  "Include runtime executable"  FORCE)
 set(INCLUDE_DYNAMIC     OFF CACHE STRING  "Include dynamic library"     FORCE)
-set(INCLUDE_OSC         OFF CACHE STRING  "nclude Faust OSC library"    FORCE)
+set(INCLUDE_OSC         OFF CACHE STRING  "Include Faust OSC library"   FORCE)
 set(INCLUDE_HTTP        OFF CACHE STRING  "Include Faust HTTPD library" FORCE)
 
 ## Hardcoded backends for faust
