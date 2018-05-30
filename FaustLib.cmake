@@ -43,6 +43,9 @@ add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
 if(MSVC)
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
+    get_property(STATIC_LIB_COMPILE_FLAGS TARGET staticlib PROPERTY COMPILE_FLAGS)
+    string(REPLACE "/MD" "/MT" ${STATIC_LIB_COMPILE_FLAGS} "${${STATIC_LIB_COMPILE_FLAGS}}")
+    set_property(TARGET staticlib PROPERTY COMPILE_FLAGS ${STATIC_LIB_COMPILE_FLAGS})
 endif()
 
 ## Restore llvm directory
