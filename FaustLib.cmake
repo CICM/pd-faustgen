@@ -44,9 +44,7 @@ if(MSVC)
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
 
-    set(TargetFlags
-        COMPILE_FLAGS COMPILE_FLAGS_DEBUG COMPILE_FLAGS_RELEASE
-        STATIC_LIBRARY_FLAGS STATIC_LIBRARY_FLAGS_DEBUG STATIC_LIBRARY_FLAGS_RELEASE)
+    set(TargetFlags COMPILE_FLAGS COMPILE_DEFINITIONS COMPILE_OPTIONS)
     foreach(TargetFlag ${TargetFlags})
         get_target_property(STATIC_LIB_CURRENT_FLAGS staticlib ${TargetFlag})
         message(STATUS "${TargetFlag}: ${STATIC_LIB_CURRENT_FLAGS}")
