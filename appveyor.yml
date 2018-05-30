@@ -28,6 +28,7 @@ after_build:
   - del /F /S /Q /A external\*.pdb
   - del /F /S /Q /A external\*.ilk
   - del /F /S /Q /A external\*.lib
+  - del /F /S /Q /A external\*.exp
   - copy src\faust_tilde.c external\faust_tilde.c
   - copy README.md external\README.md
   - copy LICENSE external\LICENSE.txt
