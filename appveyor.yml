@@ -36,6 +36,14 @@ after_build:
 artifacts:
   - path: '*.zip'
 
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: 0SV8u3c06daN/cno+27kzzIvWbsRoOOG61OOCNEtiYbsoY8FNe4TgZh+s/7zcMiL
+  artifact: /.*\.zip/
+  on:
+    appveyor_repo_tag: true
+
 notifications:
 
   - provider: Email
