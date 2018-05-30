@@ -9,11 +9,6 @@ if(MSVC)
     foreach(CompilerFlag ${CompilerFlags})
       string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
     endforeach()
-    message(STATUS "MSVC GENERATOR ACTIVATED")
-endif()
-
-if(${MSVC})
-    message(STATUS "2nd MSVC GENERATOR ACTIVATED")
 endif()
 
 ## Save the llvm directory and change it for subdirectory
@@ -51,6 +46,7 @@ if(MSVC)
     get_property(STATIC_LIB_COMPILE_FLAGS TARGET staticlib PROPERTY COMPILE_FLAGS)
     string(REPLACE "/MD" "/MT" ${STATIC_LIB_COMPILE_FLAGS} "${${STATIC_LIB_COMPILE_FLAGS}}")
     set_property(TARGET staticlib PROPERTY COMPILE_FLAGS ${STATIC_LIB_COMPILE_FLAGS})
+    message(STATUS "Compile flags: ${STATIC_LIB_COMPILE_FLAGS}")
 endif()
 
 ## Restore llvm directory

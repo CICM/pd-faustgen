@@ -16,7 +16,6 @@ if(MSVC)
     foreach(CompilerFlag ${CompilerFlags})
       string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
     endforeach()
-    message(STATUS "previous MSVC")
 endif()
 
 include(FaustLib.cmake)
