@@ -18,43 +18,7 @@ if(MSVC)
     endforeach()
 endif()
 
-## Create Faust Lib
-message(STATUS "Faust Library")
-
-## Hardcoded targets for faust
-set(INCLUDE_STATIC  ON)
-set(INCLUDE_EXECUTABLE  OFF)
-set(INCLUDE_DYNAMIC     OFF)
-set(INCLUDE_OSC         OFF)
-set(INCLUDE_HTTP        OFF)
-
-## Save the llvm directory and change it for subdirectory
-if(DEFINED LLVM_DIR)
-  set(LLVM_DIR_TEMP   ${LLVM_DIR})
-  set(LLVM_DIR        "./../.${LLVM_DIR_TEMP}")
-endif()
-
-## Hardcoded backends for faust
-set(ASMJS_BACKEND  OFF                            CACHE STRING  "Include ASMJS backend" FORCE)
-set(C_BACKEND      OFF                            CACHE STRING  "Include C backend"         FORCE)
-set(CPP_BACKEND    OFF                            CACHE STRING  "Include CPP backend"       FORCE)
-set(FIR_BACKEND    OFF                            CACHE STRING  "Include FIR backend"       FORCE)
-set(INTERP_BACKEND OFF                            CACHE STRING  "Include INTERPRETER backend" FORCE)
-set(JAVA_BACKEND   OFF                            CACHE STRING  "Include JAVA backend"      FORCE)
-set(JS_BACKEND     OFF                            CACHE STRING  "Include JAVASCRIPT backend" FORCE)
-set(LLVM_BACKEND   COMPILER STATIC DYNAMIC        CACHE STRING  "Include LLVM backend"      FORCE)
-set(OLDCPP_BACKEND OFF                            CACHE STRING  "Include old CPP backend"   FORCE)
-set(RUST_BACKEND   OFF                            CACHE STRING  "Include RUST backend"      FORCE)
-set(WASM_BACKEND   OFF                            CACHE STRING  "Include WASM backend"  FORCE)
-
-## Call the faust cmakelist.txt
-add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
-
-## Restore llvm directory
-if(DEFINED LLVM_DIR)
-  set(LLVM_DIR ${LLVM_DIR_TEMP})
-endif()
-
+include(FaustLib.cmake)
 ## Create Faust~
 message(STATUS "Faust External")
 
@@ -66,10 +30,7 @@ add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde
 ## Link the Pure Data external with faustlib
 include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
 add_dependencies(faust_tilde_project staticlib)
-target_link_libraries(faust_tilde_project ${staticlib})
-if(WIN32)
-  target_link_libraries(faust_tilde_project ws2_32)
-endif()
+target_link_libraries(faust_tilde_project staticlib)
 
 if(MSVC)
     add_library(faust_lib STATIC IMPORTED)
