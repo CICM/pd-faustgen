@@ -34,6 +34,7 @@ before_deploy:
   - cp src/faust_tilde.c external\faust_tilde.c
   - cp README.md external/README.txt
   - cp LICENSE external/LICENSE.txt
+  - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
   - mv external faust_tilde
   - zip -r $release.zip faust_tilde
 deploy:

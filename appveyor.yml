@@ -17,6 +17,7 @@ install:
   - git submodule update --init --recursive
   - curl -L https://github.com/pierreguillot/llvm-win/releases/download/v%llvmversion%/llvm-windows-%llvmplateform%-mtd.zip -o llvm.zip
   - 7z x llvm.zip
+  - curl http://faust.grame.fr/images/faust-quick-reference.pdf -o ./external/faust-quick-reference.pdf 
 build_script:
   - mkdir build%llvmplateform% && cd build%llvmplateform%
   - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm-windows-%llvmplateform%-mtd/lib/cmake/llvm
