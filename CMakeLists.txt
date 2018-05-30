@@ -51,5 +51,5 @@ if(WIN32)
 endif()
 
 if(MSVC)
-    set_property(TARGET faust_tilde_project APPEND_STRING PROPERTY LINK_FLAGS " /IGNORE:4099 ")
+    set_property(TARGET faust_tilde_project APPEND_STRING PROPERTY LINK_FLAGS " /ignore:4099 ")
 endif()

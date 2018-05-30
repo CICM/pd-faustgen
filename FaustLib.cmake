@@ -42,7 +42,7 @@ add_subdirectory(./faust/build EXCLUDE_FROM_ALL)
 
 if(MSVC)
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc /D WIN32 -D_SCL_SECURE_NO_WARNINGS ")
-    set_property(TARGET staticlib APPEND_STRING PROPERTY LINK_FLAGS " /IGNORE:4099 ")
+    set_property(TARGET staticlib APPEND_STRING PROPERTY LINK_FLAGS " /ignore:4099 ")
 endif()
 
 ## Restore llvm directory
