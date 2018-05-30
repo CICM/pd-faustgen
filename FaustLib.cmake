@@ -53,9 +53,9 @@ if(MSVC)
 
         #if(NOT ${STATIC_LIB_CURRENT_FLAGS} STREQUAL "STATIC_LIB_CURRENT_FLAGS-NOTFOUND")
 
-        #string(REPLACE "/MD" "/MT" STATIC_LIB_${CompilerFlag} "${${STATIC_LIB_CURRENT_FLAGS}}")
-        #set_target_properties(staticlib PROPERTIES ${CompilerFlag} ${STATIC_LIB_CURRENT_FLAGS})
-        #message(STATUS "${CompilerFlag}: ${STATIC_LIB_CURRENT_FLAGS}")
+        string(REPLACE "/MD" "/MT" ${STATIC_LIB_CURRENT_FLAGS} "${${STATIC_LIB_CURRENT_FLAGS}}")
+        set_target_properties(staticlib PROPERTIES ${TargetFlag} ${STATIC_LIB_CURRENT_FLAGS})
+        message(STATUS "${TargetFlag}: ${STATIC_LIB_CURRENT_FLAGS}")
     endforeach()
 endif()
 
