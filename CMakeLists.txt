@@ -49,3 +49,7 @@ target_link_libraries(faust_tilde_project ${llvm_libs})
 if(WIN32)
   target_link_libraries(faust_tilde_project ws2_32)
 endif()
+
+if(MSVC)
+    set_property(TARGET faust_tilde_project APPEND_STRING PROPERTY LINK_FLAGS " /IGNORE:4099 ")
+endif()
