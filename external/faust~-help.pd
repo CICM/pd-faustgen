@@ -24,8 +24,6 @@ about the code in the Pd console.;
 #X obj 177 287 faust~ noise -vs 64 -vec;
 #N canvas 0 23 343 242 credits 0;
 #X text 15 131 fauts~ website: github.com/pierreguillot/faust-pd;
-#X text 15 188 This object is inspired by faustgen~ for Max developed
-Martin Di Rollo and Stéphane Letz., f 45;
 #X text 15 11 FAUST institution: GRAME;
 #X text 15 25 FAUST website: faust.grame.fr;
 #X text 121 40 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
@@ -33,6 +31,8 @@ Martin Di Rollo and Stéphane Letz., f 45;
 #X text 15 113 faust~ institution: GRAME - CICM - ANR MUSICOLL;
 #X text 15 39 FAUST developers:;
 #X text 15 149 faust~ developer: Pierre Guillot;
+#X text 15 188 This object is inspired by faustgen~ for Max developed
+by Martin Di Rollo and Stéphane Letz., f 47;
 #X restore 18 340 pd credits;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;
