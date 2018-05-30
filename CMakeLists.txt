@@ -40,6 +40,8 @@ if(MSVC)
     IMPORTED_LOCATION_RELEASE ${PROJECT_SOURCE_DIR}/faust/build/lib/Release/faust.lib
     INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/faust/architecture")
     target_link_libraries(faust_tilde_project faust_lib)
+    set_property(TARGET faust_tilde_project APPEND_STRING PROPERTY COMPILE_FLAGS "/wd4530")
+    set_property(TARGET faust_tilde_project APPEND_STRING PROPERTY COMPILE_FLAGS "/DWIN32")
 endif()
 
 ## Link the Pure Data external with llvm
