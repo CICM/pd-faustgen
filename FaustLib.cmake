@@ -48,10 +48,10 @@ if(MSVC)
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
         CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
     foreach(CompilerFlag ${CompilerFlags})
-        get_property(STATIC_LIB_${CompilerFlags} TARGET staticlib PROPERTY ${CompilerFlags})
+        get_target_property(STATIC_LIB_${CompilerFlags} staticlib ${CompilerFlags})
         string(REPLACE "/MD" "/MT" STATIC_LIB_${CompilerFlags} "${STATIC_LIB_${CompilerFlags}}")
-        set_property(TARGET staticlib PROPERTY ${CompilerFlags} ${STATIC_LIB_COMPILE_FLAGS})
-        message(STATUS "${CompilerFlags}: ${STATIC_LIB_COMPILE_FLAGS}")
+        set_target_properties(staticlib PROPERTIES ${CompilerFlags} ${STATIC_LIB_${CompilerFlags}})
+        message(STATUS "${CompilerFlags}: ${STATIC_LIB_${CompilerFlags}}")
     endforeach()
 endif()
 
