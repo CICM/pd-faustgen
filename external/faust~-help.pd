@@ -1,4 +1,4 @@
-#N canvas 582 298 433 477 10;
+#N canvas 548 204 413 372 10;
 #X obj 7 7 cnv 15 200 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
 #X text 5 28 The FAUST compiler embedded in a Pd external.;
@@ -9,7 +9,7 @@
 #X obj 27 257 faust~ noise;
 #X msg 57 220 reload;
 #X obj 27 170 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 0.15 256;
+-1 -1 0 256;
 #X msg 27 189 Volume \$1;
 #X obj 27 128 loadbang;
 #X msg 27 149 0;
@@ -20,14 +20,20 @@ to read. The path is relative to the patch. Extra arguments can be
 used to define compilation options \, see the FAUST documentation for
 further information. Use the debug level 3 to displays information
 about the code in the Pd console.;
-#X text 22 357 Faust website: faust.grame.fr;
-#X text 22 371 Faust development: GRAME;
-#X text 22 385 faust~ external: Pierre Guillot;
 #X text 177 268 options example;
-#X text 22 400 fauts~ website: github.com/pierreguillot/faust-pd;
-#X text 22 430 This object is inspired by faustgen~ for Max developed
-Martin Di Rollo and Stéphane Letz., f 45;
 #X obj 177 287 faust~ noise -vs 64 -vec;
+#N canvas 0 23 343 242 credits 0;
+#X text 15 131 fauts~ website: github.com/pierreguillot/faust-pd;
+#X text 15 188 This object is inspired by faustgen~ for Max developed
+Martin Di Rollo and Stéphane Letz., f 45;
+#X text 15 11 FAUST institution: GRAME;
+#X text 15 25 FAUST website: faust.grame.fr;
+#X text 121 40 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
+..., f 17;
+#X text 15 113 faust~ institution: GRAME - CICM - ANR MUSICOLL;
+#X text 15 39 FAUST developers:;
+#X text 15 149 faust~ developer: Pierre Guillot;
+#X restore 18 340 pd credits;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;
 #X connect 5 0 4 1;
