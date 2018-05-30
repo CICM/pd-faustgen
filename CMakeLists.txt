@@ -32,11 +32,6 @@ include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
 add_dependencies(faust_tilde_project staticlib)
 target_link_libraries(faust_tilde_project staticlib)
 
-if(MSVC)
-    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
-    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
-endif()
-
 ## Link the Pure Data external with llvm
 find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
