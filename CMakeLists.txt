@@ -33,8 +33,8 @@ add_dependencies(faust_tilde_project staticlib)
 target_link_libraries(faust_tilde_project staticlib)
 
 if(MSVC)
-    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS "/EHsc")
-    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS "/DWIN32")
+    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
+    set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
 
     add_library(faust_lib STATIC IMPORTED)
     set_target_properties(faust_lib PROPERTIES
