@@ -44,15 +44,18 @@ if(MSVC)
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /EHsc ")
     set_property(TARGET staticlib APPEND_STRING PROPERTY COMPILE_FLAGS " /D WIN32 ")
 
-    set(CompilerFlags
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
-    foreach(CompilerFlag ${CompilerFlags})
-        set(STATIC_LIB_CURRENT_FLAGS)
-        get_target_property(STATIC_LIB_CURRENT_FLAGS staticlib ${CompilerFlag})
-        string(REPLACE "/MD" "/MT" STATIC_LIB_${CompilerFlag} "${${STATIC_LIB_CURRENT_FLAGS}}")
-        set_target_properties(staticlib PROPERTIES ${CompilerFlag} ${STATIC_LIB_CURRENT_FLAGS})
-        message(STATUS "${CompilerFlag}: ${STATIC_LIB_CURRENT_FLAGS}")
+    set(TargetFlags
+        COMPILE_FLAGS COMPILE_FLAGS_DEBUG COMPILE_FLAGS_RELEASE
+        STATIC_LIBRARY_FLAGS STATIC_LIBRARY_FLAGS_DEBUG STATIC_LIBRARY_FLAGS_RELEASE)
+    foreach(TargetFlag ${TargetFlags})
+        get_target_property(STATIC_LIB_CURRENT_FLAGS staticlib ${TargetFlag})
+        message(STATUS "${TargetFlag}: ${STATIC_LIB_CURRENT_FLAGS}")
+
+        #if(NOT ${STATIC_LIB_CURRENT_FLAGS} STREQUAL "STATIC_LIB_CURRENT_FLAGS-NOTFOUND")
+
+        #string(REPLACE "/MD" "/MT" STATIC_LIB_${CompilerFlag} "${${STATIC_LIB_CURRENT_FLAGS}}")
+        #set_target_properties(staticlib PROPERTIES ${CompilerFlag} ${STATIC_LIB_CURRENT_FLAGS})
+        #message(STATUS "${CompilerFlag}: ${STATIC_LIB_CURRENT_FLAGS}")
     endforeach()
 endif()
 
