@@ -763,6 +763,7 @@ void faust_tilde_setup(void)
         
         logpost(NULL, 3, "faust~ compiler version: %s", getCLibFaustVersion());
         logpost(NULL, 3, "faust~ include directory: %s", class_gethelpdir(c));
+        logpost(NULL, 3, "faust~ institutions: CICM - ANR MUSICOLL");
         logpost(NULL, 3, "faust~ external author: Pierre Guillot");
         logpost(NULL, 3, "faust~ website: github.com/pierreguillot/faust-pd");
     }
