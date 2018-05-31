@@ -9,12 +9,6 @@ environment:
   #  llvmplateform: x86
   - platform: x64
     compiler: "Visual Studio 14 2015 Win64"
-    configuration: Debug
-    llvmversion: 6.0.0
-    llvmplateform: x64
-    llvmpconfig: mtd
-  - platform: x64
-    compiler: "Visual Studio 14 2015 Win64"
     configuration: Release
     llvmversion: 6.0.0
     llvmplateform: x64
