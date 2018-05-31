@@ -30,7 +30,13 @@ The FAUST compiler requires LLVM 5.0.0 backend (or higher - 6.0.0). The fastest 
 curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
 ```
-You can also use HomeBrew or MacPorts on MacOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location. On Windows, you must compile from sources using the static runtime library. You can also use the pre-compiled libraries used on the Appveyor CI.   
+You can also use HomeBrew or MacPorts on MacOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location. On Windows, you must compile from sources using the static runtime library. You can also use the pre-compiled libraries used on the Appveyor CI. Compiling LLVM with the Microsoft Visual Compiler requires to use the static runtime library, for example:
+```
+cd llvm-6.0.0.src && mkdir build && cd build
+cmake .. -G "Visual Studio 14 2015 Win64" -DLLVM_USE_CRT_DEBUG=MTd -DLLVM_USE_CRT_RELEASE=MT -DLLVM_BUILD_TESTS=Off -DCMAKE_INSTALL_PREFIX="./llvm" -Thost=x64
+cmake --build . --target ALL_BUILD (--config Debug/Release)
+cmake --build . --target INSTALL (optional)
+```
 
 ## Compilation
 
