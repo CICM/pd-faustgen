@@ -35,8 +35,8 @@ before_deploy:
   - cp README.md external/README.txt
   - cp LICENSE external/LICENSE.txt
   - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
-  - mv external faust_tilde
-  - zip -r $release.zip faust_tilde
+  - mv external faust~
+  - zip -r $release.zip faust~
 deploy:
   provider: releases
   skip_cleanup: true
