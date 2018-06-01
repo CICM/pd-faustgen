@@ -13,6 +13,7 @@ environment:
     llvmversion: 6.0.0
     llvmplateform: x64
     llvmpconfig: mt
+    release: "faust~[v0.0.1](Windows-amd64-32)(Sources).zip"
 
 install:
   - git submodule update --init --recursive
@@ -34,7 +35,7 @@ after_build:
   - copy README.md external\README.md
   - copy LICENSE external\LICENSE.txt
   - rename external faust~
-  - 7z a faust_tilde-win-%llvmplateform%.zip faust~
+  - 7z a %release%.zip faust~
 
 artifacts:
   - path: '*.zip'
