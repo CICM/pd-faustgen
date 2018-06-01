@@ -9,7 +9,7 @@ matrix:
   include:
   - os: osx
     compiler: clang
-    env: release='faust~[v0.0.1](Darwin-amd64-32)(Sources).zip'
+    env: release_arch=Darwin-amd64-32
     install:
     - git submodule update --init --recursive
     - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
@@ -20,7 +20,7 @@ matrix:
     - cmake --build . --config Release --target faust_tilde_project
   - os: linux
     compiler: gcc
-    env: release='faust~[v0.0.1](Linux-amd64-32)(Sources).zip'
+    env: release_arch=Linux-amd64-32
     install:
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
@@ -36,7 +36,7 @@ before_deploy:
   - cp LICENSE external/LICENSE.txt
   - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
   - mv external faust~
-  - zip -r $release.zip faust~
+  - zip -r "faust~-$TRAVIS_TAG-($release_arch)(sources).zip" faust~
 deploy:
   provider: releases
   skip_cleanup: true
@@ -44,7 +44,7 @@ deploy:
   overwrite: true
   api_key:
     secure: anDyVdoXmPTgEvqvI/HXqXHEZvqyBEHL0KqXjq7nf5/d1h+qdQdK+4VOK4Iko4gMPLJm80ln9RE3fQPtepDYXdsew6MhCUx468MY6VOxDDX7BXP9dfDmdwr7vyfLmOGP0x60oYFSGYhorzEEs6a6MB+PrZbnQZv2fUpU44uOwbKKfljdTYikUOhjjZ68XSoUdcwDHpb0xND/vszsn2ZFgcNAi9cj2A0sd00d/1iVn/x9OTad3x+jmd3Hn2ybdhaul+Tk34vvxl4cOX/aZO/4VQAW+OxlE/zEG9sspNblxq5/Pei96VPYmooT7cM9CWM4KCu6FHsl4ICaOEOk3UfpTo4IYjlItTIqBg8lkCLR1hYA5wRS9CpTCTt5FiPdsvH2hlZ1GtmTHt/Y7AvB//9odKhxu5hfJ02uXRFQ01KhS1RCYxitTdNGkonaxYyf/uDOrXyZ8jfPD4yBnqD0JIPtxvrYIXERKx5Cd/TZl/oJneBUbH1Ts7Ae2G/3GyJi5WitylzgQx+avkXI1oZlxIhKpU3rVJocArj+1eF+Ny4pxkXAFON2klXyd9mnK2O1OS02g+fY4f14BqU4c+7iPZi1/F6vkxg97vAVL43YJEuQlLoGbvzMSTB4hODZ9+0fcVgC0f2pDOAVfFdPHi/sO1iTEw0flAGGVWmePUx2HNTJhhw=
-  file: $release.zip
+  file: "faust~-$TRAVIS_TAG-($release_arch)(sources).zip"
   on:
     repo: pierreguillot/faust-pd
     tags: true
