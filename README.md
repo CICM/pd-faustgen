@@ -51,3 +51,7 @@ Useful CMake options:
 - `LLVM_DIR` to define LLVM location for FAUST and the Pd external (for example: `-DLLVM_DIR=./llvm/lib/cmake/llvm`).
 
 see also the files `.travis.yml` and `appveyor.yml`.
+
+## Publishing with Deken
+
+Once the binaries are uploaded with Travis and Appveyor to the releases section of GitHub, the external can be published using [Deken](https://github.com/pure-data/deken). First of all, you must have an account on the website https://puredata.info and the [Deken plugin for developers](https://github.com/pure-data/deken/blob/master/developer/README.md) installed. On Windows run the script FaustDeken.bat with the version of the external, for example: `FaustDeken v0.0.1`.
