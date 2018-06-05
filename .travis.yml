@@ -36,7 +36,7 @@ before_deploy:
   - cp LICENSE external/LICENSE.txt
   - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
   - mv external faust~
-  - zip -r "faust_tilde-$TRAVIS_TAG-$release_arch-sources.zip" faust~
+  - zip -r "faust_tilde-$release_arch-sources.zip" faust~
 deploy:
   provider: releases
   skip_cleanup: true

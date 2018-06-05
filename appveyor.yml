@@ -34,8 +34,9 @@ after_build:
   - copy src\faust_tilde.c external\faust_tilde.c
   - copy README.md external\README.md
   - copy LICENSE external\LICENSE.txt
+  - xcopy  /s /e faust/libraries external/libs
   - rename external faust~
-  - 7z a "faust_tilde-%APPVEYOR_REPO_TAG_NAME%-%release_arch%-sources.zip" faust~
+  - 7z a "faust_tilde-%release_arch%-sources.zip" faust~
 
 artifacts:
   - path: '*.zip'
