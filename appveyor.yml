@@ -35,7 +35,7 @@ after_build:
   - copy README.md external\README.md
   - copy LICENSE external\LICENSE.txt
   - rename external faust~
-  - 7z a "faust_tilde-%APPVEYOR_REPO_TAG_NAME%-%release_arch%-sources.zip"faust~
+  - 7z a "faust_tilde-%APPVEYOR_REPO_TAG_NAME%-%release_arch%-sources.zip" faust~
 
 artifacts:
   - path: '*.zip'
