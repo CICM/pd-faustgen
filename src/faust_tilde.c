@@ -502,6 +502,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
         if(strnlen(errors, 4096))
         {
             pd_error(x, "faust~: %s", errors);
+            x->f_dsp_factory = NULL;
         }
         else
         {
@@ -730,6 +731,10 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_inlets         = NULL;
         x->f_noutlets       = 0;
         x->f_outlets        = NULL;
+        if(argc == 0 || argv == NULL)
+        {
+            return x;
+        }
         faust_tilde_parse_compile_options(x, argc-1, argv+1);
         faust_tilde_reload(x);
         if(!x->f_dsp_instance)
