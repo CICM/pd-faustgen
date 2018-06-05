@@ -19,7 +19,6 @@ be used to define compilation options \, see the FAUST documentation
 for further information. Use the debug level 3 to displays information
 about the code in the Pd console.;
 #X obj 192 305 faust~ noise -vs 64 -vec;
-#X text 26 403 fauts~ website: github.com/pierreguillot/faust-pd;
 #X text 26 341 FAUST institution: GRAME;
 #X text 26 355 FAUST website: faust.grame.fr;
 #X text 132 370 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
@@ -33,6 +32,7 @@ by Martin Di Rollo and Stéphane Letz., f 50;
 #X text 192 256 Use compilation options. See the FAUST documentation
 for further information, f 24;
 #X text 95 16 the FAUST compiler embedded in a Pd external;
+#X text 26 403 fauts~ website: github.com/grame-cncm/faust-pd;
 #X connect 1 0 2 0;
 #X connect 4 0 3 0;
 #X connect 4 0 3 1;

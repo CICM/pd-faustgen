@@ -1,5 +1,5 @@
 /*
-// Copyright (c) 2018 Pierre Guillot.
+// Copyright (c) 2018 - GRAME CNCM - CICM - ANR MUSICOLL - Pierre Guillot.
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 */
@@ -770,7 +770,7 @@ void faust_tilde_setup(void)
         logpost(NULL, 3, "faust~ include directory: %s", class_gethelpdir(c));
         logpost(NULL, 3, "faust~ institutions: CICM - ANR MUSICOLL");
         logpost(NULL, 3, "faust~ external author: Pierre Guillot");
-        logpost(NULL, 3, "faust~ website: github.com/pierreguillot/faust-pd");
+        logpost(NULL, 3, "faust~ website: github.com/grame-cncm/faust-pd");
     }
     
     faust_tilde_class = c;
