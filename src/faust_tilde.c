@@ -164,7 +164,7 @@ static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
         path = canvas_getdir(x->f_canvas);
         if(path && path->s_name && name && name->s_name)
         {
-            file = (char *)calloc(strnlen(path->s_name, MAXFAUSTSTRING) + strnlen(name->s_name, MAXFAUSTSTRING) + 5, sizeof(char *));
+            file = (char *)calloc(MAXFAUSTSTRING, sizeof(char *));
             if(file)
             {
                 sprintf(file, "%s/%s.dsp", path->s_name, name->s_name);
@@ -193,10 +193,10 @@ static char* faust_tilde_get_default_include_path(t_faust_tilde *x)
     char const* path = class_gethelpdir(faust_tilde_class);
     if(path)
     {
-        include_path = (char *)calloc(strnlen(path, MAXFAUSTSTRING) + strnlen("/libs", MAXFAUSTSTRING), sizeof(char));
+        include_path = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
         if(include_path)
         {
-            sprintf(include_path, "%s/libs", path);
+            sprintf(include_path, "%s/libs/", path);
             return include_path;
         }
         else
