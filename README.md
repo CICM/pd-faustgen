@@ -14,7 +14,9 @@
 
 ### Presentation
 
-The pure-data counterpart of the Max external faustgen~. This project is mainly a testing and experimental ground to embed the FAUST compiler with LLVM inside another application. The final goal is to integrate a similar feature in the application KIWI.
+The **faust~** object is an external with the [FAUST](http://faust.grame.fr/about/) just-in-time (JIT) compiler embedded that allows to load, compile and play FAUST files within the audio programming environment [Pure Data](http://msp.ucsd.edu/software.html). FAUST (Functional Audio Stream) is a functional programming language specifically designed for real-time signal processing and synthesis developed by the [GRAME](http://www.grame.fr/). The FAUST JIT compiler - built with [LLVM](https://llvm.org/) - brings together the convenience of a standalone interpreted language with the efficiency of a compiled language. The **faust~** object is a very first version with elementary features, any help and any contribution are welcome.
+
+This **faust~** object for Pd is inspired by the **faustgen~** object for Max developed by Martin Di Rollo and Stéphane Letz.
 
 ### Dependencies
 
@@ -54,4 +56,14 @@ see also the files `.travis.yml` and `appveyor.yml`.
 
 ## Publishing with Deken
 
-Once the binaries are uploaded with Travis and Appveyor to the releases section of GitHub, the external can be published using [Deken](https://github.com/pure-data/deken). First of all, you must have an account on the website https://puredata.info and the [Deken plugin for developers](https://github.com/pure-data/deken/blob/master/developer/README.md) installed. On Windows run the script FaustDeken.bat with the version of the external, for example: `FaustDeken v0.0.1`.
+Once the binaries are uploaded with Travis and Appveyor to the releases section of GitHub, the external can be published using [Deken](https://github.com/pure-data/deken). First of all, you must have an account on the website https://puredata.info and the [Deken plugin for developers](https://github.com/pure-data/deken/blob/master/developer/README.md) installed. On Windows run the script FaustDeken.bat with the version of the external, for example: `FaustDeken 0.0.1`.
+
+## Credits
+
+- FAUST institution: GRAME
+- FAUST website: faust.grame.fr
+- FAUST developers: Yann Orlarey, Stéphane Letz, Dominique Fober and others
+
+- faust~ institutions: CICM - ANR MUSICOLL
+- fauts~ website: github.com/grame-cncm/faust-pd
+- faust~ developer: Pierre Guillot
