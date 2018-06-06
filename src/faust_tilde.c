@@ -161,7 +161,7 @@ static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
         path = canvas_getdir(x->f_canvas);
         if(path && path->s_name && name && name->s_name)
         {
-            file = (char *)malloc(strnlen(path->s_name, 4096) + strnlen(name->s_name, 4096) + 5);
+            file = (char *)calloc(strnlen(path->s_name, 4096) + strnlen(name->s_name, 4096) + 5, sizeof(char *));
             if(file)
             {
                 sprintf(file, "%s/%s.dsp", path->s_name, name->s_name);
@@ -190,7 +190,7 @@ static char* faust_tilde_get_default_include_path(t_faust_tilde *x)
     char const* path = class_gethelpdir(faust_tilde_class);
     if(path)
     {
-        inlcudepath = (char *)malloc(strnlen(path, 4096) + strnlen("/libs", 5));
+        inlcudepath = (char *)calloc(strnlen(path, 4096) + strnlen("/libs", 4096), sizeof(char));
         if(inlcudepath)
         {
             sprintf(inlcudepath, "%s/libs", path);
@@ -213,12 +213,12 @@ static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom
     int i = 0;
     char has_include = 0;
     int const nsize = argc + 2;
-    x->f_compile_options = (char **)malloc(nsize * sizeof(char *));
+    x->f_compile_options = (char **)calloc(nsize, sizeof(char *));
     if(x->f_compile_options)
     {
         for(i = 0; i < argc; ++i)
         {
-            x->f_compile_options[i] = (char *)malloc(MAXPDSTRING * sizeof(char));
+            x->f_compile_options[i] = (char *)calloc(MAXPDSTRING, sizeof(char));
             if(x->f_compile_options[i])
             {
                 if(argv[i].a_type == A_FLOAT)
@@ -248,7 +248,7 @@ static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom
         }
         if(!has_include)
         {
-            x->f_compile_options[i] = (char *)malloc(MAXPDSTRING * sizeof(char));
+            x->f_compile_options[i] = (char *)calloc(MAXPDSTRING, sizeof(char));
             if(x->f_compile_options[i])
             {
                 sprintf(x->f_compile_options[i], "-I");
