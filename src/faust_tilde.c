@@ -11,6 +11,9 @@
 
 #include <faust/dsp/llvm-c-dsp.h>
 
+#define MAXFAUSTSTRING 4096
+#define MAXFAUSTOPTIONS 128
+
 typedef struct _faust_param
 {
     t_symbol*   p_label;
@@ -40,7 +43,7 @@ typedef struct _faust_tilde
     t_symbol*           f_dsp_name;
     
     size_t              f_ncompile_options;
-    char**              f_compile_options;
+    char*               f_compile_options[MAXFAUSTOPTIONS];
     
     size_t              f_ninlets;
     t_inlet**           f_inlets;
@@ -161,7 +164,7 @@ static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
         path = canvas_getdir(x->f_canvas);
         if(path && path->s_name && name && name->s_name)
         {
-            file = (char *)calloc(strnlen(path->s_name, 4096) + strnlen(name->s_name, 4096) + 5, sizeof(char *));
+            file = (char *)calloc(strnlen(path->s_name, MAXFAUSTSTRING) + strnlen(name->s_name, MAXFAUSTSTRING) + 5, sizeof(char *));
             if(file)
             {
                 sprintf(file, "%s/%s.dsp", path->s_name, name->s_name);
@@ -186,15 +189,15 @@ static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
 
 static char* faust_tilde_get_default_include_path(t_faust_tilde *x)
 {
-    char* inlcudepath;
+    char* include_path;
     char const* path = class_gethelpdir(faust_tilde_class);
     if(path)
     {
-        inlcudepath = (char *)calloc(strnlen(path, 4096) + strnlen("/libs", 4096), sizeof(char));
-        if(inlcudepath)
+        include_path = (char *)calloc(strnlen(path, MAXFAUSTSTRING) + strnlen("/libs", MAXFAUSTSTRING), sizeof(char));
+        if(include_path)
         {
-            sprintf(inlcudepath, "%s/libs", path);
-            return inlcudepath;
+            sprintf(include_path, "%s/libs", path);
+            return include_path;
         }
         else
         {
@@ -208,76 +211,65 @@ static char* faust_tilde_get_default_include_path(t_faust_tilde *x)
     return NULL;
 }
 
-static void faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom* argv)
+static int faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom* argv)
 {
     int i = 0;
     char has_include = 0;
-    int const nsize = argc + 2;
-    x->f_compile_options = (char **)calloc(nsize, sizeof(char *));
-    if(x->f_compile_options)
+    for(i = 0; i < argc && i < MAXFAUSTOPTIONS; ++i)
     {
-        for(i = 0; i < argc; ++i)
+        x->f_compile_options[i] = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
+        if(x->f_compile_options[i])
         {
-            x->f_compile_options[i] = (char *)calloc(MAXPDSTRING, sizeof(char));
-            if(x->f_compile_options[i])
+            if(argv[i].a_type == A_FLOAT)
             {
-                if(argv[i].a_type == A_FLOAT)
+                sprintf(x->f_compile_options[i], "%i", (int)argv[i].a_w.w_float);
+            }
+            else if(argv[i].a_type == A_SYMBOL && argv[i].a_w.w_symbol)
+            {
+                sprintf(x->f_compile_options[i], "%s", argv[i].a_w.w_symbol->s_name);
+                if(!strncmp(x->f_compile_options[i], "-I", 2))
                 {
-                    sprintf(x->f_compile_options[i], "%i", (int)argv[i].a_w.w_float);
-                }
-                else if(argv[i].a_type == A_SYMBOL && argv[i].a_w.w_symbol)
-                {
-                    sprintf(x->f_compile_options[i], "%s", argv[i].a_w.w_symbol->s_name);
-                    if(!strncmp(x->f_compile_options[i], "-I", 2))
-                    {
-                        has_include = 1;
-                    }
-                }
-                else
-                {
-                    pd_error(x, "faust~: option type invalid");
-                    memset(x->f_compile_options[i], 0, MAXPDSTRING);
+                    has_include = 1;
                 }
             }
             else
             {
-                pd_error(x, "faust~: memory allocation failed - compile option");
-                x->f_ncompile_options = i;
-                return;
-            }
-        }
-        if(!has_include)
-        {
-            x->f_compile_options[i] = (char *)calloc(MAXPDSTRING, sizeof(char));
-            if(x->f_compile_options[i])
-            {
-                sprintf(x->f_compile_options[i], "-I");
-            }
-            else
-            {
-                pd_error(x, "faust~: memory allocation failed - compile option");
-                x->f_ncompile_options = i;
-                return;
-            }
-            ++i;
-            x->f_compile_options[i] = faust_tilde_get_default_include_path(x);
-            if(!x->f_compile_options[i])
-            {
-                pd_error(x, "faust~: memory allocation failed - compile option");
-                x->f_ncompile_options = i;
-                return;
+                pd_error(x, "faust~: option type invalid");
+                memset(x->f_compile_options[i], 0, MAXFAUSTSTRING);
             }
             x->f_ncompile_options = i+1;
         }
         else
         {
-            x->f_ncompile_options = argc;
+            pd_error(x, "faust~: memory allocation failed - compile option");
+            x->f_ncompile_options = i;
+            return -1;
         }
     }
-    else
+    if(!has_include)
     {
-        pd_error(x, "faust~: memory allocation failed - compile options");
+        x->f_compile_options[i] = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
+        if(x->f_compile_options[i])
+        {
+            sprintf(x->f_compile_options[i], "%s", "-I");
+        }
+        else
+        {
+            pd_error(x, "faust~: memory allocation failed - compile option");
+            x->f_ncompile_options = i;
+            return -1;
+        }
+        ++i;
+        x->f_compile_options[i] = faust_tilde_get_default_include_path(x);
+        if(!x->f_compile_options[i])
+        {
+            pd_error(x, "faust~: memory allocation failed - compile option");
+            x->f_ncompile_options = i;
+            return -1;
+        }
+        x->f_ncompile_options = i+1;
     }
+    return 0;
 }
 
 static void faust_tilde_free_compile_options(t_faust_tilde *x)
@@ -292,7 +284,6 @@ static void faust_tilde_free_compile_options(t_faust_tilde *x)
                 free(x->f_compile_options[i]);
             }
         }
-        free(x->f_compile_options);
     }
 }
 
@@ -372,7 +363,7 @@ static void faust_tilde_restore_params(t_faust_tilde *x)
 static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int const type, FAUSTFLOAT* zone,
                                    FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
 {
-    char temp[MAXPDSTRING];
+    char temp[MAXFAUSTSTRING];
     t_faust_param *newmemory;
     size_t size = x->f_nparams;
     if(x->f_params)
@@ -393,7 +384,7 @@ static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int cons
             return;
         }
     }
-    if(strnlen(label, MAXPDSTRING) == 0 || label[0] == '0')
+    if(strnlen(label, MAXFAUSTSTRING) == 0 || label[0] == '0')
     {
         sprintf(temp, "param%i", (int)size+1);
         newmemory[size].p_label = gensym(temp);
@@ -488,7 +479,7 @@ static void faust_tilde_print(t_faust_tilde *x)
 static void faust_tilde_reload(t_faust_tilde *x)
 {
     size_t i;
-    char errors[4096];
+    char errors[MAXFAUSTSTRING];
     int dspstate = canvas_suspend_dsp();
     char* filepath = faust_tilde_get_dsp_file_path(x);
     if(filepath)
@@ -496,11 +487,20 @@ static void faust_tilde_reload(t_faust_tilde *x)
         faust_tilde_delete_instance(x);
         faust_tilde_delete_factory(x);
         faust_tilde_delete_params(x);
+        
         x->f_dsp_factory = createCDSPFactoryFromFile(filepath,
                                                      (int)x->f_ncompile_options, (const char**)x->f_compile_options,
                                                      "", errors, -1);
-        if(strnlen(errors, 4096))
+        if(strnlen(errors, MAXFAUSTSTRING))
         {
+            pd_error(x, "faust~: try to load %s", filepath);
+            for (i  = 0; i < x->f_ncompile_options; ++i)
+            {
+                if(x->f_compile_options[i])
+                {
+                    pd_error(x, "faust~: option %s", x->f_compile_options[i]);
+                }
+            }
             pd_error(x, "faust~: %s", errors);
             x->f_dsp_factory = NULL;
         }
@@ -689,6 +689,7 @@ static void faust_tilde_free(t_faust_tilde *x)
 
 static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
 {
+    size_t i;
     t_faust_tilde* x = (t_faust_tilde *)pd_new(faust_tilde_class);
     if(x)
     {
@@ -725,17 +726,23 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_dsp_name       = atom_getsymbolarg(0, argc, argv);
         
         x->f_ncompile_options   = 0;
-        x->f_compile_options    = NULL;
-        
-        x->f_ninlets        = 0;
-        x->f_inlets         = NULL;
-        x->f_noutlets       = 0;
-        x->f_outlets        = NULL;
+        for(i = 0; i < MAXFAUSTOPTIONS; ++i)
+        {
+            x->f_compile_options[i] = NULL;
+        }
+        x->f_ninlets            = 0;
+        x->f_inlets             = NULL;
+        x->f_noutlets           = 0;
+        x->f_outlets            = NULL;
         if(argc == 0 || argv == NULL)
         {
             return x;
         }
-        faust_tilde_parse_compile_options(x, argc-1, argv+1);
+        if(faust_tilde_parse_compile_options(x, argc-1, argv+1))
+        {
+            faust_tilde_free(x);
+            return NULL;
+        }
         faust_tilde_reload(x);
         if(!x->f_dsp_instance)
         {
