@@ -138,15 +138,18 @@ static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
     nsignals = (t_sample **)resizebytes(x->f_signals,
                                         x->f_nsignals * sizeof(t_sample *),
                                         (x->f_noutlets + x->f_ninlets) * sizeof(t_sample *));
+    
+    gobj_vis((t_gobj *)x, x->f_canvas, 0);
+    gobj_vis((t_gobj *)x, x->f_canvas, 1);
+    canvas_fixlinesfor(x->f_canvas, (t_text *)x);
+    
     if(nsignals)
     {
         x->f_nsignals = x->f_noutlets + x->f_ninlets;
         x->f_signals  = nsignals;
-        canvas_fixlinesfor(x->f_canvas, (t_text *)x);
         return valid;
     }
     pd_error(x, "faust~: memory allocation failed - signals");
-    canvas_fixlinesfor(x->f_canvas, (t_text *)x);
     return 1;
 }
 
