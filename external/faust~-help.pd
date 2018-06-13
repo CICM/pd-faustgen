@@ -12,7 +12,6 @@
 #X msg 32 177 Volume \$1;
 #X obj 32 116 loadbang;
 #X msg 32 137 0;
-#X text 95 155 Controls the parameters with their names, f 15;
 #X text 10 36 The first argument is the name of the file FAUST DSP
 file to read. The path is relative to the patch. Extra arguments can
 be used to define compilation options \, see the FAUST documentation
@@ -28,7 +27,6 @@ about the code in the Pd console.;
 #X text 26 439 This object is inspired by faustgen~ for Max developed
 by Martin Di Rollo and Stéphane Letz., f 50;
 #X text 26 389 faust~ institutions: CICM - ANR MUSICOLL;
-#X text 113 206 Reloads the FAUST file;
 #X text 192 256 Use compilation options. See the FAUST documentation
 for further information, f 24;
 #X text 95 16 the FAUST compiler embedded in a Pd external;
@@ -36,6 +34,8 @@ for further information, f 24;
 #X text 26 469 Another faust~ object has been developed by Albert Graef
 using the programming language "Pure" : https://github.com/agraef/pure-lang.
 , f 67;
+#X text 95 155 Control the parameters with their names, f 15;
+#X text 113 206 Reload the FAUST file;
 #X connect 1 0 2 0;
 #X connect 4 0 3 0;
 #X connect 4 0 3 1;
