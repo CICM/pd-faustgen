@@ -87,6 +87,7 @@ static char faust_tilde_resize_inputs(t_faust_tilde *x, int const nins)
     for(i = rnins; i < cins; ++i)
     {
         inlet_free(x->f_inlets[i]);
+        x->f_inlets[i] = NULL;
     }
     ninlets = (t_inlet **)resizebytes(x->f_inlets, sizeof(t_inlet*) * cins, sizeof(t_inlet*) * rnins);
     if(ninlets)
@@ -112,13 +113,14 @@ static char faust_tilde_resize_outputs(t_faust_tilde *x, int const nins)
     for(i = rnouts; i < couts; ++i)
     {
         outlet_free(x->f_outlets[i]);
+        x->f_outlets[i] = NULL;
     }
     noutlets = (t_outlet **)resizebytes(x->f_outlets, sizeof(t_outlet*) * couts, sizeof(t_outlet*) * rnouts);
     if(noutlets)
     {
         for(i = couts; i < rnouts; ++i)
         {
-            outlet_new((t_object *)x, &s_signal);
+            noutlets[i] = outlet_new((t_object *)x, &s_signal);
         }
         x->f_outlets = noutlets;
         x->f_noutlets = rnouts;
