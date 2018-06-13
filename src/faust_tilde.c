@@ -142,16 +142,23 @@ static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
 {
     char valid = 0;
     t_sample** nsignals;
-    gobj_vis((t_gobj *)x, x->f_canvas, 0);
+    int const redraw = (x->f_canvas && glist_isvisible(x->f_canvas) && (!x->f_canvas->gl_isdeleting)
+                  && glist_istoplevel(x->f_canvas));
+    if(redraw)
+    {
+        gobj_vis((t_gobj *)x, x->f_canvas, 0);
+    }
     valid = faust_tilde_resize_inputs(x, nins) ? 1 : valid;
     valid = faust_tilde_resize_outputs(x, nouts) ? 1 : valid;
     nsignals = (t_sample **)resizebytes(x->f_signals,
                                         x->f_nsignals * sizeof(t_sample *),
                                         (x->f_noutlets + x->f_ninlets) * sizeof(t_sample *));
     
-    
-    gobj_vis((t_gobj *)x, x->f_canvas, 1);
-    canvas_fixlinesfor(x->f_canvas, (t_text *)x);
+    if(redraw)
+    {
+        gobj_vis((t_gobj *)x, x->f_canvas, 1);
+        canvas_fixlinesfor(x->f_canvas, (t_text *)x);
+    }
 
     if(nsignals)
     {
