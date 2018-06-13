@@ -45,6 +45,7 @@ deploy:
   provider: GitHub
   prerelease: true
   overwrite: true
+  draft: true
   auth_token:
     secure: 0SV8u3c06daN/cno+27kzzIvWbsRoOOG61OOCNEtiYbsoY8FNe4TgZh+s/7zcMiL
   artifact: /.*\.zip/
