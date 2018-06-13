@@ -1,4 +1,4 @@
-#N canvas 80 279 467 497 10;
+#N canvas 364 281 470 537 10;
 #X obj 12 15 cnv 15 360 17 empty empty faust~ 2 9 0 14 -233017 -66577
 0;
 #X obj 286 155 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
@@ -33,6 +33,9 @@ by Martin Di Rollo and Stéphane Letz., f 50;
 for further information, f 24;
 #X text 95 16 the FAUST compiler embedded in a Pd external;
 #X text 26 403 fauts~ website: github.com/grame-cncm/faust-pd;
+#X text 26 469 Another faust~ object has been developed by Albert Graef
+using the programming language "Pure" : https://github.com/agraef/pure-lang.
+;
 #X connect 1 0 2 0;
 #X connect 4 0 3 0;
 #X connect 4 0 3 1;
