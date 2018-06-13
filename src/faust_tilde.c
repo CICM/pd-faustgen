@@ -49,6 +49,7 @@ typedef struct _faust_tilde
     t_inlet**           f_inlets;
     size_t              f_noutlets;
     t_outlet**          f_outlets;
+    char                f_allocated;
 } t_faust_tilde;
 
 static t_class *faust_tilde_class;
@@ -143,7 +144,7 @@ static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
     char valid = 0;
     t_sample** nsignals;
     int const redraw = (x->f_canvas && glist_isvisible(x->f_canvas) && (!x->f_canvas->gl_isdeleting)
-                  && glist_istoplevel(x->f_canvas));
+                  && glist_istoplevel(x->f_canvas) && x->f_allocated);
     if(redraw)
     {
         gobj_vis((t_gobj *)x, x->f_canvas, 0);
@@ -154,20 +155,22 @@ static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
                                         x->f_nsignals * sizeof(t_sample *),
                                         (x->f_noutlets + x->f_ninlets) * sizeof(t_sample *));
     
+    if(nsignals)
+    {
+        x->f_nsignals = x->f_noutlets + x->f_ninlets;
+        x->f_signals  = nsignals;
+    }
+    else
+    {
+        pd_error(x, "faust~: memory allocation failed - signals");
+        valid = 1;
+    }
     if(redraw)
     {
         gobj_vis((t_gobj *)x, x->f_canvas, 1);
         canvas_fixlinesfor(x->f_canvas, (t_text *)x);
     }
-
-    if(nsignals)
-    {
-        x->f_nsignals = x->f_noutlets + x->f_ninlets;
-        x->f_signals  = nsignals;
-        return valid;
-    }
-    pd_error(x, "faust~: memory allocation failed - signals");
-    return 1;
+    return valid;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -541,7 +544,8 @@ static void faust_tilde_reload(t_faust_tilde *x)
                             getNumInputsCDSPInstance(x->f_dsp_instance));
                     logpost(x, 3, "             %s: %i", "number of outputs",
                             getNumOutputsCDSPInstance(x->f_dsp_instance));
-                    for (i  = 0; i < x->f_nparams; ++i)
+                    
+                    for (i = 0; i < x->f_nparams; ++i)
                     {
                         logpost(x, 3, "             parameter %i: %s", (int)i, x->f_params[i].p_label->s_name);
                     }
@@ -750,10 +754,12 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         {
             x->f_compile_options[i] = NULL;
         }
-        x->f_ninlets            = 0;
+        x->f_ninlets            = 1;
         x->f_inlets             = NULL;
         x->f_noutlets           = 0;
         x->f_outlets            = NULL;
+        x->f_allocated          = 0;
+        
         if(argc == 0 || argv == NULL)
         {
             return x;
@@ -764,6 +770,7 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
             return NULL;
         }
         faust_tilde_reload(x);
+        x->f_allocated = 1;
         if(!x->f_dsp_instance)
         {
             faust_tilde_free(x);
