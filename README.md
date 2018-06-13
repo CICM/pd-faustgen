@@ -16,8 +16,6 @@
 
 The **faust~** object is an external with the [FAUST](http://faust.grame.fr/about/) just-in-time (JIT) compiler embedded that allows to load, compile and play FAUST files within the audio programming environment [Pure Data](http://msp.ucsd.edu/software.html). FAUST (Functional Audio Stream) is a functional programming language specifically designed for real-time signal processing and synthesis developed by the [GRAME](http://www.grame.fr/). The FAUST JIT compiler - built with [LLVM](https://llvm.org/) - brings together the convenience of a standalone interpreted language with the efficiency of a compiled language. The **faust~** object is a very first version with elementary features, any help and any contribution are welcome.
 
-This **faust~** object for Pd is inspired by the **faustgen~** object for Max developed by Martin Di Rollo and Stéphane Letz.
-
 ### Dependencies
 
 - [llvm](http://llvm.org)
@@ -32,13 +30,21 @@ The FAUST compiler requires LLVM 5.0.0 backend (or higher - 6.0.0). The fastest 
 curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
 tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
 ```
-You can also use HomeBrew or MacPorts on MacOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location. On Windows, you must compile from sources using the static runtime library. You can also use the pre-compiled libraries used on the Appveyor CI. Compiling LLVM with the Microsoft Visual Compiler requires to use the static runtime library, for example:
+or a for a linux system
+```
+curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+```
+You can also use HomeBrew or MacPorts on MacOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location.
+
+On Windows, you must compile from sources using the static runtime library. Compiling LLVM with the Microsoft Visual Compiler requires to use the static runtime library, for example:
 ```
 cd llvm-6.0.0.src && mkdir build && cd build
 cmake .. -G "Visual Studio 14 2015 Win64" -DLLVM_USE_CRT_DEBUG=MTd -DLLVM_USE_CRT_RELEASE=MT -DLLVM_BUILD_TESTS=Off -DCMAKE_INSTALL_PREFIX="./llvm" -Thost=x64
 cmake --build . --target ALL_BUILD (--config Debug/Release)
 cmake --build . --target INSTALL (optional)
 ```
+You can also use the pre-compiled libraries used on the Appveyor CI.
 
 ## Compilation
 
@@ -60,10 +66,16 @@ Once the binaries are uploaded with Travis and Appveyor to the releases section 
 
 ## Credits
 
-- FAUST institution: GRAME
-- FAUST website: faust.grame.fr
-- FAUST developers: Yann Orlarey, Stéphane Letz, Dominique Fober and others
+**FAUST institution**: GRAME  
+**FAUST website**: faust.grame.fr  
+**FAUST developers**: Yann Orlarey, Stéphane Letz, Dominique Fober and others  
 
-- faust~ institutions: CICM - ANR MUSICOLL
-- fauts~ website: github.com/grame-cncm/faust-pd
-- faust~ developer: Pierre Guillot
+**faust~ institutions**: CICM - ANR MUSICOLL  
+**fauts~ website**: github.com/grame-cncm/faust-pd  
+**faust~ developer**: Pierre Guillot
+
+## Legacy
+
+This **faust~** object for Pd is inspired by the **faustgen~** object for Max developed by Martin Di Rollo and Stéphane Letz.
+
+Another **faust~** object has been developed by Albert Graef using the programming language [Pure](https://github.com/agraef/pure-lang).
