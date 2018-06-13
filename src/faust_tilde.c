@@ -84,6 +84,10 @@ static char faust_tilde_resize_inputs(t_faust_tilde *x, int const nins)
     size_t i;
     size_t const cins = x->f_ninlets > 1 ? x->f_ninlets : 1;
     size_t const rnins = (size_t)nins > 1 ? (size_t)nins : 1;
+    if(rnins == cins)
+    {
+        return 0;
+    }
     for(i = rnins; i < cins; ++i)
     {
         inlet_free(x->f_inlets[i]);
@@ -110,6 +114,10 @@ static char faust_tilde_resize_outputs(t_faust_tilde *x, int const nins)
     size_t i;
     size_t const couts = x->f_noutlets;
     size_t const rnouts = (size_t)nins > 0 ? (size_t)nins : 0;
+    if(rnouts == couts)
+    {
+        return 0;
+    }
     for(i = rnouts; i < couts; ++i)
     {
         outlet_free(x->f_outlets[i]);
