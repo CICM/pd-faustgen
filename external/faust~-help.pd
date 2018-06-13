@@ -35,7 +35,7 @@ for further information, f 24;
 #X text 26 403 fauts~ website: github.com/grame-cncm/faust-pd;
 #X text 26 469 Another faust~ object has been developed by Albert Graef
 using the programming language "Pure" : https://github.com/agraef/pure-lang.
-;
+, f 67;
 #X connect 1 0 2 0;
 #X connect 4 0 3 0;
 #X connect 4 0 3 1;
