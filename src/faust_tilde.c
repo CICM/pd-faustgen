@@ -585,7 +585,7 @@ static void faust_tilde_anything(t_faust_tilde *x, t_symbol* s, int argc, t_atom
                     *x->f_params[i].p_zone = !(*x->f_params[i].p_zone != 0.f);
                     if(argc)
                     {
-                        pd_error(x, "faust~: parameter '%s' two many arguments: 0 expected", s->s_name);
+                        pd_error(x, "faust~: parameter '%s' too many arguments: 0 expected", s->s_name);
                     }
                 }
                 else if(x->f_params[i].p_type == 1)
@@ -598,7 +598,7 @@ static void faust_tilde_anything(t_faust_tilde *x, t_symbol* s, int argc, t_atom
                     *x->f_params[i].p_zone = argv[0].a_w.w_float != 0.f;
                     if(argc > 1)
                     {
-                        pd_error(x, "faust~: parameter '%s' two many arguments: 1 float expected", s->s_name);
+                        pd_error(x, "faust~: parameter '%s' too many arguments: 1 float expected", s->s_name);
                     }
                 }
                 else if(x->f_params[i].p_type == 2)
@@ -614,7 +614,7 @@ static void faust_tilde_anything(t_faust_tilde *x, t_symbol* s, int argc, t_atom
                     *x->f_params[i].p_zone = value;
                     if(argc > 1)
                     {
-                        pd_error(x, "faust~: parameter '%s' two many arguments: 1 float expected", s->s_name);
+                        pd_error(x, "faust~: parameter '%s' too many arguments: 1 float expected", s->s_name);
                     }
                 }
                 else
