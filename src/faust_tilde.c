@@ -179,15 +179,13 @@ static char faust_tilde_resize_ioputs(t_faust_tilde *x, int const nins, int cons
 
 static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
 {
-    char* file = NULL;
-    t_symbol const* name = x->f_dsp_name;
-    t_symbol const* path;
     if(x->f_canvas)
     {
-        path = canvas_getdir(x->f_canvas);
+        t_symbol const* name = x->f_dsp_name;
+        t_symbol const* path = canvas_getdir(x->f_canvas);
         if(path && path->s_name && name && name->s_name)
         {
-            file = (char *)calloc(MAXFAUSTSTRING, sizeof(char *));
+            char* file = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
             if(file)
             {
                 sprintf(file, "%s/%s.dsp", path->s_name, name->s_name);
@@ -212,11 +210,10 @@ static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
 
 static char* faust_tilde_get_default_include_path(t_faust_tilde *x)
 {
-    char* include_path;
     char const* path = class_gethelpdir(faust_tilde_class);
     if(path)
     {
-        include_path = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
+        char* include_path = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
         if(include_path)
         {
             sprintf(include_path, "%s/libs/", path);
@@ -297,9 +294,9 @@ static int faust_tilde_parse_compile_options(t_faust_tilde *x, int argc, t_atom*
 
 static void faust_tilde_free_compile_options(t_faust_tilde *x)
 {
-    size_t i;
     if(x->f_compile_options)
     {
+        size_t i;
         for(i = 0; i < x->f_ncompile_options; ++i)
         {
             if(x->f_compile_options[i])
@@ -386,7 +383,6 @@ static void faust_tilde_restore_params(t_faust_tilde *x)
 static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int const type, FAUSTFLOAT* zone,
                                    FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
 {
-    char temp[MAXFAUSTSTRING];
     t_faust_param *newmemory;
     size_t size = x->f_nparams;
     if(x->f_params)
@@ -409,6 +405,7 @@ static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int cons
     }
     if(strnlen(label, MAXFAUSTSTRING) == 0 || label[0] == '0')
     {
+        char temp[MAXFAUSTSTRING];
         sprintf(temp, "param%i", (int)size+1);
         newmemory[size].p_label = gensym(temp);
         logpost(x, 3, "faust~: parameter has no label, empty string replace with '%s'", temp);
@@ -502,11 +499,11 @@ static void faust_tilde_print(t_faust_tilde *x)
 static void faust_tilde_reload(t_faust_tilde *x)
 {
     size_t i;
-    char errors[MAXFAUSTSTRING];
     int dspstate = canvas_suspend_dsp();
     char* filepath = faust_tilde_get_dsp_file_path(x);
     if(filepath)
     {
+        char errors[MAXFAUSTSTRING];
         faust_tilde_delete_instance(x);
         faust_tilde_delete_factory(x);
         faust_tilde_delete_params(x);
