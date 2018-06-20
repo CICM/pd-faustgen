@@ -24,9 +24,11 @@ matrix:
     install:
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
+    - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
+    - tar xvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
     script:
     - mkdir build && cd build
-    - cmake .. -DCMAKE_C_FLAGS=-m64
+    - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
     - cmake --build . --config Release --target faust_tilde_project
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
@@ -37,7 +39,7 @@ before_deploy:
   - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
   - mv external faust~
   - zip -r "faust_tilde-$release_arch-sources.zip" faust~
-  
+
 deploy:
   provider: releases
   skip_cleanup: true
