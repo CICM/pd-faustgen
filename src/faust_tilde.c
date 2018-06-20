@@ -682,11 +682,11 @@ static char faust_tilde_is_valid(t_faust_tilde *x)
 
 static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
 {
-    size_t i;
-    size_t const ninlets = x->f_ninlets;
-    size_t const noutlets = x->f_noutlets;
     if(!faust_tilde_is_valid(x))
     {
+        size_t i;
+        size_t const ninlets = x->f_ninlets;
+        size_t const noutlets = x->f_noutlets;
         faust_tilde_save_params(x);
         initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
         for(i = 0; i < ninlets + noutlets; ++i)
@@ -710,10 +710,10 @@ static void faust_tilde_free(t_faust_tilde *x)
 
 static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
 {
-    size_t i;
     t_faust_tilde* x = (t_faust_tilde *)pd_new(faust_tilde_class);
     if(x)
     {
+        size_t i;
         x->f_dsp_factory    = NULL;
         x->f_dsp_instance   = NULL;
         x->f_nsignals       = 0;
