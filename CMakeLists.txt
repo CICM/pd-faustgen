@@ -8,6 +8,11 @@ include(pd.build/pd.cmake)
 
 project(faust~ C)
 
+## On Linux "force" the link with stdc++
+if(UNIX AND NOT APPLE)
+    set(FAUST_LIBS  "stdc++"  CACHE STRING  "FAUST LIBRARIES" FORCE)
+endif()
+
 ## For Windows use static runtime instead of default dynamic runtime
 if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "/MT"  CACHE STRING  "FORCE CXX FLAGS" FORCE)
