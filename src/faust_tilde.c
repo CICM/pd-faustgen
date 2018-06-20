@@ -569,10 +569,10 @@ static void faust_tilde_reload(t_faust_tilde *x)
 
 static void faust_tilde_anything(t_faust_tilde *x, t_symbol* s, int argc, t_atom* argv)
 {
-    size_t i;
     t_float value;
     if(x->f_dsp_instance)
     {
+        size_t i;
         for(i = 0; i < x->f_nparams; ++i)
         {
             if(x->f_params[i].p_label == s)
