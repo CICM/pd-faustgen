@@ -1,7 +1,6 @@
 #!/bin/bash
 
 echo -e "title Deken manager for Faust~ for Pure Data"
-release_version="$1"
 
 rm -rf faust~
 rm -f *.dek
