@@ -498,7 +498,6 @@ static void faust_tilde_print(t_faust_tilde *x)
 
 static void faust_tilde_reload(t_faust_tilde *x)
 {
-    size_t i;
     int dspstate = canvas_suspend_dsp();
     char* filepath = faust_tilde_get_dsp_file_path(x);
     if(filepath)
@@ -514,6 +513,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
         if(strnlen(errors, MAXFAUSTSTRING))
         {
             pd_error(x, "faust~: try to load %s", filepath);
+            size_t i;
             for (i  = 0; i < x->f_ncompile_options; ++i)
             {
                 if(x->f_compile_options[i])
@@ -541,7 +541,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
                             getNumInputsCDSPInstance(x->f_dsp_instance));
                     logpost(x, 3, "             %s: %i", "number of outputs",
                             getNumOutputsCDSPInstance(x->f_dsp_instance));
-                    
+                    size_t i;
                     for (i = 0; i < x->f_nparams; ++i)
                     {
                         logpost(x, 3, "             parameter %i: %s", (int)i, x->f_params[i].p_label->s_name);
