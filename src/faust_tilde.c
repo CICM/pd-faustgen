@@ -10,20 +10,10 @@
 #include <string.h>
 
 #include <faust/dsp/llvm-c-dsp.h>
+#include "faust_tilde_ui.h"
 
 #define MAXFAUSTSTRING 4096
 #define MAXFAUSTOPTIONS 128
-
-typedef struct _faust_param
-{
-    t_symbol*   p_label;
-    int         p_type;
-    FAUSTFLOAT* p_zone;
-    FAUSTFLOAT  p_min;
-    FAUSTFLOAT  p_max;
-    FAUSTFLOAT  p_step;
-    FAUSTFLOAT  p_saved;
-}t_faust_param;
 
 typedef struct _faust_tilde
 {
@@ -35,9 +25,7 @@ typedef struct _faust_tilde
     t_float             f_f;
     
     MetaGlue            f_meta_glue;
-    UIGlue              f_ui_glue;
-    size_t              f_nparams;
-    t_faust_param*      f_params;
+    t_faust_ui_manager* f_ui_manager;
     
     t_canvas*           f_canvas;
     t_symbol*           f_dsp_name;
@@ -129,7 +117,7 @@ static char faust_tilde_resize_outputs(t_faust_tilde *x, int const nins)
     {
         for(i = couts; i < rnouts; ++i)
         {
-            noutlets[i] = outlet_new((t_object *)x, &s_signal);
+            noutlets[i] = outlet_new((t_object *)x, gensym("signal"));
         }
         x->f_outlets = noutlets;
         x->f_noutlets = rnouts;
@@ -330,156 +318,6 @@ static void faust_tilde_delete_factory(t_faust_tilde *x)
     }
 }
 
-static void faust_tilde_ui_open_tab_box(t_faust_tilde* x, const char* label)
-{
-    //pd_error(x, "faust~: open tab box not supported yet (%s)", label);
-}
-
-static void faust_tilde_ui_open_horizontal_box(t_faust_tilde* x, const char* label)
-{
-    //pd_error(x, "faust~: open horizontal box not supported yet (%s)", label);
-}
-
-static void faust_tilde_ui_open_vertical_box(t_faust_tilde* x, const char* label)
-{
-    //pd_error(x, "faust~: open vertical box not supported yet (%s)", label);
-}
-
-static void faust_tilde_ui_close_box(t_faust_tilde* x)
-{
-    //pd_error(x, "faust~: close box not supported yet");
-}
-
-
-
-static void faust_tilde_delete_params(t_faust_tilde *x)
-{
-    if(x->f_params)
-    {
-        freebytes(x->f_params, x->f_nparams * sizeof(t_faust_param));
-        x->f_params = NULL;
-        x->f_nparams = 0;
-    }
-}
-
-static void faust_tilde_save_params(t_faust_tilde *x)
-{
-    size_t i;
-    for(i = 0; i < x->f_nparams; ++i)
-    {
-        x->f_params[i].p_saved = *x->f_params[i].p_zone;
-    }
-}
-
-static void faust_tilde_restore_params(t_faust_tilde *x)
-{
-    size_t i;
-    for(i = 0; i < x->f_nparams; ++i)
-    {
-        *x->f_params[i].p_zone = x->f_params[i].p_saved;
-    }
-}
-
-static void faust_tilde_add_params(t_faust_tilde *x, const char* label, int const type, FAUSTFLOAT* zone,
-                                   FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
-{
-    t_faust_param *newmemory;
-    size_t size = x->f_nparams;
-    if(x->f_params)
-    {
-        newmemory = (t_faust_param *)resizebytes(x->f_params, size * sizeof(t_faust_param), (size + 1) * sizeof(t_faust_param));
-        if(!newmemory)
-        {
-            pd_error(x, "faust~: memory allocation failed - parameter");
-            return;
-        }
-    }
-    else
-    {
-        newmemory = (t_faust_param *)getbytes(sizeof(t_faust_param));
-        if(!newmemory)
-        {
-            pd_error(x, "faust~: memory allocation failed - parameter");
-            return;
-        }
-    }
-    if(strnlen(label, MAXFAUSTSTRING) == 0 || label[0] == '0')
-    {
-        char temp[MAXFAUSTSTRING];
-        sprintf(temp, "param%i", (int)size+1);
-        newmemory[size].p_label = gensym(temp);
-        logpost(x, 3, "faust~: parameter has no label, empty string replace with '%s'", temp);
-    }
-    else
-    {
-        newmemory[size].p_label = gensym(label);
-    }
-    newmemory[size].p_type  = type;
-    newmemory[size].p_zone  = zone;
-    newmemory[size].p_min   = min;
-    newmemory[size].p_max   = max;
-    newmemory[size].p_step  = step;
-    *newmemory[size].p_zone = init;
-    x->f_params  = (t_faust_param *)newmemory;
-    x->f_nparams++;
-}
-
-static void faust_tilde_ui_add_button(t_faust_tilde* x, const char* label, FAUSTFLOAT* zone)
-{
-    faust_tilde_add_params(x, label, 0, zone, 0, 0, 0, 0);
-}
-
-static void faust_tilde_ui_add_check_button(t_faust_tilde* x, const char* label, FAUSTFLOAT* zone)
-{
-    faust_tilde_add_params(x, label, 1, zone,0, 0, 1, 1);
-}
-
-static void faust_tilde_ui_add_vertical_slider(t_faust_tilde* x, const char* label, FAUSTFLOAT* zone,
-                                               FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
-{
-    faust_tilde_add_params(x, label, 2, zone, init, min, max, step);
-}
-
-static void faust_tilde_ui_add_horizontal_slider(t_faust_tilde* x, const char* label, FAUSTFLOAT* zone,
-                                               FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
-{
-    faust_tilde_add_params(x, label, 2, zone, init, min, max, step);
-}
-
-static void faust_tilde_ui_add_number_entry(t_faust_tilde* x, const char* label, FAUSTFLOAT* zone,
-                                                 FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
-{
-    faust_tilde_add_params(x, label, 2, zone, init, min, max, step);
-}
-
-
-
-
-static void faust_tilde_ui_add_horizontal_bargraph(t_faust_tilde* x, const char* label,
-                                                   FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max)
-{
-    pd_error(x, "faust~: add horizontal bargraph not supported yet");
-}
-
-static void faust_tilde_ui_add_vertical_bargraph(t_faust_tilde* x, const char* label,
-                                                 FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max)
-{
-    pd_error(x, "faust~: add vertical bargraph not supported yet");
-}
-
-static void faust_tilde_ui_add_sound_file(t_faust_tilde* x, const char* label, const char* filename, struct Soundfile** sf_zone)
-{
-    pd_error(x, "faust~: add sound file not supported yet");
-}
-
-static void faust_tilde_ui_declare(t_faust_tilde* x, FAUSTFLOAT* zone, const char* key, const char* value)
-{
-    //pd_error(x, "faust~: ui declare %s: %s", key, value);
-}
-
-
-
-
 static void faust_tilde_meta_declare(t_faust_tilde* x, const char* key, const char* value)
 {
     logpost(x, 3, "             %s: %s", key, value);
@@ -505,7 +343,7 @@ static void faust_tilde_reload(t_faust_tilde *x)
         char errors[MAXFAUSTSTRING];
         faust_tilde_delete_instance(x);
         faust_tilde_delete_factory(x);
-        faust_tilde_delete_params(x);
+        faust_ui_manager_clear(x->f_ui_manager);
         
         x->f_dsp_factory = createCDSPFactoryFromFile(filepath,
                                                      (int)x->f_ncompile_options, (const char**)x->f_compile_options,
@@ -529,23 +367,18 @@ static void faust_tilde_reload(t_faust_tilde *x)
             x->f_dsp_instance = createCDSPInstance(x->f_dsp_factory);
             if(x->f_dsp_instance)
             {
+                faust_ui_manager_init(x->f_ui_manager, x->f_dsp_instance);
+                logpost(x, 3, "\nfaust~: compilation from source '%s' succeeded", x->f_dsp_name->s_name);
+                logpost(x, 3, "             %s: %i", "number of inputs",
+                        getNumInputsCDSPInstance(x->f_dsp_instance));
+                logpost(x, 3, "             %s: %i", "number of outputs",
+                        getNumOutputsCDSPInstance(x->f_dsp_instance));
                 if(!faust_tilde_resize_ioputs(x,
                                           getNumInputsCDSPInstance(x->f_dsp_instance),
                                           getNumOutputsCDSPInstance(x->f_dsp_instance)))
                 {
-                    logpost(x, 3, "\nfaust~: compilation from source '%s' succeeded", x->f_dsp_name->s_name);
                     metadataCDSPInstance(x->f_dsp_instance, &x->f_meta_glue);
-                    buildUserInterfaceCDSPInstance(x->f_dsp_instance, &x->f_ui_glue);
                     
-                    logpost(x, 3, "             %s: %i", "number of inputs",
-                            getNumInputsCDSPInstance(x->f_dsp_instance));
-                    logpost(x, 3, "             %s: %i", "number of outputs",
-                            getNumOutputsCDSPInstance(x->f_dsp_instance));
-                    size_t i;
-                    for (i = 0; i < x->f_nparams; ++i)
-                    {
-                        logpost(x, 3, "             parameter %i: %s", (int)i, x->f_params[i].p_label->s_name);
-                    }
                 }
                 
             }
@@ -569,75 +402,20 @@ static void faust_tilde_reload(t_faust_tilde *x)
 
 static void faust_tilde_anything(t_faust_tilde *x, t_symbol* s, int argc, t_atom* argv)
 {
-    t_float value;
     if(x->f_dsp_instance)
     {
-        size_t i;
-        for(i = 0; i < x->f_nparams; ++i)
+        t_float value;
+        if(!faust_ui_manager_set(x->f_ui_manager, s, atom_getfloatarg(0, argc, argv)))
         {
-            if(x->f_params[i].p_label == s)
-            {
-                if(x->f_params[i].p_type == 0)
-                {
-                    *x->f_params[i].p_zone = !(*x->f_params[i].p_zone != 0.f);
-                    if(argc)
-                    {
-                        pd_error(x, "faust~: parameter '%s' too many arguments: 0 expected", s->s_name);
-                    }
-                }
-                else if(x->f_params[i].p_type == 1)
-                {
-                    if(argc < 1 || argv[0].a_type != A_FLOAT)
-                    {
-                        pd_error(x, "faust~: parameter '%s' wrong arguments: 0 expected", s->s_name);
-                        return;
-                    }
-                    *x->f_params[i].p_zone = argv[0].a_w.w_float != 0.f;
-                    if(argc > 1)
-                    {
-                        pd_error(x, "faust~: parameter '%s' too many arguments: 1 float expected", s->s_name);
-                    }
-                }
-                else if(x->f_params[i].p_type == 2)
-                {
-                    if(argc < 1 || argv[0].a_type != A_FLOAT)
-                    {
-                        pd_error(x, "faust~: parameter '%s' wrong arguments: 0 expected", s->s_name);
-                        return;
-                    }
-                    value = argv[0].a_w.w_float;
-                    value = value > x->f_params[i].p_min ? value : x->f_params[i].p_min;
-                    value = value < x->f_params[i].p_max ? value : x->f_params[i].p_max;
-                    *x->f_params[i].p_zone = value;
-                    if(argc > 1)
-                    {
-                        pd_error(x, "faust~: parameter '%s' too many arguments: 1 float expected", s->s_name);
-                    }
-                }
-                else
-                {
-                    pd_error(x, "faust~: wrong parameter '%s'", s->s_name);
-                }
-                return;
-            }
+            return;
+        }
+        if(!faust_ui_manager_get(x->f_ui_manager, s, &value))
+        {
+            outlet_float(NULL, value);
+            return;
         }
         pd_error(x, "faust~: parameter '%s' not defined", s->s_name);
     }
-}
-
-static void faust_tilde_bang(t_faust_tilde *x, t_float f)
-{
-    faust_tilde_anything(x, &s_, 0, NULL);
-}
-
-static void faust_tilde_symbol(t_faust_tilde *x, t_symbol* s)
-{
-    faust_tilde_anything(x, s, 0, NULL);
-}
-
-static void faust_tilde_list(t_faust_tilde *x, t_symbol* s, int argc, t_atom* argv)
-{
-    faust_tilde_anything(x, s, argc, argv);
 }
 
 static t_int *faust_tilde_perform(t_int *w)
@@ -687,7 +465,7 @@ static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
         size_t i;
         size_t const ninlets = x->f_ninlets;
         size_t const noutlets = x->f_noutlets;
-        faust_tilde_save_params(x);
+        faust_ui_manager_save_states(x->f_ui_manager);
         initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
         for(i = 0; i < ninlets + noutlets; ++i)
         {
@@ -695,7 +473,7 @@ static void faust_tilde_dsp(t_faust_tilde *x, t_signal **sp)
         }
         dsp_add((t_perfroutine)faust_tilde_perform, 4,
                 (t_int)x->f_dsp_instance, (t_int)sp[0]->s_n, (t_int)x->f_signals, (t_int)(x->f_signals+ninlets));
-        faust_tilde_restore_params(x);
+        faust_ui_manager_restore_states(x->f_ui_manager);
     }
 }
 
@@ -703,7 +481,7 @@ static void faust_tilde_free(t_faust_tilde *x)
 {
     faust_tilde_delete_instance(x);
     faust_tilde_delete_factory(x);
-    faust_tilde_delete_params(x);
+    faust_ui_manager_free(x->f_ui_manager);
     faust_tilde_free_compile_options(x);
     faust_tilde_free_ioputs(x);
 }
@@ -720,28 +498,9 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_signals        = NULL;
         x->f_f              = 0;
         
+        x->f_ui_manager     = faust_ui_manager_new((t_object *)x);
         x->f_meta_glue.metaInterface = x;
         x->f_meta_glue.declare       = (metaDeclareFun)faust_tilde_meta_declare;
-        
-        x->f_ui_glue.uiInterface            = x;
-        x->f_ui_glue.openTabBox             = (openTabBoxFun)faust_tilde_ui_open_tab_box;
-        x->f_ui_glue.openHorizontalBox      = (openHorizontalBoxFun)faust_tilde_ui_open_horizontal_box;
-        x->f_ui_glue.openVerticalBox        = (openVerticalBoxFun)faust_tilde_ui_open_vertical_box;
-        x->f_ui_glue.closeBox               = (closeBoxFun)faust_tilde_ui_close_box;
-        
-        x->f_ui_glue.addButton              = (addButtonFun)faust_tilde_ui_add_button;
-        x->f_ui_glue.addCheckButton         = (addCheckButtonFun)faust_tilde_ui_add_check_button;
-        x->f_ui_glue.addVerticalSlider      = (addVerticalSliderFun)faust_tilde_ui_add_vertical_slider;
-        x->f_ui_glue.addHorizontalSlider    = (addHorizontalSliderFun)faust_tilde_ui_add_horizontal_slider;
-        x->f_ui_glue.addNumEntry            = (addNumEntryFun)faust_tilde_ui_add_number_entry;
-        
-        x->f_ui_glue.addHorizontalBargraph  = (addHorizontalBargraphFun)faust_tilde_ui_add_horizontal_bargraph;
-        x->f_ui_glue.addVerticalBargraph    = (addVerticalBargraphFun)faust_tilde_ui_add_vertical_bargraph;
-        x->f_ui_glue.addSoundFile           = (addSoundFileFun)faust_tilde_ui_add_sound_file;
-        x->f_ui_glue.declare                = (declareFun)faust_tilde_ui_declare;
-        
-        x->f_nparams        = 0;
-        x->f_params         = NULL;
         
         x->f_canvas         = canvas_getcurrent();
         x->f_dsp_name       = atom_getsymbolarg(0, argc, argv);
@@ -784,13 +543,10 @@ void faust_tilde_setup(void)
                            sizeof(t_faust_tilde), CLASS_DEFAULT, A_GIMME, 0);
     if(c)
     {
-        class_addmethod(c, (t_method)faust_tilde_dsp, gensym("dsp"), A_CANT);
-        class_addmethod(c, (t_method)faust_tilde_reload, gensym("reload"), A_NULL);
-        class_addmethod(c, (t_method)faust_tilde_print, gensym("print"), A_NULL);
-        class_addbang(c, (t_method)faust_tilde_bang);
-        class_addsymbol(c, (t_method)faust_tilde_symbol);
-        class_addlist(c, (t_method)faust_tilde_list);
-        class_addanything(c, (t_method)faust_tilde_anything);
+        class_addmethod(c,      (t_method)faust_tilde_dsp,      gensym("dsp"),      A_CANT);
+        class_addmethod(c,      (t_method)faust_tilde_reload,   gensym("reload"),   A_NULL);
+        class_addmethod(c,      (t_method)faust_tilde_print,    gensym("print"),    A_NULL);
+        class_addanything(c,    (t_method)faust_tilde_anything);
         
         CLASS_MAINSIGNALIN(c, t_faust_tilde, f_f);
         
