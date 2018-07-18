@@ -6,6 +6,9 @@
 
 #include <m_pd.h>
 #include <string.h>
+#include <float.h>
+#include <math.h>
+#include <sys/stat.h>
 
 #include <faust/dsp/llvm-c-dsp.h>
 #include "faust_tilde_ui.h"
@@ -26,6 +29,9 @@ typedef struct _faustgen_tilde
  
     t_symbol*           f_dsp_name;
     t_float             f_dummy;
+    t_clock*            f_clock;
+    double              f_clock_time;
+    long                f_time;
 } t_faustgen_tilde;
 
 static t_class *faustgen_tilde_class;
@@ -118,6 +124,37 @@ static void faustgen_tilde_read(t_faustgen_tilde *x, t_symbol* s)
     faustgen_tilde_compile(x);
 }
 
+static long faustgen_tilde_get_time(t_faustgen_tilde *x)
+{
+    struct stat attrib;
+    stat(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), &attrib);
+    return attrib.st_ctimespec.tv_nsec;
+}
+
+static void faustgen_tilde_autocompile_tick(t_faustgen_tilde *x)
+{
+    long ntime = faustgen_tilde_get_time(x);
+    if(ntime != x->f_time)
+    {
+        faustgen_tilde_compile(x);
+    }
+    clock_delay(x->f_clock, x->f_clock_time);
+}
+
+static void faustgen_tilde_autocompile(t_faustgen_tilde *x, t_float state, t_floatarg time)
+{
+    if(fabsf(state) > FLT_EPSILON)
+    {
+        x->f_clock_time = (time > FLT_EPSILON) ? (double)time : 100.;
+        x->f_time = faustgen_tilde_get_time(x);
+        clock_delay(x->f_clock, x->f_clock_time);
+    }
+    else
+    {
+        clock_unset(x->f_clock);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                  PURE DATA GENERIC INTERFACE                                 //
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +221,7 @@ static void *faustgen_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_io_manager     = faust_io_manager_new((t_object *)x, canvas_getcurrent());
         x->f_opt_manager    = faust_opt_manager_new((t_object *)x, canvas_getcurrent());
         x->f_dsp_name       = atom_getsymbolarg(0, argc, argv);
+        x->f_clock          = clock_new(x, (t_method)faustgen_tilde_autocompile_tick);
         faust_opt_manager_parse_compile_options(x->f_opt_manager, argc-1, argv+1);
         if(!argc)
         {
@@ -207,10 +245,11 @@ void faustgen_tilde_setup(void)
     
     if(c)
     {
-        class_addmethod(c,      (t_method)faustgen_tilde_dsp,              gensym("dsp"),           A_CANT);
-        class_addmethod(c,      (t_method)faustgen_tilde_compile,          gensym("compile"),       A_NULL);
+        class_addmethod(c,      (t_method)faustgen_tilde_dsp,              gensym("dsp"),            A_CANT);
+        class_addmethod(c,      (t_method)faustgen_tilde_compile,          gensym("compile"),        A_NULL);
         //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
         class_addmethod(c,      (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"), A_GIMME);
+        class_addmethod(c,      (t_method)faustgen_tilde_autocompile,      gensym("autocompile"), A_FLOAT, A_FLOAT);
         class_addanything(c,    (t_method)faustgen_tilde_anything);
         
         CLASS_MAINSIGNALIN(c, t_faustgen_tilde, f_dummy);
