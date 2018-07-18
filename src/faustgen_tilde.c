@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 
 #include <faust/dsp/llvm-c-dsp.h>
+
 #include "faust_tilde_ui.h"
 #include "faust_tilde_io.h"
 #include "faust_tilde_options.h"
@@ -307,10 +308,11 @@ void faustgen_tilde_setup(void)
     {
         class_addmethod(c,      (t_method)faustgen_tilde_dsp,              gensym("dsp"),            A_CANT);
         class_addmethod(c,      (t_method)faustgen_tilde_compile,          gensym("compile"),        A_NULL);
-        //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
         class_addmethod(c,      (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"), A_GIMME);
         class_addmethod(c,      (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),    A_GIMME);
         class_addmethod(c,      (t_method)faustgen_tilde_print_parameters, gensym("print"),          A_NULL);
+        
+        //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
         class_addanything(c,    (t_method)faustgen_tilde_anything);
         
         CLASS_MAINSIGNALIN(c, t_faustgen_tilde, f_dummy);
