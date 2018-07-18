@@ -1,0 +1,2 @@
+- Mesure DSP time of the code
+- Use automatic optimizations with compile options
