@@ -23,40 +23,12 @@ typedef struct _faust_tilde
     t_faust_ui_manager* f_ui_manager;
     t_faust_io_manager* f_io_manager;
     t_faust_opt_manager* f_opt_manager;
-    t_canvas*           f_canvas;
-    t_symbol*           f_directory;
+ 
     t_symbol*           f_dsp_name;
+    t_float             f_dummy;
 } t_faust_tilde;
 
 static t_class *faust_tilde_class;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          FILE LOCALIZATION                                   //
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-static char* faust_tilde_get_dsp_file_path(t_faust_tilde *x)
-{
-    if(x->f_canvas)
-    {
-        t_symbol const* name = x->f_dsp_name;
-        t_symbol const* path = canvas_getdir(x->f_canvas);
-        if(path && path->s_name && name && name->s_name)
-        {
-            char* file = (char *)calloc(MAXFAUSTSTRING, sizeof(char));
-            if(file)
-            {
-                sprintf(file, "%s/%s.dsp", path->s_name, name->s_name);
-                return file;
-            }
-            pd_error(x, "faust~: memory allocation failed");
-            return NULL;
-        }
-        pd_error(x, "faust~: invalid canvas directory or DSP file name");
-        return NULL;
-    }
-    pd_error(x, "faust~: invalid canvas");
-    return NULL;
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,10 +54,15 @@ static void faust_tilde_delete_factory(t_faust_tilde *x)
     x->f_dsp_factory = NULL;
 }
 
-static void faust_tilde_reload(t_faust_tilde *x)
+static void faust_tilde_compile(t_faust_tilde *x)
 {
+    char const* filepath;
     int dspstate = canvas_suspend_dsp();
-    char* filepath = faust_tilde_get_dsp_file_path(x);
+    if(!x->f_dsp_name)
+    {
+        return;
+    }
+    filepath = faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name);
     if(filepath)
     {
         char errors[MAXFAUSTSTRING];
@@ -102,7 +79,6 @@ static void faust_tilde_reload(t_faust_tilde *x)
             pd_error(x, "faust~: %s", errors);
             x->f_dsp_factory = NULL;
             
-            free(filepath);
             canvas_resume_dsp(dspstate);
             return;
         }
@@ -117,17 +93,29 @@ static void faust_tilde_reload(t_faust_tilde *x)
             logpost(x, 3, "             %s: %i", "number of outputs", noutputs);
             faust_ui_manager_init(x->f_ui_manager, x->f_dsp_instance);
             faust_io_manager_init(x->f_io_manager, ninputs, noutputs, faust_ui_manager_has_passive_ui(x->f_ui_manager));
-            free(filepath);
+
             canvas_resume_dsp(dspstate);
             return;
         }
+        
         pd_error(x, "faust~: memory allocation failed - instance");
-        free(filepath);
         canvas_resume_dsp(dspstate);
         return;
     }
-    pd_error(x, "faust~: source file not defined");
+    pd_error(x, "faust~: source file not found %s", x->f_dsp_name->s_name);
     canvas_resume_dsp(dspstate);
+}
+
+static void faust_tilde_compile_options(t_faust_tilde *x, t_symbol* s, int argc, t_atom* argv)
+{
+    faust_opt_manager_parse_compile_options(x->f_opt_manager, argc, argv);
+    faust_tilde_compile(x);
+}
+
+static void faust_tilde_read(t_faust_tilde *x, t_symbol* s)
+{
+    x->f_dsp_name = s;
+    faust_tilde_compile(x);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,7 +144,7 @@ static void faust_tilde_anything(t_faust_tilde *x, t_symbol* s, int argc, t_atom
 
 static t_int *faust_tilde_perform(t_int *w)
 {
-    computeCDSPInstance((llvm_dsp *)w[1], (int)w[2], (float **)w[3], (float **)w[4]);
+    computeCDSPInstance((llvm_dsp *)w[1], (int)w[2], (FAUSTFLOAT **)w[3], (FAUSTFLOAT **)w[4]);
     return (w+5);
 }
 
@@ -193,16 +181,15 @@ static void *faust_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_dsp_instance   = NULL;
         
         x->f_ui_manager     = faust_ui_manager_new((t_object *)x);
-        x->f_io_manager     = faust_io_manager_new((t_object *)x, x->f_canvas);
-        x->f_opt_manager    = faust_opt_manager_new((t_object *)x);
-        x->f_canvas         = canvas_getcurrent();
+        x->f_io_manager     = faust_io_manager_new((t_object *)x, canvas_getcurrent());
+        x->f_opt_manager    = faust_opt_manager_new((t_object *)x, canvas_getcurrent());
         x->f_dsp_name       = atom_getsymbolarg(0, argc, argv);
         faust_opt_manager_parse_compile_options(x->f_opt_manager, argc-1, argv+1);
         if(!argc)
         {
             return x;
         }
-        faust_tilde_reload(x);
+        faust_tilde_compile(x);
         if(!x->f_dsp_instance)
         {
             faust_tilde_free(x);
@@ -220,10 +207,13 @@ void faust_tilde_setup(void)
     
     if(c)
     {
-        class_addmethod(c,      (t_method)faust_tilde_dsp,      gensym("dsp"),      A_CANT);
-        class_addmethod(c,      (t_method)faust_tilde_reload,   gensym("reload"),   A_NULL);
+        class_addmethod(c,      (t_method)faust_tilde_dsp,              gensym("dsp"),            A_CANT);
+        class_addmethod(c,      (t_method)faust_tilde_compile,          gensym("recompile"),      A_NULL);
+        //class_addmethod(c,      (t_method)faust_tilde_read,             gensym("read"),           A_SYMBOL);
+        class_addmethod(c,      (t_method)faust_tilde_compile_options,  gensym("compileoptions"), A_GIMME);
         class_addanything(c,    (t_method)faust_tilde_anything);
         
+        CLASS_MAINSIGNALIN(c, t_faust_tilde, f_dummy);
         logpost(NULL, 3, "Faust website: faust.grame.fr");
         logpost(NULL, 3, "Faust development: GRAME");
         

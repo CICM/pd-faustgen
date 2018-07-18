@@ -74,7 +74,7 @@ static char faust_io_manager_resize_signals(t_faust_io_manager *x, size_t nsigna
         return 0;
     }
     nsigs = (t_sample **)resizebytes(x->f_signals, x->f_nsignals * sizeof(t_sample*), nsignals * sizeof(t_sample*));
-    if(nsignals)
+    if(nsigs)
     {
         x->f_nsignals = nsignals;
         x->f_signals  = nsigs;
@@ -89,7 +89,7 @@ static char faust_io_manager_resize_inputs(t_faust_io_manager *x, size_t const n
     t_inlet** ninlets;
     size_t i;
     size_t const cins = faust_io_manager_get_ninputs(x);
-    size_t const rnins = nins > 1 ? nins : 1;
+    size_t const rnins = nins;
     if(rnins == cins)
     {
         return 0;
@@ -110,15 +110,16 @@ static char faust_io_manager_resize_inputs(t_faust_io_manager *x, size_t const n
         x->f_ninlets = rnins;
         return 0;
     }
+    pd_error(x->f_owner, "faust~: memory allocation failed - inputs");
     return 2;
 }
 
-static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const nins, char const extraout)
+static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const nouts, char const extraout)
 {
     t_outlet** noutlets;
     size_t i;
     size_t const couts = faust_io_manager_get_noutputs(x);
-    size_t const rnouts = nins;
+    size_t const rnouts = nouts;
     if(rnouts == couts)
     {
         return 0;
@@ -149,10 +150,12 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
             {
                  return 0;
             }
+            pd_error(x->f_owner, "faust~: memory allocation failed - extra output");
             return 1;
         }
         return 0;
     }
+    pd_error(x->f_owner, "faust~: memory allocation failed - output");
     return 1;
 }
 
@@ -215,15 +218,16 @@ char faust_io_manager_init(t_faust_io_manager *x, int const nins, int const nout
     {
         gobj_vis((t_gobj *)x->f_owner, x->f_canvas, 0);
     }
-    valid += faust_io_manager_resize_inputs(x, (size_t)nins);
+    size_t const rnins = nins > 1 ? nins : 1;
+    valid += faust_io_manager_resize_inputs(x, (size_t)rnins);
     valid += faust_io_manager_resize_outputs(x, (size_t)nouts, extraout);
-    valid += faust_io_manager_resize_signals(x, (size_t)nouts + (size_t)nins);
+    valid += faust_io_manager_resize_signals(x, (size_t)rnins + (size_t)nouts);
     if(redraw)
     {
         gobj_vis((t_gobj *)x->f_owner, x->f_canvas, 1);
         canvas_fixlinesfor(x->f_canvas, (t_text *)x->f_owner);
     }
-    x->f_valid = valid != 0;
+    x->f_valid = (valid == 0);
     return valid;
 }
 
@@ -248,5 +252,5 @@ t_sample** faust_io_manager_get_output_signals(t_faust_io_manager *x)
 
 char faust_io_manager_is_valid(t_faust_io_manager *x)
 {
-    return x->f_valid;
+    return x->f_signals && x->f_valid;
 }

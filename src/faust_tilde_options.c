@@ -16,6 +16,8 @@ typedef struct _faust_opt_manager
     char*       f_default_include;
     size_t      f_noptions;
     char**      f_options;
+    t_symbol*   f_directory;
+    t_symbol*   f_temp_path;
 }t_faust_opt_manager;
 
 
@@ -152,7 +154,7 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
 //                                      PUBLIC INTERFACE                                        //
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-t_faust_opt_manager* faust_opt_manager_new(t_object* owner)
+t_faust_opt_manager* faust_opt_manager_new(t_object* owner, t_canvas* canvas)
 {
     t_faust_opt_manager* x = (t_faust_opt_manager*)getbytes(sizeof(t_faust_opt_manager));
     if(x)
@@ -161,6 +163,7 @@ t_faust_opt_manager* faust_opt_manager_new(t_object* owner)
         x->f_default_include    = NULL;
         x->f_options            = NULL;
         x->f_noptions           = 0;
+        x->f_directory          = canvas_getdir(canvas);
         faust_opt_manager_get_default_include_path(x);
     }
     return x;
@@ -180,4 +183,23 @@ size_t faust_opt_manager_get_noptions(t_faust_opt_manager* x)
 char const** faust_opt_manager_get_options(t_faust_opt_manager* x)
 {
     return (char const**)x->f_options;
+}
+
+char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* name)
+{
+    if(x->f_directory && x->f_directory->s_name && name)
+    {
+        char* file = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
+        if(file)
+        {
+            sprintf(file, "%s/%s.dsp", x->f_directory->s_name, name);
+            x->f_temp_path = gensym(file);
+            freebytes(file, MAXFAUSTSTRING * sizeof(char));
+            return x->f_temp_path->s_name;
+        }
+        pd_error(x, "faust~: memory allocation failed");
+        return NULL;
+    }
+    pd_error(x, "faust~: invalid path or name");
+    return NULL;
 }

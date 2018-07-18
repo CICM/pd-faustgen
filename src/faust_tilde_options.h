@@ -12,7 +12,7 @@
 struct _faust_opt_manager;
 typedef struct _faust_opt_manager t_faust_opt_manager;
 
-t_faust_opt_manager* faust_opt_manager_new(t_object* owner);
+t_faust_opt_manager* faust_opt_manager_new(t_object* owner, t_canvas* canvas);
 
 void faust_opt_manager_free(t_faust_opt_manager* x);
 
@@ -21,5 +21,7 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
 size_t faust_opt_manager_get_noptions(t_faust_opt_manager* x);
 
 char const** faust_opt_manager_get_options(t_faust_opt_manager* x);
+
+char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* name);
 
 #endif
