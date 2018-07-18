@@ -128,7 +128,7 @@ static long faustgen_tilde_get_time(t_faustgen_tilde *x)
 {
     struct stat attrib;
     stat(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), &attrib);
-    return attrib.st_ctimespec.tv_nsec;
+    return attrib.st_ctime;
 }
 
 static void faustgen_tilde_autocompile_tick(t_faustgen_tilde *x)
@@ -136,15 +136,18 @@ static void faustgen_tilde_autocompile_tick(t_faustgen_tilde *x)
     long ntime = faustgen_tilde_get_time(x);
     if(ntime != x->f_time)
     {
+        x->f_time = ntime;
         faustgen_tilde_compile(x);
     }
     clock_delay(x->f_clock, x->f_clock_time);
 }
 
-static void faustgen_tilde_autocompile(t_faustgen_tilde *x, t_float state, t_floatarg time)
+static void faustgen_tilde_autocompile(t_faustgen_tilde *x, t_symbol* s, int argc, t_atom* argv)
 {
+    float state = atom_getfloatarg(0, argc, argv);
     if(fabsf(state) > FLT_EPSILON)
     {
+        float time = atom_getfloatarg(1, argc, argv);
         x->f_clock_time = (time > FLT_EPSILON) ? (double)time : 100.;
         x->f_time = faustgen_tilde_get_time(x);
         clock_delay(x->f_clock, x->f_clock_time);
@@ -249,7 +252,7 @@ void faustgen_tilde_setup(void)
         class_addmethod(c,      (t_method)faustgen_tilde_compile,          gensym("compile"),        A_NULL);
         //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
         class_addmethod(c,      (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"), A_GIMME);
-        class_addmethod(c,      (t_method)faustgen_tilde_autocompile,      gensym("autocompile"), A_FLOAT, A_FLOAT);
+        class_addmethod(c,      (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),    A_GIMME);
         class_addanything(c,    (t_method)faustgen_tilde_anything);
         
         CLASS_MAINSIGNALIN(c, t_faustgen_tilde, f_dummy);
