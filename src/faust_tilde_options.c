@@ -18,6 +18,7 @@ typedef struct _faust_opt_manager
     char**      f_options;
     t_symbol*   f_directory;
     t_symbol*   f_temp_path;
+    char        f_use_default_include;
 }t_faust_opt_manager;
 
 
@@ -58,7 +59,8 @@ static void faust_opt_manager_free_compile_options(t_faust_opt_manager *x)
     if(x->f_options && x->f_noptions)
     {
         size_t i;
-        for(i = 0; i < x->f_noptions; ++i)
+        size_t noptions = x->f_use_default_include ? x->f_noptions - 1 : x->f_noptions;
+        for(i = 0; i < noptions; ++i)
         {
             if(x->f_options[i])
             {
@@ -70,6 +72,7 @@ static void faust_opt_manager_free_compile_options(t_faust_opt_manager *x)
     }
     x->f_options    = NULL;
     x->f_noptions   = 0;
+    x->f_use_default_include = 0;
 }
 
 char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t const argc, const t_atom* argv)
@@ -138,6 +141,7 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
             
             x->f_options[argc+1] = x->f_default_include;
             x->f_noptions = argc+2;
+            x->f_use_default_include = 1;
             return 0;
         }
         else
@@ -159,11 +163,12 @@ t_faust_opt_manager* faust_opt_manager_new(t_object* owner, t_canvas* canvas)
     t_faust_opt_manager* x = (t_faust_opt_manager*)getbytes(sizeof(t_faust_opt_manager));
     if(x)
     {
-        x->f_owner              = owner;
-        x->f_default_include    = NULL;
-        x->f_options            = NULL;
-        x->f_noptions           = 0;
-        x->f_directory          = canvas_getdir(canvas);
+        x->f_owner                  = owner;
+        x->f_default_include        = NULL;
+        x->f_options                = NULL;
+        x->f_noptions               = 0;
+        x->f_use_default_include    = 0;
+        x->f_directory              = canvas_getdir(canvas);
         faust_opt_manager_get_default_include_path(x);
     }
     return x;

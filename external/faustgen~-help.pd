@@ -1,11 +1,10 @@
 #N canvas 364 281 470 537 10;
-#X obj 12 15 cnv 15 360 17 empty empty faust~ 2 9 0 14 -233017 -66577
+#X obj 12 15 cnv 15 360 17 empty empty faustgen~ 2 9 0 14 -233017 -66577
 0;
 #X obj 286 155 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X msg 286 175 \; pd dsp \$1;
 #X obj 32 308 dac~ 1 2;
-#X msg 62 208 reload;
 #X obj 32 158 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
 -1 -1 0 256;
 #X msg 32 177 Volume \$1;
@@ -21,34 +20,29 @@ about the code in the Pd console.;
 #X text 132 370 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
 ...;
 #X text 26 369 FAUST developers:;
-#X text 26 417 faust~ developer: Pierre Guillot;
 #X text 26 439 This object is inspired by faustgen~ for Max developed
 by Martin Di Rollo and Stéphane Letz., f 50;
-#X text 26 389 faust~ institutions: CICM - ANR MUSICOLL;
 #X text 192 256 Use compilation options. See the FAUST documentation
 for further information, f 24;
 #X text 95 16 the FAUST compiler embedded in a Pd external;
-#X text 26 403 fauts~ website: github.com/grame-cncm/faust-pd;
 #X text 26 469 Another faust~ object has been developed by Albert Graef
 using the programming language "Pure" : https://github.com/agraef/pure-lang.
 , f 67;
 #X text 95 155 Control the parameters with their names, f 15;
-#X text 113 206 Reload the FAUST file;
-#X obj 32 255 faust~ examples/noise;
-#X obj 192 305 faust~ examples/noise -vs 64 -vec;
-#X obj 101 291 snapshot~;
-#X obj 101 312 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 0 256;
-#X obj 206 233 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
+#X obj 32 265 faustgen~ examples/noise;
+#X text 26 389 faustgen~ institutions: CICM - ANR MUSICOLL;
+#X text 26 403 faustgen~ website: github.com/grame-cncm/faust-pd;
+#X text 26 417 faustgen~ developer: Pierre Guillot;
+#X msg 52 207 compile;
+#X text 103 208 Reload and recompile the FAUST file;
+#X msg 82 231 compileoptions -vs 64 -vec;
+#X obj 192 305 faustgen~ examples/noise -vs 64 -vec;
 #X connect 1 0 2 0;
-#X connect 4 0 23 0;
-#X connect 5 0 6 0;
-#X connect 6 0 23 0;
-#X connect 7 0 8 0;
-#X connect 8 0 5 0;
-#X connect 23 0 3 0;
-#X connect 23 0 3 1;
-#X connect 23 0 25 0;
-#X connect 25 0 26 0;
-#X connect 27 0 25 0;
+#X connect 4 0 5 0;
+#X connect 5 0 18 0;
+#X connect 6 0 7 0;
+#X connect 7 0 4 0;
+#X connect 18 0 3 0;
+#X connect 18 0 3 1;
+#X connect 22 0 18 0;
+#X connect 24 0 18 0;
