@@ -145,7 +145,7 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
         x->f_noutlets = rnouts;
         if(extraout)
         {
-            x->f_extra_outlet = outlet_new((t_object *)x->f_owner, gensym("float"));
+            x->f_extra_outlet = outlet_new((t_object *)x->f_owner, gensym("anything"));
             if(x->f_extra_outlet)
             {
                  return 0;
