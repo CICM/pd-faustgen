@@ -34,7 +34,15 @@ message(STATUS "Faust External")
 ## Create the Pure Data external
 set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
 set_pd_external_path("${PROJECT_SOURCE_DIR}/external/")
-add_pd_external(faust_tilde_project faust~ ${PROJECT_SOURCE_DIR}/src/faust_tilde.c)
+file(GLOB faust_tilde_sources
+${PROJECT_SOURCE_DIR}/src/faust_tilde.c
+${PROJECT_SOURCE_DIR}/src/faust_tilde_ui.h
+${PROJECT_SOURCE_DIR}/src/faust_tilde_ui.c
+${PROJECT_SOURCE_DIR}/src/faust_tilde_io.h
+${PROJECT_SOURCE_DIR}/src/faust_tilde_io.c
+${PROJECT_SOURCE_DIR}/src/faust_tilde_options.h
+${PROJECT_SOURCE_DIR}/src/faust_tilde_options.c)
+add_pd_external(faust_tilde_project faust~ "${faust_tilde_sources}")
 
 ## Link the Pure Data external with faustlib
 include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)

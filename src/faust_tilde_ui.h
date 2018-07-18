@@ -20,6 +20,8 @@ void faust_ui_manager_free(t_faust_ui_manager *x);
 
 void faust_ui_manager_clear(t_faust_ui_manager *x);
 
+char faust_ui_manager_has_passive_ui(t_faust_ui_manager *x);
+
 char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f);
 
 char faust_ui_manager_get(t_faust_ui_manager *x, t_symbol* name, t_float* f);

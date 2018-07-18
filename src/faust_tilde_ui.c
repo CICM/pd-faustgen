@@ -41,6 +41,7 @@ typedef struct _faust_ui_manager
     size_t      f_npassive_uis;
     t_symbol**  f_names;
     size_t      f_nnames;
+    MetaGlue    f_meta_glue;
 }t_faust_ui_manager;
 
 
@@ -273,6 +274,15 @@ static void faust_ui_manager_ui_declare(t_faust_ui_manager* x, FAUSTFLOAT* zone,
     //logpost(x->f_owner, 3, "%s: %s - %f", key, value, *zone);
 }
 
+// META UIS
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+static void faust_ui_manager_meta_declare(t_faust_ui_manager* x, const char* key, const char* value)
+{
+    logpost(x->f_owner, 3, "             %s: %s", key, value);
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                      PUBLIC INTERFACE                                        //
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,6 +319,9 @@ t_faust_ui_manager* faust_ui_manager_new(t_object* owner)
         ui_manager->f_npassive_uis  = 0;
         ui_manager->f_names         = NULL;
         ui_manager->f_nnames        = 0;
+        
+        ui_manager->f_meta_glue.metaInterface = ui_manager;
+        ui_manager->f_meta_glue.declare       = (metaDeclareFun)faust_ui_manager_meta_declare;
     }
     return ui_manager;
 }
@@ -324,6 +337,7 @@ void faust_ui_manager_init(t_faust_ui_manager *x, void* dspinstance)
     faust_ui_manager_clear(x);
     buildUserInterfaceCDSPInstance((llvm_dsp *)dspinstance, (UIGlue *)&(x->f_glue));
     faust_ui_manager_clear_names(x);
+    metadataCDSPInstance((llvm_dsp *)dspinstance, &x->f_meta_glue);
 }
 
 void faust_ui_manager_clear(t_faust_ui_manager *x)
@@ -340,6 +354,11 @@ static void faust_ui_manager_tick(t_faust_ui_manager* x)
         *(x->f_temp_ui->p_zone) = 0;
     }
     x->f_temp_ui = NULL;
+}
+
+char faust_ui_manager_has_passive_ui(t_faust_ui_manager *x)
+{
+    return x->f_npassive_uis != 0;
 }
 
 char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f)
