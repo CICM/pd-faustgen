@@ -192,7 +192,11 @@ char const** faust_opt_manager_get_options(t_faust_opt_manager* x)
 
 char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* name)
 {
-    if(x->f_directory && x->f_directory->s_name && name)
+    if(sys_isabsolutepath(name))
+    {
+        return name;
+    }
+    else if(x->f_directory && x->f_directory->s_name && name)
     {
         char* file = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
         if(file)
@@ -202,9 +206,9 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* 
             freebytes(file, MAXFAUSTSTRING * sizeof(char));
             return x->f_temp_path->s_name;
         }
-        pd_error(x, "faust~: memory allocation failed");
+        pd_error(x->f_owner, "faust~: memory allocation failed - path");
         return NULL;
     }
-    pd_error(x, "faust~: invalid path or name");
+    pd_error(x->f_owner, "faust~: invalid path or name");
     return NULL;
 }
