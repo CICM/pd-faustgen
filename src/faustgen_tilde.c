@@ -172,20 +172,59 @@ static void faustgen_tilde_anything(t_faustgen_tilde *x, t_symbol* s, int argc, 
 {
     if(x->f_dsp_instance)
     {
-        t_float value;
-        if(!faust_ui_manager_set(x->f_ui_manager, s, atom_getfloatarg(0, argc, argv)))
+        if(!argc)
         {
+            t_float value;
+            if(!faust_ui_manager_get(x->f_ui_manager, s, &value))
+            {
+                t_atom av;
+                SETFLOAT(&av, value);
+                outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 1, &av);
+                return;
+            }
+            pd_error(x, "faustgen~: passive parameter '%s' not defined", s->s_name);
             return;
         }
-        if(!faust_ui_manager_get(x->f_ui_manager, s, &value))
+        else if(argc == 1)
         {
-            t_atom av;
-            SETFLOAT(&av, value);
-            outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 1, &av);
+            if(argv[0].a_type != A_FLOAT)
+            {
+                pd_error(x, "faustgen~: active parameter requires a float value");
+                return;
+            }
+            if(!faust_ui_manager_set(x->f_ui_manager, s, argv[0].a_w.w_float))
+            {
+                return;
+            }
+            pd_error(x, "faustgen~: active parameter '%s' not defined", s->s_name);
             return;
         }
-        pd_error(x, "faustgen~: ui glue '%s' not defined", s->s_name);
-        return;
+        else
+        {
+            int i, start;
+            char name[MAXFAUSTSTRING];
+            if(argv[0].a_type != A_FLOAT)
+            {
+                pd_error(x, "faustgen~: list parameters requires a first index");
+                return;
+            }
+            start = (int)argv[0].a_w.w_float;
+            for(i = 0; i < argc; ++i)
+            {
+                sprintf(name, "%s %i", s->s_name, start+i);
+                if(argv[i+1].a_type != A_FLOAT)
+                {
+                    pd_error(x, "faustgen~: active parameter requires a float value");
+                    return;
+                }
+                if(faust_ui_manager_set(x->f_ui_manager, gensym(name), argv[i+1].a_w.w_float))
+                {
+                    pd_error(x, "faustgen~: active parameter '%s' not defined", name);
+                    return;
+                }
+            }
+            return;
+        }
     }
     pd_error(x, "faustgen~: no dsp instance");
 }
