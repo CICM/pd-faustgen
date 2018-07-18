@@ -254,3 +254,10 @@ char faust_io_manager_is_valid(t_faust_io_manager *x)
 {
     return x->f_signals && x->f_valid;
 }
+
+void faust_io_manager_print(t_faust_io_manager* x, char const log)
+{
+    logpost(x->f_owner, 2+log, "             number of inputs: %i", (int)faust_io_manager_get_ninputs(x));
+    logpost(x->f_owner, 2+log, "             number of outputs: %i", (int)faust_io_manager_get_noutputs(x));
+    logpost(x->f_owner, 2+log, "             extra output: %s", faust_io_manager_has_extra_output(x) ? "true" : "false");
+}

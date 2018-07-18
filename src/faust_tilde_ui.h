@@ -30,4 +30,6 @@ void faust_ui_manager_save_states(t_faust_ui_manager *x);
 
 void faust_ui_manager_restore_states(t_faust_ui_manager *x);
 
+void faust_ui_manager_print(t_faust_ui_manager* x, char const log);
+
 #endif

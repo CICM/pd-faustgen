@@ -34,4 +34,6 @@ t_sample** faust_io_manager_get_output_signals(t_faust_io_manager *x);
 
 char faust_io_manager_is_valid(t_faust_io_manager *x);
 
+void faust_io_manager_print(t_faust_io_manager* x, char const log);
+
 #endif

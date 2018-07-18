@@ -437,4 +437,45 @@ void faust_ui_manager_restore_default(t_faust_ui_manager *x)
     }
 }
 
+const char* faust_ui_manager_get_parameter_char(int type)
+{
+    if(type == FAUST_UI_TYPE_BUTTON)
+        return "button";
+    else if(type == FAUST_UI_TYPE_TOGGLE)
+        return "toggle";
+    else if(type == FAUST_UI_TYPE_NUMBER)
+        return "number";
+    else
+        return "bargraph";
+}
+
+void faust_ui_manager_print(t_faust_ui_manager* x, char const log)
+{
+    size_t i;
+    logpost(x->f_owner, 2+log, "             active parameters: %i", (int)x->f_nactive_uis);
+    for(i = 0; i < x->f_nactive_uis; ++i)
+    {
+        logpost(x->f_owner, 2+log, "             %i: %s [path:%s - type:%s - init:%g - min:%g - max:%g - current:%g]", (int)i,
+                x->f_active_uis[i].p_name->s_name,
+                x->f_active_uis[i].p_longname->s_name,
+                faust_ui_manager_get_parameter_char(x->f_active_uis[i].p_type),
+                x->f_active_uis[i].p_default,
+                x->f_active_uis[i].p_min,
+                x->f_active_uis[i].p_max,
+                *x->f_active_uis[i].p_zone);
+    }
+    logpost(x->f_owner, 2+log, "             passive parameters: %i", (int)x->f_npassive_uis);
+    for(i = 0; i < x->f_npassive_uis; ++i)
+    {
+        logpost(x->f_owner, 2+log, "             %i: %s [path:%s - type:%s - init:%g - min:%g - max:%g - current:%g]", (int)i,
+                x->f_passive_uis[i].p_name->s_name,
+                x->f_passive_uis[i].p_longname->s_name,
+                faust_ui_manager_get_parameter_char(x->f_passive_uis[i].p_type),
+                x->f_passive_uis[i].p_default,
+                x->f_passive_uis[i].p_min,
+                x->f_passive_uis[i].p_max,
+                *x->f_passive_uis[i].p_zone);
+    }
+}
+
 

@@ -95,11 +95,9 @@ static void faustgen_tilde_compile(t_faustgen_tilde *x)
             const int ninputs = getNumInputsCDSPInstance(x->f_dsp_instance);
             const int noutputs = getNumOutputsCDSPInstance(x->f_dsp_instance);
             logpost(x, 3, "\nfaustgen~: compilation from source '%s' succeeded", x->f_dsp_name->s_name);
-            logpost(x, 3, "             %s: %i", "number of inputs", ninputs);
-            logpost(x, 3, "             %s: %i", "number of outputs", noutputs);
-            faust_ui_manager_init(x->f_ui_manager, x->f_dsp_instance);
             faust_io_manager_init(x->f_io_manager, ninputs, noutputs, faust_ui_manager_has_passive_ui(x->f_ui_manager));
-
+            faust_ui_manager_init(x->f_ui_manager, x->f_dsp_instance);
+            
             canvas_resume_dsp(dspstate);
             return;
         }
@@ -157,6 +155,14 @@ static void faustgen_tilde_autocompile(t_faustgen_tilde *x, t_symbol* s, int arg
         clock_unset(x->f_clock);
     }
 }
+
+static void faustgen_tilde_print_parameters(t_faustgen_tilde *x)
+{
+    faust_io_manager_print(x->f_io_manager, 0);
+    faust_opt_manager_print(x->f_opt_manager, 0);
+    faust_ui_manager_print(x->f_ui_manager, 0);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                                  PURE DATA GENERIC INTERFACE                                 //
@@ -255,6 +261,7 @@ void faustgen_tilde_setup(void)
         //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
         class_addmethod(c,      (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"), A_GIMME);
         class_addmethod(c,      (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),    A_GIMME);
+        class_addmethod(c,      (t_method)faustgen_tilde_print_parameters, gensym("print"),          A_NULL);
         class_addanything(c,    (t_method)faustgen_tilde_anything);
         
         CLASS_MAINSIGNALIN(c, t_faustgen_tilde, f_dummy);

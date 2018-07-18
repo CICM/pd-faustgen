@@ -24,4 +24,6 @@ char const** faust_opt_manager_get_options(t_faust_opt_manager* x);
 
 char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* name);
 
+void faust_opt_manager_print(t_faust_opt_manager* x, char const log);
+
 #endif
