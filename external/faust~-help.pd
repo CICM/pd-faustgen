@@ -5,7 +5,6 @@
 1;
 #X msg 286 175 \; pd dsp \$1;
 #X obj 32 308 dac~ 1 2;
-#X obj 32 255 faust~ noise;
 #X msg 62 208 reload;
 #X obj 32 158 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
 -1 -1 0 256;
@@ -17,7 +16,6 @@ file to read. The path is relative to the patch. Extra arguments can
 be used to define compilation options \, see the FAUST documentation
 for further information. Use the debug level 3 to displays information
 about the code in the Pd console.;
-#X obj 192 305 faust~ noise -vs 64 -vec;
 #X text 26 341 FAUST institution: GRAME;
 #X text 26 355 FAUST website: faust.grame.fr;
 #X text 132 370 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
@@ -36,11 +34,13 @@ using the programming language "Pure" : https://github.com/agraef/pure-lang.
 , f 67;
 #X text 95 155 Control the parameters with their names, f 15;
 #X text 113 206 Reload the FAUST file;
+#X obj 32 255 faust~ examples/noise;
+#X obj 192 305 faust~ examples/noise -vs 64 -vec;
 #X connect 1 0 2 0;
-#X connect 4 0 3 0;
-#X connect 4 0 3 1;
-#X connect 5 0 4 0;
-#X connect 6 0 7 0;
-#X connect 7 0 4 0;
-#X connect 8 0 9 0;
-#X connect 9 0 6 0;
+#X connect 4 0 23 0;
+#X connect 5 0 6 0;
+#X connect 6 0 23 0;
+#X connect 7 0 8 0;
+#X connect 8 0 5 0;
+#X connect 23 0 3 0;
+#X connect 23 0 3 1;
