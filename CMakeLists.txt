@@ -35,7 +35,7 @@ message(STATUS "faustgen~ external")
 set_pd_sources(${PROJECT_SOURCE_DIR}/pure-data/src/)
 set_pd_external_path("${PROJECT_SOURCE_DIR}/external/")
 file(GLOB faustgen_tilde_sources
-${PROJECT_SOURCE_DIR}/src/faust_tilde.c
+${PROJECT_SOURCE_DIR}/src/faustgen_tilde.c
 ${PROJECT_SOURCE_DIR}/src/faust_tilde_ui.h
 ${PROJECT_SOURCE_DIR}/src/faust_tilde_ui.c
 ${PROJECT_SOURCE_DIR}/src/faust_tilde_io.h
