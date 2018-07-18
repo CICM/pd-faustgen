@@ -218,7 +218,7 @@ void faustgen_tilde_setup(void)
         logpost(NULL, 3, "Faust development: GRAME");
         
         logpost(NULL, 3, "faustgen~ compiler version: %s", getCLibFaustVersion());
-        logpost(NULL, 3, "faustgen~ include directory: %s", class_gethelpdir(c));
+        logpost(NULL, 3, "faustgen~ default include directory: %s", class_gethelpdir(c));
         logpost(NULL, 3, "faustgen~ institutions: CICM - ANR MUSICOLL");
         logpost(NULL, 3, "faustgen~ external author: Pierre Guillot");
         logpost(NULL, 3, "faustgen~ website: github.com/CICM/faust-pd");
