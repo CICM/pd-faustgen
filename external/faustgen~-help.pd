@@ -157,6 +157,33 @@ the index 2, f 36;
 #X connect 33 0 0 1;
 #X connect 34 0 33 1;
 #X restore 287 243 pd control lists;
+#N canvas 532 169 409 407 passive 0;
+#X obj 32 308 dac~ 1 2;
+#X obj 32 118 osc~ 220;
+#X obj 30 265 faustgen~ examples/mixer;
+#X msg 85 184 print;
+#X msg 257 216 compile;
+#X msg 145 199 snapshot;
+#X msg 309 268 john;
+#X obj 171 285 route snapshot;
+#X obj 171 306 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X obj 125 338 snapshot~;
+#X obj 125 359 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X obj 160 142 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 2 0 0 1;
+#X connect 2 0 9 0;
+#X connect 3 0 2 0;
+#X connect 4 0 2 0;
+#X connect 5 0 2 0;
+#X connect 6 0 2 0;
+#X connect 7 0 8 0;
+#X connect 9 0 10 0;
+#X restore 287 273 pd passive parameters;
 #X connect 1 0 2 0;
 #X connect 4 0 19 0;
 #X connect 5 0 6 0;

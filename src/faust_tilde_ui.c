@@ -128,7 +128,7 @@ static void faust_ui_manager_add_params(t_faust_ui_manager *x, const char* label
         newmemory = (t_faust_ui *)resizebytes(oldmemory, size * sizeof(t_faust_ui), (size + 1) * sizeof(t_faust_ui));
         if(!newmemory)
         {
-            pd_error(x->f_owner, "faust~: memory allocation failed - ui glue");
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - ui glue");
             return;
         }
     }
@@ -137,7 +137,7 @@ static void faust_ui_manager_add_params(t_faust_ui_manager *x, const char* label
         newmemory = (t_faust_ui *)getbytes(sizeof(t_faust_ui));
         if(!newmemory)
         {
-            pd_error(x->f_owner, "faust~: memory allocation failed - ui glue");
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - ui glue");
             return;
         }
     }
@@ -186,7 +186,7 @@ static void faust_ui_manager_ui_open_box(t_faust_ui_manager* x, const char* labe
         }
         else
         {
-            pd_error(x->f_owner, "faust~: memory allocation failed - ui box");
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - ui box");
             return;
         }
     }
@@ -201,7 +201,7 @@ static void faust_ui_manager_ui_open_box(t_faust_ui_manager* x, const char* labe
         }
         else
         {
-            pd_error(x->f_owner, "faust~: memory allocation failed - ui box");
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - ui box");
             return;
         }
     }
@@ -220,7 +220,7 @@ static void faust_ui_manager_ui_close_box(t_faust_ui_manager* x)
         }
         else
         {
-            pd_error(x->f_owner, "faust~: memory de-allocation failed - ui box");
+            pd_error(x->f_owner, "faustgen~: memory de-allocation failed - ui box");
             return;
         }
     }
@@ -263,7 +263,7 @@ static void faust_ui_manager_ui_add_bargraph(t_faust_ui_manager* x, const char* 
 
 static void faust_ui_manager_ui_add_sound_file(t_faust_ui_manager* x, const char* label, const char* filename, struct Soundfile** sf_zone)
 {
-    pd_error(x->f_owner, "faust~: add sound file not supported yet");
+    pd_error(x->f_owner, "faustgen~: add sound file not supported yet");
 }
 
 // DECLARE UIS
@@ -358,7 +358,7 @@ static void faust_ui_manager_tick(t_faust_ui_manager* x)
 
 char faust_ui_manager_has_passive_ui(t_faust_ui_manager *x)
 {
-    return x->f_npassive_uis != 0;
+    return x->f_npassive_uis > 0;
 }
 
 char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f)
@@ -404,7 +404,7 @@ char faust_ui_manager_get(t_faust_ui_manager *x, t_symbol* name, t_float* f)
     t_faust_ui* ui = faust_ui_manager_get_passive_uis(x, name);
     if(ui)
     {
-        *f = *(ui->p_zone);
+        *f = (t_float)(*(ui->p_zone));
         return 0;
     }
     return 1;

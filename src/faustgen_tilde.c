@@ -96,8 +96,8 @@ static void faustgen_tilde_compile(t_faustgen_tilde *x)
             const int ninputs = getNumInputsCDSPInstance(x->f_dsp_instance);
             const int noutputs = getNumOutputsCDSPInstance(x->f_dsp_instance);
             logpost(x, 3, "\nfaustgen~: compilation from source '%s' succeeded", x->f_dsp_name->s_name);
-            faust_io_manager_init(x->f_io_manager, ninputs, noutputs, faust_ui_manager_has_passive_ui(x->f_ui_manager));
             faust_ui_manager_init(x->f_ui_manager, x->f_dsp_instance);
+            faust_io_manager_init(x->f_io_manager, ninputs, noutputs, faust_ui_manager_has_passive_ui(x->f_ui_manager));
             
             canvas_resume_dsp(dspstate);
             return;
@@ -180,7 +180,7 @@ static void faustgen_tilde_anything(t_faustgen_tilde *x, t_symbol* s, int argc, 
             {
                 t_atom av;
                 SETFLOAT(&av, value);
-                outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 1, &av);
+                outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 0, &av);
                 return;
             }
             pd_error(x, "faustgen~: passive parameter '%s' not defined", s->s_name);
@@ -248,15 +248,17 @@ static t_int *faustgen_tilde_perform(t_int *w)
 
 static void faustgen_tilde_dsp(t_faustgen_tilde *x, t_signal **sp)
 {
-    if(x->f_dsp_instance && faust_io_manager_is_valid(x->f_io_manager))
+    if(x->f_dsp_instance)
     {
         faust_ui_manager_save_states(x->f_ui_manager);
         initCDSPInstance(x->f_dsp_instance, sp[0]->s_sr);
-        faust_io_manager_prepare(x->f_io_manager, sp);
-        dsp_add((t_perfroutine)faustgen_tilde_perform, 4,
-                (t_int)x->f_dsp_instance, (t_int)sp[0]->s_n,
-                (t_int)faust_io_manager_get_input_signals(x->f_io_manager),
-                (t_int)faust_io_manager_get_output_signals(x->f_io_manager));
+        if(!faust_io_manager_prepare(x->f_io_manager, sp))
+        {
+            dsp_add((t_perfroutine)faustgen_tilde_perform, 4,
+                    (t_int)x->f_dsp_instance, (t_int)sp[0]->s_n,
+                    (t_int)faust_io_manager_get_input_signals(x->f_io_manager),
+                    (t_int)faust_io_manager_get_output_signals(x->f_io_manager));
+        }
         faust_ui_manager_restore_states(x->f_ui_manager);
     }
 }

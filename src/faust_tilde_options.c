@@ -35,10 +35,10 @@ static void faust_opt_manager_get_default_include_path(t_faust_opt_manager *x)
             sprintf(x->f_default_include, "%s/libs/", path);
             return;
         }
-        pd_error(x->f_owner, "faust~: memory allocation failed - include path");
+        pd_error(x->f_owner, "faustgen~: memory allocation failed - include path");
         return;
     }
-    pd_error(x->f_owner, "faust~: cannot locate the include path");
+    pd_error(x->f_owner, "faustgen~: cannot locate the include path");
     return;
 }
 
@@ -102,14 +102,14 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
                 }
                 else
                 {
-                    pd_error(x->f_owner, "faust~: option type invalid");
+                    pd_error(x->f_owner, "faustgen~: option type invalid");
                     memset(x->f_options[i], 0, MAXFAUSTSTRING);
                 }
                 x->f_noptions = i+1;
             }
             else
             {
-                pd_error(x->f_owner, "faust~: memory allocation failed - compile option %i", (int)i);
+                pd_error(x->f_owner, "faustgen~: memory allocation failed - compile option %i", (int)i);
                 x->f_noptions = i;
                 return -1;
             }
@@ -117,7 +117,7 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
     }
     else
     {
-        pd_error(x->f_owner, "faust~: memory allocation failed - compile options");
+        pd_error(x->f_owner, "faustgen~: memory allocation failed - compile options");
         x->f_noptions = 0;
         return -1;
     }
@@ -134,7 +134,7 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
             }
             else
             {
-                pd_error(x, "faust~: memory allocation failed - compile option");
+                pd_error(x, "faustgen~: memory allocation failed - compile option");
                 x->f_noptions = argc;
                 return -1;
             }
@@ -146,7 +146,7 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
         }
         else
         {
-            pd_error(x->f_owner, "faust~: memory allocation failed - compile options for default include");
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - compile options for default include");
             return -1;
         }
     }
@@ -206,10 +206,10 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* 
             freebytes(file, MAXFAUSTSTRING * sizeof(char));
             return x->f_temp_path->s_name;
         }
-        pd_error(x->f_owner, "faust~: memory allocation failed - path");
+        pd_error(x->f_owner, "faustgen~: memory allocation failed - path");
         return NULL;
     }
-    pd_error(x->f_owner, "faust~: invalid path or name");
+    pd_error(x->f_owner, "faustgen~: invalid path or name");
     return NULL;
 }
 

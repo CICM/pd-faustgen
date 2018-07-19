@@ -7,6 +7,7 @@
 
 #include "faust_tilde_io.h"
 #include <g_canvas.h>
+#include <assert.h>
 
 typedef struct _faust_io_manager
 {
@@ -80,7 +81,7 @@ static char faust_io_manager_resize_signals(t_faust_io_manager *x, size_t nsigna
         x->f_signals  = nsigs;
         return 0;
     }
-    pd_error(x->f_owner, "faust~: memory allocation failed - signals");
+    pd_error(x->f_owner, "faustgen~: memory allocation failed - signals");
     return 4;
 }
 
@@ -110,7 +111,7 @@ static char faust_io_manager_resize_inputs(t_faust_io_manager *x, size_t const n
         x->f_ninlets = rnins;
         return 0;
     }
-    pd_error(x->f_owner, "faust~: memory allocation failed - inputs");
+    pd_error(x->f_owner, "faustgen~: memory allocation failed - inputs");
     return 2;
 }
 
@@ -120,7 +121,7 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
     size_t i;
     size_t const couts = faust_io_manager_get_noutputs(x);
     size_t const rnouts = nouts;
-    if(rnouts == couts)
+    if(rnouts == couts && faust_io_manager_has_extra_output(x) == extraout)
     {
         return 0;
     }
@@ -145,17 +146,17 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
         x->f_noutlets = rnouts;
         if(extraout)
         {
-            x->f_extra_outlet = outlet_new((t_object *)x->f_owner, gensym("anything"));
+            x->f_extra_outlet = outlet_new((t_object *)x->f_owner, NULL);
             if(x->f_extra_outlet)
             {
                  return 0;
             }
-            pd_error(x->f_owner, "faust~: memory allocation failed - extra output");
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - extra output");
             return 1;
         }
         return 0;
     }
-    pd_error(x->f_owner, "faust~: memory allocation failed - output");
+    pd_error(x->f_owner, "faustgen~: memory allocation failed - output");
     return 1;
 }
 
@@ -231,13 +232,55 @@ char faust_io_manager_init(t_faust_io_manager *x, int const nins, int const nout
     return valid;
 }
 
-void faust_io_manager_prepare(t_faust_io_manager *x, t_signal **sp)
+#include <m_imp.h>
+
+static char faust_io_manager_is_valid(t_faust_io_manager *x)
+{
+    if(!x->f_signals || !x->f_valid)
+    {
+        pd_error(x->f_owner, "faustgen~: something wrong happened during iolets allocation");
+        return 0;
+    }
+    if(obj_nsiginlets(x->f_owner) != x->f_ninlets)
+    {
+        pd_error(x->f_owner, "faustgen~: number of signal inlets %i incompatible with internal %i", (int)x->f_ninlets, (int)obj_nsiginlets(x->f_owner));
+        return 0;
+    }
+    if(obj_nsiginlets(x->f_owner) != x->f_ninlets)
+    {
+        pd_error(x->f_owner, "faustgen~: number of signal inlets %i incompatible with internal %i", (int)x->f_ninlets, (int)obj_nsiginlets(x->f_owner));
+        return 0;
+    }
+    if(obj_nsigoutlets(x->f_owner) != x->f_noutlets)
+    {
+        pd_error(x->f_owner, "faustgen~: number of signal outlets %i incompatible with internal %i", (int)x->f_noutlets, (int)obj_nsigoutlets(x->f_owner));
+        return 0;
+    }
+    if(x->f_ninlets + x->f_noutlets != x->f_nsignals)
+    {
+        pd_error(x->f_owner, "faustgen~: number of signals %i incompatible with number of iolets %i", (int)x->f_nsignals, (int)(x->f_ninlets + x->f_noutlets));
+        return 0;
+    }
+    return 1;
+}
+
+char faust_io_manager_prepare(t_faust_io_manager *x, t_signal **sp)
 {
     size_t i;
+    if(!faust_io_manager_is_valid)
+    {
+        return 1;
+    }
     for(i = 0; i < x->f_nsignals; ++i)
     {
         x->f_signals[i] = sp[i]->s_vec;
+        if(x->f_signals[i] == NULL)
+        {
+            pd_error(x->f_owner, "faustgen~: the signal vector %i is empty", (int)i);
+            return 1;
+        }
     }
+    return 0;
 }
 
 t_sample** faust_io_manager_get_input_signals(t_faust_io_manager *x)
@@ -248,11 +291,6 @@ t_sample** faust_io_manager_get_input_signals(t_faust_io_manager *x)
 t_sample** faust_io_manager_get_output_signals(t_faust_io_manager *x)
 {
     return x->f_signals+x->f_ninlets;
-}
-
-char faust_io_manager_is_valid(t_faust_io_manager *x)
-{
-    return x->f_signals && x->f_valid;
 }
 
 void faust_io_manager_print(t_faust_io_manager* x, char const log)

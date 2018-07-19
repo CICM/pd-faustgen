@@ -26,13 +26,11 @@ t_outlet* faust_io_manager_get_extra_output(t_faust_io_manager *x);
 
 char faust_io_manager_init(t_faust_io_manager *x, int const nins, int const nouts, char const extraout);
 
-void faust_io_manager_prepare(t_faust_io_manager *x, t_signal **sp);
+char faust_io_manager_prepare(t_faust_io_manager *x, t_signal **sp);
 
 t_sample** faust_io_manager_get_input_signals(t_faust_io_manager *x);
 
 t_sample** faust_io_manager_get_output_signals(t_faust_io_manager *x);
-
-char faust_io_manager_is_valid(t_faust_io_manager *x);
 
 void faust_io_manager_print(t_faust_io_manager* x, char const log);
 
