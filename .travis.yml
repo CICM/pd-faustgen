@@ -17,7 +17,7 @@ matrix:
     script:
     - mkdir build && cd build
     - cmake .. -GXcode -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
-    - cmake --build . --config Release --target faust_tilde_project
+    - cmake --build . --config Release --target faustgen_tilde_project
   - os: linux
     compiler: gcc
     env: release_arch=Linux-amd64-32
@@ -29,16 +29,16 @@ matrix:
     script:
     - mkdir build && cd build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
-    - cmake --build . --config Release --target faust_tilde_project
+    - cmake --build . --config Release --target faustgen_tilde_project
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
   - cp -r faust/libraries external/libs
-  - cp src/faust_tilde.c external/faust_tilde.c
+  - cp src/faustgen_tilde.c external/faustgen_tilde.c
   - cp README.md external/README.txt
   - cp LICENSE external/LICENSE.txt
   - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
-  - mv external faust~
-  - zip -r "faust_tilde-$release_arch-sources.zip" faust~
+  - mv external faustgen~
+  - zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
 
 deploy:
   provider: releases

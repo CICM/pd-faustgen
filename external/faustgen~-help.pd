@@ -1,0 +1,182 @@
+#N canvas 428 137 481 548 10;
+#X obj 12 15 cnv 15 360 17 empty empty faustgen~ 2 9 0 14 -233017 -66577
+0;
+#X obj 286 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 286 135 \; pd dsp \$1;
+#X obj 32 308 dac~ 1 2;
+#X obj 62 192 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
+-1 -1 0 256;
+#X obj 62 149 loadbang;
+#X msg 62 171 0;
+#X text 10 36 The first argument is the name of the file FAUST DSP
+file to read. The path is relative to the patch. Extra arguments can
+be used to define compilation options \, see the FAUST documentation
+for further information. Use the debug level 3 to displays information
+about the code in the Pd console.;
+#X text 26 351 FAUST institution: GRAME;
+#X text 26 365 FAUST website: faust.grame.fr;
+#X text 132 380 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
+...;
+#X text 26 379 FAUST developers:;
+#X text 26 449 This object is inspired by faustgen~ for Max developed
+by Martin Di Rollo and Stéphane Letz., f 50;
+#X text 95 16 the FAUST compiler embedded in a Pd external;
+#X text 26 479 Another faust~ object has been developed by Albert Graef
+using the programming language "Pure" : https://github.com/agraef/pure-lang.
+, f 67;
+#X text 125 189 Control the parameters with their names, f 15;
+#X text 26 399 faustgen~ institutions: CICM - ANR MUSICOLL;
+#X text 26 427 faustgen~ developer: Pierre Guillot;
+#X msg 62 211 gain \$1;
+#X obj 32 118 osc~ 220;
+#N canvas 766 136 471 246 options 0;
+#X text 16 70 Change the compile options and recompile;
+#X msg 17 91 compileoptions -vec -vs 64;
+#X text 56 141 Use the compile options as default arguments;
+#X text 19 196 All the compile options are listed page 54 and page
+55 of the PDF file faust-quick-reference, f 46;
+#X text 21 27 Use the compile options to optimize the CPU or improve
+the redering, f 55;
+#X msg 41 115 print;
+#X text 84 116 Print faustgen~ informations;
+#X obj 405 65 switch~;
+#X obj 405 43 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 17 165 faustgen~ examples/gain -vec -lv 1;
+#X connect 1 0 9 0;
+#X connect 5 0 9 0;
+#X connect 8 0 7 0;
+#X restore 287 185 pd options;
+#N canvas 287 129 524 202 recompilation 0;
+#X obj 17 75 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X msg 17 134 autocompile \$1 100;
+#X obj 17 166 faustgen~ examples/dummy;
+#X text 14 11 The automatic compilation can be used during the Faust
+code edition to recompile the code each time the file has been modified.
+;
+#X text 50 62 Active/deactivate the autocompilation when the dsp file
+changed., f 37;
+#X text 50 92 The second argument is the time between each check.,
+f 37;
+#X msg 155 134 compile;
+#X text 214 128 Reload and recompile the FAUST file manually, f 23
+;
+#X obj 339 90 switch~;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 6 0 2 0;
+#X restore 287 214 pd recompilation;
+#N canvas 575 109 646 630 control 0;
+#X obj 30 598 dac~ 1 2;
+#X msg 45 195 print;
+#N canvas 0 22 450 278 (subpatch) 0;
+#X array \$0-gains 20 float 3;
+#A 0 0.706521 0.597826 0.521739 0.521739 0.521739 0.378572 0.442858
+0.528573 0.621431 0.685717 0.792861 0.921433 0.950004 0.950004 0.950004
+0.871432 0.792861 0.607145 0.578574 0.3;
+#X coords 0 1 20 0 199 92 1 0 0;
+#X restore 397 74 graph;
+#N canvas 0 22 450 278 (subpatch) 0;
+#X array \$0-decays 20 float 3;
+#A 0 0.0652173 0.0978258 0.119565 0.152173 0.206521 0.260868 0.326085
+0.402172 0.456519 0.521736 0.65217 0.706518 0.771735 0.804344 0.804344
+0.804344 0.771735 0.749996 0.66304 0.608692;
+#X coords 0 1 20 0 199 92 1 0 0;
+#X restore 397 198 graph;
+#N canvas 0 22 450 278 (subpatch) 0;
+#X array \$0-freq 20 float 3;
+#A 0 0.0652173 6956.52 6956.52 8260.87 9347.82 10434.8 11956.5 13478.2
+15000 16521.7 17608.7 18478.2 19130.4 18913 18260.8 14782.6 11304.3
+9347.82 8695.65 0.608692;
+#X coords 0 20000 20 0 199 92 1 0 0;
+#X restore 397 328 graph;
+#X obj 30 107 noise~;
+#X obj 30 525 faustgen~ examples/resonator;
+#X obj 119 177 list trim;
+#X obj 119 155 list prepend gain 0;
+#X obj 119 133 array get \$0-gains;
+#X obj 119 112 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 17 13 Use lists of values to control the lists of parameters.
+The first element of the list must be the name of the parameter \,
+the second argument is the index of the first parameters the other
+arguments are the list., f 44;
+#X obj 139 291 list trim;
+#X obj 139 227 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 139 248 array get \$0-decays 2 4;
+#X obj 139 270 list prepend decay 2;
+#X text 44 145 Print to display the parameters' information, f 11
+;
+#X obj 203 320 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 203 362 freq 4 \$1;
+#X obj 203 341 array get \$0-decays 3 1;
+#X text 395 10 Change the value of the arrays and use the bangs to
+send them to the faustgen~ object, f 33;
+#X text 116 84 Set the values of all the "gain" parameters, f 23;
+#X text 137 199 Set the values of 4 "decay" parameters starting with
+the index 2, f 36;
+#X text 201 292 Set the value of the 3rd "freq" parameter, f 23;
+#X obj 201 481 list trim;
+#X obj 201 417 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 256 416 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X obj 312 416 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X obj 201 438 array get \$0-decays;
+#X obj 201 460 list prepend decay 0;
+#X text 199 388 Dynamic approach, f 9;
+#X text 254 398 Index;
+#X text 312 398 Size;
+#X obj 303 107 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 301 86 Turn DSP on;
+#X obj 303 128 switch~;
+#X connect 1 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 0 0;
+#X connect 6 0 0 1;
+#X connect 7 0 6 0;
+#X connect 8 0 7 0;
+#X connect 9 0 8 0;
+#X connect 10 0 9 0;
+#X connect 12 0 6 0;
+#X connect 13 0 14 0;
+#X connect 14 0 15 0;
+#X connect 15 0 12 0;
+#X connect 17 0 19 0;
+#X connect 18 0 6 0;
+#X connect 19 0 18 0;
+#X connect 24 0 6 0;
+#X connect 25 0 28 0;
+#X connect 26 0 28 1;
+#X connect 26 0 29 1;
+#X connect 27 0 28 2;
+#X connect 28 0 29 0;
+#X connect 29 0 24 0;
+#X connect 33 0 35 0;
+#X restore 287 243 pd control lists;
+#X obj 103 305 snapshot~;
+#X obj 103 326 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X obj 103 284 metro 100;
+#X obj 103 264 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 31 242 faustgen~ examples/gain;
+#X text 26 413 faustgen~ website: github.com/CICM/faust-pd;
+#X connect 1 0 2 0;
+#X connect 4 0 18 0;
+#X connect 5 0 6 0;
+#X connect 6 0 4 0;
+#X connect 18 0 27 0;
+#X connect 19 0 27 0;
+#X connect 23 0 24 0;
+#X connect 25 0 23 0;
+#X connect 26 0 25 0;
+#X connect 27 0 3 0;
+#X connect 27 0 3 1;
+#X connect 27 0 23 0;

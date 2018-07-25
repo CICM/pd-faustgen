@@ -23,7 +23,7 @@ install:
 build_script:
   - mkdir build%llvmplateform% && cd build%llvmplateform%
   - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm-windows-%llvmplateform%-%llvmpconfig%/lib/cmake/llvm
-  - msbuild faust~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
+  - msbuild faustgen~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - del /F /Q llvm.zip
@@ -31,12 +31,12 @@ after_build:
   - del /F /S /Q /A external\*.ilk
   - del /F /S /Q /A external\*.lib
   - del /F /S /Q /A external\*.exp
-  - copy src\faust_tilde.c external\faust_tilde.c
+  - copy src\faustgen_tilde.c external\faustgen_tilde.c
   - copy README.md external\README.md
   - copy LICENSE external\LICENSE.txt
   - xcopy /S /E /Y /I .\faust\libraries .\external\libs
-  - rename external faust~
-  - 7z a "faust_tilde-%release_arch%-sources.zip" faust~
+  - rename external faustgen~
+  - 7z a "faustgen_tilde-%release_arch%-sources.zip" faustgen~
 
 artifacts:
   - path: '*.zip'
