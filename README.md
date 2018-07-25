@@ -15,7 +15,7 @@
 
 ## Presentation
 
-The **faustgen~** object is an external with the [FAUST](http://faust.grame.fr/about/) just-in-time (JIT) compiler embedded that allows to load, compile and play FAUST files within the audio programming environment [Pure Data](http://msp.ucsd.edu/software.html). FAUST (Functional Audio Stream) is a functional programming language specifically designed for real-time signal processing and synthesis developed by the [GRAME](http://www.grame.fr/). The FAUST JIT compiler - built with [LLVM](https://llvm.org/) - brings together the convenience of a standalone interpreted language with the efficiency of a compiled language. The **faust~** object is a very first version with elementary features, any help and any contribution are welcome.
+The **faustgen~** object is an external with the [FAUST](http://faust.grame.fr/about/) just-in-time (JIT) compiler embedded that allows to load, compile and play FAUST files within the audio programming environment [Pure Data](http://msp.ucsd.edu/software.html). FAUST (Functional Audio Stream) is a functional programming language specifically designed for real-time signal processing and synthesis developed by the [GRAME](http://www.grame.fr/). The FAUST JIT compiler - built with [LLVM](https://llvm.org/) - brings together the convenience of a standalone interpreted language with the efficiency of a compiled language. The **faustgen~** object is a very first version with elementary features, any help and any contribution are welcome.
 
 **Dependencies:**
 
