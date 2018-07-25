@@ -387,7 +387,7 @@ char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f)
                 *(ui->p_zone) = ui->p_min;
                 return 0;
             }
-            else if(v > ui->p_max)
+            if(v > ui->p_max)
             {
                 *(ui->p_zone) = ui->p_max;
                 return 0;

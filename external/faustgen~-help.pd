@@ -1,7 +1,7 @@
 #N canvas 428 137 481 548 10;
 #X obj 12 15 cnv 15 360 17 empty empty faustgen~ 2 9 0 14 -233017 -66577
 0;
-#X obj 286 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 286 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X msg 286 135 \; pd dsp \$1;
 #X obj 32 308 dac~ 1 2;
@@ -27,26 +27,28 @@ using the programming language "Pure" : https://github.com/agraef/pure-lang.
 , f 67;
 #X text 125 189 Control the parameters with their names, f 15;
 #X text 26 399 faustgen~ institutions: CICM - ANR MUSICOLL;
-#X text 26 413 faustgen~ website: github.com/grame-cncm/faust-pd;
 #X text 26 427 faustgen~ developer: Pierre Guillot;
 #X msg 62 211 gain \$1;
 #X obj 32 118 osc~ 220;
-#X obj 31 265 faustgen~ examples/gain;
-#N canvas 389 171 372 237 options 0;
+#N canvas 766 136 471 246 options 0;
 #X text 16 70 Change the compile options and recompile;
 #X msg 17 91 compileoptions -vec -vs 64;
 #X text 56 141 Use the compile options as default arguments;
 #X text 19 196 All the compile options are listed page 54 and page
 55 of the PDF file faust-quick-reference, f 46;
-#X obj 17 165 faustgen~ examples/gain -vec -lv 1 -double;
 #X text 21 27 Use the compile options to optimize the CPU or improve
 the redering, f 55;
 #X msg 41 115 print;
 #X text 84 116 Print faustgen~ informations;
-#X connect 1 0 4 0;
-#X connect 6 0 4 0;
+#X obj 405 65 switch~;
+#X obj 405 43 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 17 165 faustgen~ examples/gain -vec -lv 1;
+#X connect 1 0 9 0;
+#X connect 5 0 9 0;
+#X connect 8 0 7 0;
 #X restore 287 185 pd options;
-#N canvas 287 129 388 208 recompilation 0;
+#N canvas 287 129 524 202 recompilation 0;
 #X obj 17 75 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
 #X msg 17 134 autocompile \$1 100;
@@ -61,11 +63,12 @@ f 37;
 #X msg 155 134 compile;
 #X text 214 128 Reload and recompile the FAUST file manually, f 23
 ;
+#X obj 339 90 switch~;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 6 0 2 0;
 #X restore 287 214 pd recompilation;
-#N canvas 364 121 646 630 control 0;
+#N canvas 575 109 646 630 control 0;
 #X obj 30 598 dac~ 1 2;
 #X msg 45 195 print;
 #N canvas 0 22 450 278 (subpatch) 0;
@@ -129,12 +132,14 @@ the index 2, f 36;
 #X text 199 388 Dynamic approach, f 9;
 #X text 254 398 Index;
 #X text 312 398 Size;
-#X obj 30 566 *~;
-#X obj 45 546 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 303 107 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
+#X text 301 86 Turn DSP on;
+#X obj 303 128 switch~;
 #X connect 1 0 6 0;
 #X connect 5 0 6 0;
-#X connect 6 0 33 0;
+#X connect 6 0 0 0;
+#X connect 6 0 0 1;
 #X connect 7 0 6 0;
 #X connect 8 0 7 0;
 #X connect 9 0 8 0;
@@ -153,15 +158,13 @@ the index 2, f 36;
 #X connect 27 0 28 2;
 #X connect 28 0 29 0;
 #X connect 29 0 24 0;
-#X connect 33 0 0 0;
-#X connect 33 0 0 1;
-#X connect 34 0 33 1;
+#X connect 33 0 35 0;
 #X restore 287 243 pd control lists;
 #N canvas 532 169 409 407 passive 0;
 #X obj 32 308 dac~ 1 2;
 #X obj 32 118 osc~ 220;
 #X obj 30 265 faustgen~ examples/mixer;
-#X msg 85 184 print;
+#X msg 242 79 print;
 #X msg 257 216 compile;
 #X msg 145 199 snapshot;
 #X msg 309 268 john;
@@ -173,6 +176,7 @@ the index 2, f 36;
 -262144 -1 -1 0 256;
 #X obj 160 142 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
+#X obj 128 71 switch~;
 #X connect 1 0 2 0;
 #X connect 2 0 0 0;
 #X connect 2 0 0 1;
@@ -184,11 +188,23 @@ the index 2, f 36;
 #X connect 7 0 8 0;
 #X connect 9 0 10 0;
 #X restore 287 273 pd passive parameters;
+#X obj 103 305 snapshot~;
+#X obj 103 326 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 0.619613 256;
+#X obj 103 284 metro 100;
+#X obj 103 264 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 31 242 faustgen~ examples/gain;
+#X text 26 413 faustgen~ website: github.com/CICM/faust-pd;
 #X connect 1 0 2 0;
-#X connect 4 0 19 0;
+#X connect 4 0 18 0;
 #X connect 5 0 6 0;
 #X connect 6 0 4 0;
-#X connect 19 0 21 0;
-#X connect 20 0 21 0;
-#X connect 21 0 3 0;
-#X connect 21 0 3 1;
+#X connect 18 0 28 0;
+#X connect 19 0 28 0;
+#X connect 24 0 25 0;
+#X connect 26 0 24 0;
+#X connect 27 0 26 0;
+#X connect 28 0 3 0;
+#X connect 28 0 3 1;
+#X connect 28 0 24 0;

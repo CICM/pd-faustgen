@@ -95,10 +95,10 @@ static char faust_io_manager_resize_inputs(t_faust_io_manager *x, size_t const n
     {
         return 0;
     }
-    for(i = rnins; i < cins; ++i)
+    for(i = cins; i > rnins; --i)
     {
-        inlet_free(x->f_inlets[i]);
-        x->f_inlets[i] = NULL;
+        inlet_free(x->f_inlets[i-1]);
+        x->f_inlets[i-1] = NULL;
     }
     ninlets = (t_inlet **)resizebytes(x->f_inlets, sizeof(t_inlet*) * cins, sizeof(t_inlet*) * rnins);
     if(ninlets)
@@ -106,6 +106,10 @@ static char faust_io_manager_resize_inputs(t_faust_io_manager *x, size_t const n
         for(i = cins; i < rnins; ++i)
         {
             ninlets[i] = signalinlet_new((t_object *)x->f_owner, 0);
+            if(!ninlets[i])
+            {
+                pd_error(x->f_owner, "faustgen~: memory allocation failed - input %i", (int)i);
+            }
         }
         x->f_inlets = ninlets;
         x->f_ninlets = rnins;
@@ -121,19 +125,37 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
     size_t i;
     size_t const couts = faust_io_manager_get_noutputs(x);
     size_t const rnouts = nouts;
-    if(rnouts == couts && faust_io_manager_has_extra_output(x) == extraout)
+    
+    if(rnouts == couts)
     {
+        if(faust_io_manager_has_extra_output(x) && !extraout)
+        {
+            outlet_free(x->f_extra_outlet);
+            x->f_extra_outlet = NULL;
+            return 0;
+        }
+        else if(!faust_io_manager_has_extra_output(x) && extraout)
+        {
+            x->f_extra_outlet = outlet_new((t_object *)x->f_owner, NULL);
+            if(x->f_extra_outlet)
+            {
+                return 0;
+            }
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - extra output");
+            return 1;
+        }
         return 0;
     }
+    
     if(faust_io_manager_has_extra_output(x))
     {
         outlet_free(x->f_extra_outlet);
         x->f_extra_outlet = NULL;
     }
-    for(i = rnouts; i < couts; ++i)
+    for(i = couts; i > rnouts; --i)
     {
-        outlet_free(x->f_outlets[i]);
-        x->f_outlets[i] = NULL;
+        outlet_free(x->f_outlets[i-1]);
+        x->f_outlets[i-1] = NULL;
     }
     noutlets = (t_outlet **)resizebytes(x->f_outlets, sizeof(t_outlet*) * couts, sizeof(t_outlet*) * rnouts);
     if(noutlets)
@@ -141,6 +163,10 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
         for(i = couts; i < rnouts; ++i)
         {
             noutlets[i] = outlet_new((t_object *)x->f_owner, gensym("signal"));
+            if(!noutlets[i])
+            {
+                pd_error(x->f_owner, "faustgen~: memory allocation failed - output %i", (int)i);
+            }
         }
         x->f_outlets = noutlets;
         x->f_noutlets = rnouts;
