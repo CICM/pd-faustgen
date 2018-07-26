@@ -8,7 +8,7 @@
   </p>
   <p align="center">
     <a href="https://travis-ci.org/pierreguillot/faust-pd"><img src="https://img.shields.io/travis/pierreguillot/faust-pd.svg?label=travis" alt="Travis CI"></a>
-    <a href="https://ci.appveyor.com/project/pierreguillot/faust-pd/history"><img src="https://img.shields.io/appveyor/ci/pierreguillot/faust-pd.svg?label=appveyor" alt="Appveyor CI"></a>
+    <a href="https://ci.appveyor.com/project/CICM/pd-faustgen/history"><img src="https://img.shields.io/appveyor/ci/CICM/pd-faustgen.svg?label=appveyor" alt="Appveyor CI"></a>
     <a href="https://www.codacy.com/app/pierreguillot/faust-pd?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pierreguillot/faust-pd&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/07a9a6ada751467e8d5e72d8876551ad"/></a>
   </p>
 </p>
