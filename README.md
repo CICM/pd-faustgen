@@ -78,7 +78,7 @@ Once the binaries are compiled or uploaded with Travis and Appveyor to the relea
 **FAUST developers**: Yann Orlarey, Stéphane Letz, Dominique Fober and others  
 
 **faustgen~ institutions**: CICM - ANR MUSICOLL  
-**faustgen~ website**: github.com/grame-cncm/faust-pd  
+**faustgen~ website**: github.com/CICM/pd-faustgen  
 **faustgen~ developer**: Pierre Guillot
 
 ## Legacy
