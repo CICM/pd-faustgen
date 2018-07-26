@@ -6,4 +6,4 @@
 	url = https://github.com/pierreguillot/pd.build.git
 [submodule "faust"]
 	path = faust
-	url = https://github.com/pierreguillot/faust.git
+	url = https://github.com/grame-cncm/faust.git
