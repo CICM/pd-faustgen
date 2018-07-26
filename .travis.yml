@@ -12,11 +12,11 @@ matrix:
     env: release_arch=Darwin-amd64-32
     install:
     - git submodule update --init --recursive
-    - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
-    - tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
+    - curl -o ./llvm.zip -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-macos-x64.zip
+    - tar xzf ./llvm.zip && mv llvm-macos-x64 llvm
     script:
     - mkdir build && cd build
-    - cmake .. -GXcode -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
+    - cmake .. -GXcode -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
     - cmake --build . --config Release --target faustgen_tilde_project
   - os: linux
     compiler: gcc
@@ -24,8 +24,8 @@ matrix:
     install:
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
-    - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    - tar xvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+    - curl -o ./llvm.tar.gz -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-linux-x64.zip
+    - tar xvf ./llvm.tar.gz && mv llvm-linux-x64 llvm
     script:
     - mkdir build && cd build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
@@ -52,5 +52,5 @@ deploy:
     secure: dT+n95s+gMM1iZ2G91S6zRKb/bQLxeOANy3AIh2PO/7cOCJ/MoFGjNv69qhn0B17RbPwrpbHjw+aXNS3BSuQ6uWzK6YT8Xr+vS45mIYxq/QTnyn+zWuAnzMFdu37WgGnuCau7X2tl99ia82acqt/sMKbFBWlufgudQVUtj34i8t2SuIteWT+wJ0N2V4evtvr1FnLazcbxCJFQFyw0lUrc3tMlm0rgB61lV7oESTfuEK9WCLFJyrXR9ar9Nvo22l/LVl6XsIQhpEH+/+WRTx/pa8aeM9iZzs7pYsRp5VZeezTfcPcBIL+S5Z2sKZNXf6SeWDXooR84T4WyONbNz7Io2+860VjUzSmYjr0Z9pveShApOjk3iwauwLU4bpJEuVKk4TTiDJ7eTX4JwcNvSS+kWxXUROTO6QZkkVTD/xCxAjr9BQVuts30xOXQ4D0EUaVAMLU9KNFNfqcZxqhtIihVKZgGOPzR2CqO/KgdL5aT4Ov6j1usSj32xhnzDhLEb1GVpW7TF2mzSq4Qqdesr8lhskrkPaim3SBwiqra9oqUK3qJcGysdZQX/dXgmZYBZnukvtxzV4MgE9QVSqAcUUDqxuxirg6ozHZe+OjaLuKhP+5vxr1BSUc+8o3jZbAaN17rCuPl1EDcv5QHQphwZSCPFhPzrv7kjbJMAhIQnPmSRE=
   file: "faustgen_tilde-$release_arch-sources.zip"
   on:
-    repo: pierreguillot/faust-pd
+    repo: CICM/pd-faustgen
     tags: true
