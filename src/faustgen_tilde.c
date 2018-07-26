@@ -401,7 +401,7 @@ void faustgen_tilde_setup(void)
         logpost(NULL, 3, "faustgen~ default include directory: %s", class_gethelpdir(c));
         logpost(NULL, 3, "faustgen~ institutions: CICM - ANR MUSICOLL");
         logpost(NULL, 3, "faustgen~ external author: Pierre Guillot");
-        logpost(NULL, 3, "faustgen~ website: github.com/CICM/faust-pd");
+        logpost(NULL, 3, "faustgen~ website: github.com/CICM/pd-faustgen");
     }
     
     faustgen_tilde_class = c;

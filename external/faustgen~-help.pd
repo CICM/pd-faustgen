@@ -29,7 +29,7 @@ using the programming language "Pure" : https://github.com/agraef/pure-lang.
 #X text 26 399 faustgen~ institutions: CICM - ANR MUSICOLL;
 #X text 26 427 faustgen~ developer: Pierre Guillot;
 #X msg 62 211 gain \$1;
-#X obj 32 118 osc~ 220;
+#X obj 31 118 osc~ 220;
 #N canvas 766 136 471 246 options 0;
 #X text 16 70 Change the compile options and recompile;
 #X msg 17 91 compileoptions -vec -vs 64;
@@ -167,7 +167,7 @@ the index 2, f 36;
 #X obj 103 264 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 31 242 faustgen~ examples/gain;
-#X text 26 413 faustgen~ website: github.com/CICM/faust-pd;
+#X text 26 413 faustgen~ website: github.com/CICM/pd-faustgen;
 #X connect 1 0 2 0;
 #X connect 4 0 18 0;
 #X connect 5 0 6 0;
