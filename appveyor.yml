@@ -5,13 +5,9 @@ environment:
   #- platform: Win32
   #  compiler: "Visual Studio 14 2015"
   #  configuration: Debug
-  #  llvmversion: 6.0.0
-  #  llvmplateform: x86
   - platform: x64
     compiler: "Visual Studio 14 2015 Win64"
     configuration: Release
-    llvmversion: 6.0.0
-    llvmplateform: x64
     release_arch: "Windows-amd64-32"
 
 install:
@@ -21,7 +17,7 @@ install:
   - rename llvm-windows-x64-mt llvm
   - curl http://faust.grame.fr/images/faust-quick-reference.pdf -o ./external/faust-quick-reference.pdf
 build_script:
-  - mkdir build%llvmplateform% && cd build%llvmplateform%
+  - mkdir build && cd build
   - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
   - msbuild faustgen~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
 after_build:
@@ -47,7 +43,7 @@ deploy:
   overwrite: true
   draft: true
   auth_token:
-    secure: LJm0ZfZbXCO3w8drSwut9xLZMVdXwq1zSnmAgB8prUgEIwN6UKzdBXt5qFYUWbb
+    secure: 0Vv/0e24P2Oa/R/obFQBd824WDpAolXToTc1B0xOjM8TdXXkFdRkfRkPHDgCtoCR
   artifact: /.*\.zip/
   on:
     appveyor_repo_tag: true
