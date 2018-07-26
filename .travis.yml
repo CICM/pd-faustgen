@@ -24,8 +24,8 @@ matrix:
     install:
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
-    - curl -o ./llvm.tar.gz -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-linux-x64.zip
-    - tar xvf ./llvm.tar.gz && mv llvm-linux-x64 llvm
+    - curl -o ./llvm.zip -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-linux-x64.zip
+    - tar xvf ./llvm.zip && mv llvm-linux-x64 llvm
     script:
     - mkdir build && cd build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
