@@ -110,10 +110,10 @@ static t_symbol* faust_ui_manager_get_long_name(t_faust_ui_manager *x, const cha
     memset(name, 0, MAXFAUSTSTRING);
     for(i = 0; i < x->f_nnames; ++i)
     {
-        strncat(name, x->f_names[i]->s_name, MAXFAUSTSTRING);
-        strncat(name, "/", 1);
+        strncat(name, x->f_names[i]->s_name, MAXFAUSTSTRING - strnlen(name, MAXFAUSTSTRING) - 1);
+        strncat(name, "/", MAXFAUSTSTRING - strnlen(name, MAXFAUSTSTRING) - 1);
     }
-    strncat(name, label, MAXFAUSTSTRING);
+    strncat(name, label, MAXFAUSTSTRING - strnlen(name, MAXFAUSTSTRING) - 1);
     return gensym(name);
 }
 
