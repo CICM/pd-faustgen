@@ -47,7 +47,7 @@ deploy:
   overwrite: true
   draft: true
   auth_token:
-    secure: 0SV8u3c06daN/cno+27kzzIvWbsRoOOG61OOCNEtiYbsoY8FNe4TgZh+s/7zcMiL
+    secure: LJm0ZfZbXCO3w8drSwut9xLZMVdXwq1zSnmAgB8prUgEIwN6UKzdBXt5qFYUWbb
   artifact: /.*\.zip/
   on:
     appveyor_repo_tag: true
