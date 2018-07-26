@@ -7,12 +7,11 @@
     The FAUST compiler embedded in a Pd external
   </p>
   <p align="center">
-    <a href="https://travis-ci.org/pierreguillot/faust-pd"><img src="https://img.shields.io/travis/pierreguillot/faust-pd.svg?label=travis" alt="Travis CI"></a>
+    <a href="https://travis-ci.org/CICM/pd-faustgen/builds"><img src="https://img.shields.io/travis/CICM/pd-faustgen.svg?label=travis" alt="Travis CI"></a>
     <a href="https://ci.appveyor.com/project/CICM/pd-faustgen/history"><img src="https://img.shields.io/appveyor/ci/CICM/pd-faustgen.svg?label=appveyor" alt="Appveyor CI"></a>
-    <a href="https://www.codacy.com/app/pierreguillot/faust-pd?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pierreguillot/faust-pd&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/07a9a6ada751467e8d5e72d8876551ad"/></a>
+    <a href="https://app.codacy.com/project/CICM/pd-faustgen/dashboard"><img src="https://api.codacy.com/project/badge/Grade/a89aaf703bf045a383ff4a28d6d4b173"/></a>
   </p>
 </p>
-
 ## Presentation
 
 The **faustgen~** object is an external with the [FAUST](http://faust.grame.fr/about/) just-in-time (JIT) compiler embedded that allows to load, compile and play FAUST files within the audio programming environment [Pure Data](http://msp.ucsd.edu/software.html). FAUST (Functional Audio Stream) is a functional programming language specifically designed for real-time signal processing and synthesis developed by the [GRAME](http://www.grame.fr/). The FAUST JIT compiler - built with [LLVM](https://llvm.org/) - brings together the convenience of a standalone interpreted language with the efficiency of a compiled language. The **faustgen~** object is a very first version with elementary features, any help and any contribution are welcome.
