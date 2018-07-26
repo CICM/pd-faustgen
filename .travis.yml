@@ -28,18 +28,18 @@ matrix:
     - tar xvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
     script:
     - mkdir build && cd build
-    - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm -DCMAKE_BUILD_TYPE=Release
+    - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
+      -DCMAKE_BUILD_TYPE=Release
     - cmake --build . --config Release --target faustgen_tilde_project
 before_deploy:
-  - cd $TRAVIS_BUILD_DIR
-  - cp -r faust/libraries external/libs
-  - cp src/faustgen_tilde.c external/faustgen_tilde.c
-  - cp README.md external/README.txt
-  - cp LICENSE external/LICENSE.txt
-  - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
-  - mv external faustgen~
-  - zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
-
+- cd $TRAVIS_BUILD_DIR
+- cp -r faust/libraries external/libs
+- cp src/faustgen_tilde.c external/faustgen_tilde.c
+- cp README.md external/README.txt
+- cp LICENSE external/LICENSE.txt
+- curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
+- mv external faustgen~
+- zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
 deploy:
   provider: releases
   skip_cleanup: true
@@ -49,7 +49,7 @@ deploy:
   name: ${TRAVIS_TAG}
   tag_name: ${TRAVIS_TAG}
   api_key:
-    secure: anDyVdoXmPTgEvqvI/HXqXHEZvqyBEHL0KqXjq7nf5/d1h+qdQdK+4VOK4Iko4gMPLJm80ln9RE3fQPtepDYXdsew6MhCUx468MY6VOxDDX7BXP9dfDmdwr7vyfLmOGP0x60oYFSGYhorzEEs6a6MB+PrZbnQZv2fUpU44uOwbKKfljdTYikUOhjjZ68XSoUdcwDHpb0xND/vszsn2ZFgcNAi9cj2A0sd00d/1iVn/x9OTad3x+jmd3Hn2ybdhaul+Tk34vvxl4cOX/aZO/4VQAW+OxlE/zEG9sspNblxq5/Pei96VPYmooT7cM9CWM4KCu6FHsl4ICaOEOk3UfpTo4IYjlItTIqBg8lkCLR1hYA5wRS9CpTCTt5FiPdsvH2hlZ1GtmTHt/Y7AvB//9odKhxu5hfJ02uXRFQ01KhS1RCYxitTdNGkonaxYyf/uDOrXyZ8jfPD4yBnqD0JIPtxvrYIXERKx5Cd/TZl/oJneBUbH1Ts7Ae2G/3GyJi5WitylzgQx+avkXI1oZlxIhKpU3rVJocArj+1eF+Ny4pxkXAFON2klXyd9mnK2O1OS02g+fY4f14BqU4c+7iPZi1/F6vkxg97vAVL43YJEuQlLoGbvzMSTB4hODZ9+0fcVgC0f2pDOAVfFdPHi/sO1iTEw0flAGGVWmePUx2HNTJhhw=
+    secure: dT+n95s+gMM1iZ2G91S6zRKb/bQLxeOANy3AIh2PO/7cOCJ/MoFGjNv69qhn0B17RbPwrpbHjw+aXNS3BSuQ6uWzK6YT8Xr+vS45mIYxq/QTnyn+zWuAnzMFdu37WgGnuCau7X2tl99ia82acqt/sMKbFBWlufgudQVUtj34i8t2SuIteWT+wJ0N2V4evtvr1FnLazcbxCJFQFyw0lUrc3tMlm0rgB61lV7oESTfuEK9WCLFJyrXR9ar9Nvo22l/LVl6XsIQhpEH+/+WRTx/pa8aeM9iZzs7pYsRp5VZeezTfcPcBIL+S5Z2sKZNXf6SeWDXooR84T4WyONbNz7Io2+860VjUzSmYjr0Z9pveShApOjk3iwauwLU4bpJEuVKk4TTiDJ7eTX4JwcNvSS+kWxXUROTO6QZkkVTD/xCxAjr9BQVuts30xOXQ4D0EUaVAMLU9KNFNfqcZxqhtIihVKZgGOPzR2CqO/KgdL5aT4Ov6j1usSj32xhnzDhLEb1GVpW7TF2mzSq4Qqdesr8lhskrkPaim3SBwiqra9oqUK3qJcGysdZQX/dXgmZYBZnukvtxzV4MgE9QVSqAcUUDqxuxirg6ozHZe+OjaLuKhP+5vxr1BSUc+8o3jZbAaN17rCuPl1EDcv5QHQphwZSCPFhPzrv7kjbJMAhIQnPmSRE=
   file: "faustgen_tilde-$release_arch-sources.zip"
   on:
     repo: pierreguillot/faust-pd
