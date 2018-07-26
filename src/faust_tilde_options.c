@@ -77,12 +77,12 @@ static void faust_opt_manager_free_compile_options(t_faust_opt_manager *x)
 
 char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t const argc, const t_atom* argv)
 {
-    size_t i;
     char has_include = 0;
     faust_opt_manager_free_compile_options(x);
     x->f_options = getbytes(argc * sizeof(char *));
     if(x->f_options)
     {
+        size_t i;
         for(i = 0; i < argc; ++i)
         {
             x->f_options[i] = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
