@@ -2,6 +2,8 @@
 
 echo -e "Deken manager for faustgen~"
 
+deken_prepare() {
+
 rm -rf faustgen~
 rm -f *.dek
 rm -f *.dek.sha256
@@ -36,4 +38,14 @@ deken package -v$1 faustgen~
 rm -rf faustgen~
 rm -f faustgen_tilde_archive.zip
 
-# deken upload faustgen~[v%release_version%](Darwin-amd64-32)(Sources).dek faustgen~[v%release_version%](Linux-amd64-32)(Sources).dek faustgen~[v%release_version%](Windows-amd64-32)(Sources).dek faustgen~[v%release_version%](Sources).dek
+}
+
+deken_upload() {
+deken upload faustgen~[v$2](Darwin-amd64-32)(Sources).dek faustgen~[v$2](Linux-amd64-32)(Sources).dek faustgen~[v$2](Windows-amd64-32)(Sources).dek faustgen~[v$2](Sources).dek
+}
+
+if [ "$1" == "upload" ]; then
+  deken_upload
+else
+  deken_prepare
+fi
