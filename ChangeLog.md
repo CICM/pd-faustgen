@@ -1,8 +1,12 @@
+### v0.0.5
+- Fix when no arguments
+- Update deken script
+- Fix sources distribution
+
 ### v0.0.4
 - Move repository to CICM
 - Improve/Secure code
 - Use repository local LLVM pre-built
-- Fix sources distribution
 
 ### v0.0.3
 - Change name from faust~ to faustgen~
