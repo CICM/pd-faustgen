@@ -55,7 +55,10 @@ dkms.conf
 /build*/
 /llvm*/
 *.tar.gz
-
+*.zip
+*.dek
+*.dek.sha256
+*.dek.txt
 # pure-data
 *.pd_darwin
 *.pd_linux
