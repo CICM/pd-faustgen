@@ -123,11 +123,13 @@ static void faustgen_tilde_compile_options(t_faustgen_tilde *x, t_symbol* s, int
     faustgen_tilde_compile(x);
 }
 
+/*
 static void faustgen_tilde_read(t_faustgen_tilde *x, t_symbol* s)
 {
     x->f_dsp_name = s;
     faustgen_tilde_compile(x);
 }
+ */
 
 static long faustgen_tilde_get_time(t_faustgen_tilde *x)
 {
@@ -361,7 +363,7 @@ static void *faustgen_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_opt_manager    = faust_opt_manager_new((t_object *)x, canvas_getcurrent());
         x->f_dsp_name       = atom_getsymbolarg(0, argc, argv);
         x->f_clock          = clock_new(x, (t_method)faustgen_tilde_autocompile_tick);
-        faust_opt_manager_parse_compile_options(x->f_opt_manager, argc-1, argv+1);
+        faust_opt_manager_parse_compile_options(x->f_opt_manager, argc ? argc-1 : 0, argv ? argv+1 : NULL);
         if(!argc)
         {
             return x;

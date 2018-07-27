@@ -79,47 +79,50 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
 {
     char has_include = 0;
     faust_opt_manager_free_compile_options(x);
-    x->f_options = getbytes(argc * sizeof(char *));
-    if(x->f_options)
+    if(argc && argv)
     {
-        size_t i;
-        for(i = 0; i < argc; ++i)
+        x->f_options = getbytes(argc * sizeof(char *));
+        if(x->f_options)
         {
-            x->f_options[i] = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
-            if(x->f_options[i])
+            size_t i;
+            for(i = 0; i < argc; ++i)
             {
-                if(argv[i].a_type == A_FLOAT)
+                x->f_options[i] = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
+                if(x->f_options[i])
                 {
-                    sprintf(x->f_options[i], "%i", (int)argv[i].a_w.w_float);
-                }
-                else if(argv[i].a_type == A_SYMBOL && argv[i].a_w.w_symbol)
-                {
-                    sprintf(x->f_options[i], "%s", argv[i].a_w.w_symbol->s_name);
-                    if(!strncmp(x->f_options[i], "-I", 2))
+                    if(argv[i].a_type == A_FLOAT)
                     {
-                        has_include = 1;
+                        sprintf(x->f_options[i], "%i", (int)argv[i].a_w.w_float);
                     }
+                    else if(argv[i].a_type == A_SYMBOL && argv[i].a_w.w_symbol)
+                    {
+                        sprintf(x->f_options[i], "%s", argv[i].a_w.w_symbol->s_name);
+                        if(!strncmp(x->f_options[i], "-I", 2))
+                        {
+                            has_include = 1;
+                        }
+                    }
+                    else
+                    {
+                        pd_error(x->f_owner, "faustgen~: option type invalid");
+                        memset(x->f_options[i], 0, MAXFAUSTSTRING);
+                    }
+                    x->f_noptions = i+1;
                 }
                 else
                 {
-                    pd_error(x->f_owner, "faustgen~: option type invalid");
-                    memset(x->f_options[i], 0, MAXFAUSTSTRING);
+                    pd_error(x->f_owner, "faustgen~: memory allocation failed - compile option %i", (int)i);
+                    x->f_noptions = i;
+                    return -1;
                 }
-                x->f_noptions = i+1;
-            }
-            else
-            {
-                pd_error(x->f_owner, "faustgen~: memory allocation failed - compile option %i", (int)i);
-                x->f_noptions = i;
-                return -1;
             }
         }
-    }
-    else
-    {
-        pd_error(x->f_owner, "faustgen~: memory allocation failed - compile options");
-        x->f_noptions = 0;
-        return -1;
+        else
+        {
+            pd_error(x->f_owner, "faustgen~: memory allocation failed - compile options vector");
+            x->f_noptions = 0;
+            return -1;
+        }
     }
     if(!has_include)
     {
