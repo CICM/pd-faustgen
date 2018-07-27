@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -e "title Deken manager for faustgen~ for Pure Data"
+echo -e "Deken manager for faustgen~"
 
 rm -rf faustgen~
 rm -f *.dek
@@ -31,7 +31,7 @@ rm -f faustgen_tilde_windows.zip
 rm -f faustgen_tilde_archive.zip
 curl -L "https://github.com/pierreguillot/faust-pd/archive/v$1.zip" -o faustgen_tilde_archive.zip
 tar zxvf faustgen_tilde_archive.zip
-mv faust-pd-$1 faustgen~
+mv pd-faustgen-$1 faustgen~
 deken package -v$1 faustgen~
 rm -rf faustgen~
 rm -f faustgen_tilde_archive.zip
