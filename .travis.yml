@@ -34,7 +34,7 @@ matrix:
 before_deploy:
 - cd $TRAVIS_BUILD_DIR
 - cp -r faust/libraries external/libs
-- cp src/faustgen_tilde.c external/faustgen_tilde.c
+- cp -r src/ external/sources
 - cp README.md external/README.txt
 - cp LICENSE external/LICENSE.txt
 - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf

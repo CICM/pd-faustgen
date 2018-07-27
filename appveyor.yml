@@ -27,10 +27,10 @@ after_build:
   - del /F /S /Q /A external\*.ilk
   - del /F /S /Q /A external\*.lib
   - del /F /S /Q /A external\*.exp
-  - copy src\faustgen_tilde.c external\faustgen_tilde.c
   - copy README.md external\README.md
   - copy LICENSE external\LICENSE.txt
   - xcopy /S /E /Y /I .\faust\libraries .\external\libs
+  - xcopy /S /E /Y /I .\src .\external\sources
   - rename external faustgen~
   - 7z a "faustgen_tilde-%release_arch%-sources.zip" faustgen~
 
