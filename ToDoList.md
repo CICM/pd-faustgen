@@ -1,4 +1,7 @@
 - Mesure DSP time of the code
 - Use automatic optimizations with compile options
-- Check if the DSP process is in-place
-- Check why -double option crashes
+- Check if FAUST supports in-place processing
+- Check why FAUST double option crashes
+- Add method to open the FAUST file in the default text editor
+- Add a default temporary FAUST file when no argument
+- Add support for saving parameters states
