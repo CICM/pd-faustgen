@@ -188,7 +188,7 @@ static void faustgen_tilde_anything(t_faustgen_tilde *x, t_symbol* s, int argc, 
             {
                 t_atom av;
                 SETFLOAT(&av, value);
-                outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 0, &av);
+                outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 1, &av);
                 return;
             }
             pd_error(x, "faustgen~: passive parameter '%s' not defined", s->s_name);
