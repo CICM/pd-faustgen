@@ -4,4 +4,4 @@
 - Check why FAUST double option crashes
 - Add method to open the FAUST file in the default text editor
 - Add a default temporary FAUST file when no argument
-- Add support for saving parameters states
+- Look for the DSP file in all Pd's search paths
