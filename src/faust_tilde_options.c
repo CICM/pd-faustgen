@@ -78,6 +78,7 @@ static void faust_opt_manager_free_compile_options(t_faust_opt_manager *x)
 char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t const argc, const t_atom* argv)
 {
     char has_include = 0;
+    char has_precision = 0;
     faust_opt_manager_free_compile_options(x);
     if(argc && argv)
     {
@@ -100,6 +101,17 @@ char faust_opt_manager_parse_compile_options(t_faust_opt_manager *x, size_t cons
                         if(!strncmp(x->f_options[i], "-I", 2))
                         {
                             has_include = 1;
+                        }
+                        else if(!strncmp(x->f_options[i], "-double", 7) ||
+                                !strncmp(x->f_options[i], "-single", 7) ||
+                                !strncmp(x->f_options[i], "-quad", 5))
+                        {
+                            if(has_precision)
+                            {
+                                pd_error(x->f_owner, "faustgen~: floating-point format already defined");
+                                memset(x->f_options[i], 0, MAXFAUSTSTRING);
+                            }
+                            has_precision = 1;
                         }
                     }
                     else
