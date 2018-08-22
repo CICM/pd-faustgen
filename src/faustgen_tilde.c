@@ -27,9 +27,11 @@ typedef struct _faustgen_tilde
     llvm_dsp_factory*   f_dsp_factory;
     llvm_dsp*           f_dsp_instance;
     
-    FAUSTFLOAT**        f_signal_matrix;
-    FAUSTFLOAT*         f_signal_aligned;
-    size_t              f_signal_aligned_size;
+    float**             f_signal_matrix_single;
+    float*              f_signal_aligned_single;
+    
+    double**            f_signal_matrix_double;
+    double*             f_signal_aligned_double;
     
     t_faust_ui_manager* f_ui_manager;
     t_faust_io_manager* f_io_manager;
@@ -260,14 +262,14 @@ static void faustgen_tilde_anything(t_faustgen_tilde *x, t_symbol* s, int argc, 
     pd_error(x, "faustgen~: no dsp instance");
 }
 
-static t_int *faustgen_tilde_perform(t_int *w)
+static t_int *faustgen_tilde_perform_single(t_int *w)
 {
     int i, j;
     llvm_dsp *dsp = (llvm_dsp *)w[1];
     int const nsamples  = (int)w[2];
     int const ninputs   = (int)w[3];
     int const noutputs  = (int)w[4];
-    FAUSTFLOAT** faustsigs      = (FAUSTFLOAT **)w[5];
+    float** faustsigs   = (float **)w[5];
     t_sample const** realinputs = (t_sample const**)w[6];
     t_sample** realoutputs      = (t_sample **)w[7];
     for(i = 0; i < ninputs; ++i)
@@ -277,7 +279,7 @@ static t_int *faustgen_tilde_perform(t_int *w)
             faustsigs[i][j] = (FAUSTFLOAT)realinputs[i][j];
         }
     }
-    computeCDSPInstance(dsp, nsamples, faustsigs, faustsigs+ninputs);
+    computeCDSPInstance(dsp, nsamples, (FAUSTFLOAT**)faustsigs, (FAUSTFLOAT**)(faustsigs+ninputs));
     for(i = 0; i < noutputs; ++i)
     {
         for(j = 0; j < nsamples; ++j)
@@ -288,18 +290,101 @@ static t_int *faustgen_tilde_perform(t_int *w)
     return (w+8);
 }
 
-static void faustgen_tilde_free_signal(t_faustgen_tilde *x)
+static t_int *faustgen_tilde_perform_double(t_int *w)
 {
-    if(x->f_signal_aligned)
+    int i, j;
+    llvm_dsp *dsp = (llvm_dsp *)w[1];
+    int const nsamples  = (int)w[2];
+    int const ninputs   = (int)w[3];
+    int const noutputs  = (int)w[4];
+    double** faustsigs  = (double **)w[5];
+    t_sample const** realinputs = (t_sample const**)w[6];
+    t_sample** realoutputs      = (t_sample **)w[7];
+    for(i = 0; i < ninputs; ++i)
     {
-        free(x->f_signal_aligned);
+        for(j = 0; j < nsamples; ++j)
+        {
+            faustsigs[i][j] = (FAUSTFLOAT)realinputs[i][j];
+        }
     }
-    x->f_signal_aligned = NULL;
-    if(x->f_signal_matrix)
+    computeCDSPInstance(dsp, nsamples, (FAUSTFLOAT**)faustsigs, (FAUSTFLOAT**)(faustsigs+ninputs));
+    for(i = 0; i < noutputs; ++i)
     {
-        free(x->f_signal_matrix);
+        for(j = 0; j < nsamples; ++j)
+        {
+            realoutputs[i][j] = (t_sample)faustsigs[ninputs+i][j];
+        }
     }
-    x->f_signal_matrix = NULL;
+    return (w+8);
+}
+
+static void faustgen_tilde_free_signals(t_faustgen_tilde *x)
+{
+    if(x->f_signal_aligned_single)
+    {
+        free(x->f_signal_aligned_single);
+    }
+    x->f_signal_aligned_single = NULL;
+    if(x->f_signal_matrix_single)
+    {
+        free(x->f_signal_matrix_single);
+    }
+    x->f_signal_matrix_single = NULL;
+    
+    if(x->f_signal_aligned_double)
+    {
+        free(x->f_signal_aligned_double);
+    }
+    x->f_signal_aligned_double = NULL;
+    if(x->f_signal_matrix_double)
+    {
+        free(x->f_signal_matrix_double);
+    }
+    x->f_signal_matrix_double = NULL;
+}
+
+static void faustgen_tilde_alloc_signals_single(t_faustgen_tilde *x, size_t const ninputs, size_t const noutputs, size_t const nsamples)
+{
+    size_t i;
+    faustgen_tilde_free_signals(x);
+    x->f_signal_aligned_single = (float *)malloc((ninputs + noutputs) * nsamples * sizeof(float));
+    if(!x->f_signal_aligned_single)
+    {
+        pd_error(x, "memory allocation failed");
+        return;
+    }
+    x->f_signal_matrix_single = (float **)malloc((ninputs + noutputs) * sizeof(float *));
+    if(!x->f_signal_matrix_single)
+    {
+        pd_error(x, "memory allocation failed");
+        return;
+    }
+    for(i = 0; i < (ninputs + noutputs); ++i)
+    {
+        x->f_signal_matrix_single[i] = (x->f_signal_aligned_single+(i*nsamples));
+    }
+}
+
+static void faustgen_tilde_alloc_signals_double(t_faustgen_tilde *x, size_t const ninputs, size_t const noutputs, size_t const nsamples)
+{
+    size_t i;
+    faustgen_tilde_free_signals(x);
+    x->f_signal_aligned_double = (double *)malloc((ninputs + noutputs) * nsamples * sizeof(double));
+    if(!x->f_signal_aligned_double)
+    {
+        pd_error(x, "memory allocation failed");
+        return;
+    }
+    x->f_signal_matrix_double = (double **)malloc((ninputs + noutputs) * sizeof(double *));
+    if(!x->f_signal_matrix_double)
+    {
+        pd_error(x, "memory allocation failed");
+        return;
+    }
+    for(i = 0; i < (ninputs + noutputs); ++i)
+    {
+        x->f_signal_matrix_double[i] = (x->f_signal_aligned_double+(i*nsamples));
+    }
 }
 
 static void faustgen_tilde_dsp(t_faustgen_tilde *x, t_signal **sp)
@@ -314,33 +399,30 @@ static void faustgen_tilde_dsp(t_faustgen_tilde *x, t_signal **sp)
         }
         if(!faust_io_manager_prepare(x->f_io_manager, sp))
         {
-            size_t i;
             size_t const ninputs  = faust_io_manager_get_ninputs(x->f_io_manager);
             size_t const noutputs = faust_io_manager_get_noutputs(x->f_io_manager);
             size_t const nsamples = (size_t)sp[0]->s_n;
-            
-            faustgen_tilde_free_signal(x);
-            x->f_signal_aligned = (t_sample *)malloc((ninputs + noutputs) * nsamples * sizeof(FAUSTFLOAT));
-            if(!x->f_signal_aligned)
+
+            if(faust_opt_has_double_precision(x->f_opt_manager))
             {
-                pd_error(x, "memory allocation failed");
-                return;
+                post("double precision");
+                faustgen_tilde_alloc_signals_double(x, ninputs, noutputs, nsamples);
+                dsp_add((t_perfroutine)faustgen_tilde_perform_double, 7,
+                        (t_int)x->f_dsp_instance, (t_int)nsamples, (t_int)ninputs, (t_int)noutputs,
+                        (t_int)x->f_signal_matrix_double,
+                        (t_int)faust_io_manager_get_input_signals(x->f_io_manager),
+                        (t_int)faust_io_manager_get_output_signals(x->f_io_manager));
             }
-            x->f_signal_matrix = (FAUSTFLOAT **)malloc((ninputs + noutputs) * sizeof(FAUSTFLOAT *));
-            if(!x->f_signal_matrix)
+            else
             {
-                pd_error(x, "memory allocation failed");
-                return;
+                post("single precision");
+                faustgen_tilde_alloc_signals_single(x, ninputs, noutputs, nsamples);
+                dsp_add((t_perfroutine)faustgen_tilde_perform_single, 7,
+                        (t_int)x->f_dsp_instance, (t_int)nsamples, (t_int)ninputs, (t_int)noutputs,
+                        (t_int)x->f_signal_matrix_single,
+                        (t_int)faust_io_manager_get_input_signals(x->f_io_manager),
+                        (t_int)faust_io_manager_get_output_signals(x->f_io_manager));
             }
-            for(i = 0; i < (ninputs + noutputs); ++i)
-            {
-                x->f_signal_matrix[i] = (x->f_signal_aligned+(i*nsamples));
-            }
-            dsp_add((t_perfroutine)faustgen_tilde_perform, 7,
-                    (t_int)x->f_dsp_instance, (t_int)nsamples, (t_int)ninputs, (t_int)noutputs,
-                    (t_int)x->f_signal_matrix,
-                    (t_int)faust_io_manager_get_input_signals(x->f_io_manager),
-                    (t_int)faust_io_manager_get_output_signals(x->f_io_manager));
         }
         if(initialized)
         {
@@ -356,6 +438,7 @@ static void faustgen_tilde_free(t_faustgen_tilde *x)
     faust_ui_manager_free(x->f_ui_manager);
     faust_io_manager_free(x->f_io_manager);
     faust_opt_manager_free(x->f_opt_manager);
+    faustgen_tilde_free_signals(x);
 }
 
 static void *faustgen_tilde_new(t_symbol* s, int argc, t_atom* argv)
@@ -366,9 +449,10 @@ static void *faustgen_tilde_new(t_symbol* s, int argc, t_atom* argv)
         x->f_dsp_factory    = NULL;
         x->f_dsp_instance   = NULL;
         
-        x->f_signal_matrix  = NULL;
-        x->f_signal_aligned = NULL;
-        x->f_signal_aligned_size = 0;
+        x->f_signal_matrix_single  = NULL;
+        x->f_signal_aligned_single = NULL;
+        x->f_signal_matrix_double  = NULL;
+        x->f_signal_aligned_double = NULL;
         
         x->f_ui_manager     = faust_ui_manager_new((t_object *)x);
         x->f_io_manager     = faust_io_manager_new((t_object *)x, canvas_getcurrent());
