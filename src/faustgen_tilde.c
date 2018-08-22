@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#define FAUSTFLOAT t_sample
 #include <faust/dsp/llvm-c-dsp.h>
 
 #include "faust_tilde_ui.h"
