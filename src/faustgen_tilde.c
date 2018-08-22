@@ -140,9 +140,13 @@ static void faustgen_tilde_read(t_faustgen_tilde *x, t_symbol* s)
 
 static long faustgen_tilde_get_time(t_faustgen_tilde *x)
 {
-    struct stat attrib;
-    stat(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), &attrib);
-    return attrib.st_ctime;
+    if(x->f_dsp_instance)
+    {
+        struct stat attrib;
+        stat(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), &attrib);
+        return attrib.st_ctime;
+    }
+    return 0;
 }
 
 static void faustgen_tilde_autocompile_tick(t_faustgen_tilde *x)
