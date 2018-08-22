@@ -1,3 +1,6 @@
+### v0.0.6
+- Preserve parameters values during recompilation
+
 ### v0.0.5
 - Fix when no arguments
 - Update deken script
