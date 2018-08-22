@@ -210,7 +210,7 @@ char faust_opt_has_double_precision(t_faust_opt_manager const *x)
     size_t i;
     for(i = 0; i < x->f_noptions; ++i)
     {
-        if(strncmp(x->f_options[i], "-double", 7))
+        if(!strncmp(x->f_options[i], "-double", 7))
         {
             return 1;
         }
