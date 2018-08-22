@@ -216,7 +216,7 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* 
     return NULL;
 }
 
-void faust_opt_manager_print(t_faust_opt_manager* x, char const log)
+void faust_opt_manager_print(t_faust_opt_manager const *x, char const log)
 {
     size_t i;
     for(i = 0; i < x->f_noptions; ++i)
