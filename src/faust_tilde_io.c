@@ -119,7 +119,7 @@ static char faust_io_manager_resize_inputs(t_faust_io_manager *x, size_t const n
     return 2;
 }
 
-static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const nouts, char const extraout)
+static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const nouts)
 {
     t_outlet** noutlets;
     size_t i;
@@ -128,13 +128,7 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
     
     if(rnouts == couts)
     {
-        if(faust_io_manager_has_extra_output(x) && !extraout)
-        {
-            outlet_free(x->f_extra_outlet);
-            x->f_extra_outlet = NULL;
-            return 0;
-        }
-        else if(!faust_io_manager_has_extra_output(x) && extraout)
+        if(!faust_io_manager_has_extra_output(x))
         {
             x->f_extra_outlet = outlet_new((t_object *)x->f_owner, NULL);
             if(x->f_extra_outlet)
@@ -170,17 +164,14 @@ static char faust_io_manager_resize_outputs(t_faust_io_manager *x, size_t const 
         }
         x->f_outlets = noutlets;
         x->f_noutlets = rnouts;
-        if(extraout)
+        
+        x->f_extra_outlet = outlet_new((t_object *)x->f_owner, NULL);
+        if(x->f_extra_outlet)
         {
-            x->f_extra_outlet = outlet_new((t_object *)x->f_owner, NULL);
-            if(x->f_extra_outlet)
-            {
-                 return 0;
-            }
-            pd_error(x->f_owner, "faustgen~: memory allocation failed - extra output");
-            return 1;
+            return 0;
         }
-        return 0;
+        pd_error(x->f_owner, "faustgen~: memory allocation failed - extra output");
+        return 1;
     }
     pd_error(x->f_owner, "faustgen~: memory allocation failed - output");
     return 1;
@@ -237,7 +228,7 @@ t_outlet* faust_io_manager_get_extra_output(t_faust_io_manager *x)
     return x->f_extra_outlet;
 }
 
-char faust_io_manager_init(t_faust_io_manager *x, int const nins, int const nouts, char const extraout)
+char faust_io_manager_init(t_faust_io_manager *x, int const nins, int const nouts)
 {
     char valid = 0;
     char const redraw = x->f_owner->te_binbuf && gobj_shouldvis((t_gobj *)x->f_owner, x->f_canvas) && glist_isvisible(x->f_canvas);
@@ -247,7 +238,7 @@ char faust_io_manager_init(t_faust_io_manager *x, int const nins, int const nout
     }
     size_t const rnins = nins > 1 ? nins : 1;
     valid += faust_io_manager_resize_inputs(x, (size_t)rnins);
-    valid += faust_io_manager_resize_outputs(x, (size_t)nouts, extraout);
+    valid += faust_io_manager_resize_outputs(x, (size_t)nouts);
     valid += faust_io_manager_resize_signals(x, (size_t)rnins + (size_t)nouts);
     if(redraw)
     {
@@ -319,9 +310,8 @@ t_sample** faust_io_manager_get_output_signals(t_faust_io_manager *x)
     return x->f_signals+x->f_ninlets;
 }
 
-void faust_io_manager_print(t_faust_io_manager* x, char const log)
+void faust_io_manager_print(t_faust_io_manager const* x, char const log)
 {
     logpost(x->f_owner, 2+log, "             number of inputs: %i", (int)faust_io_manager_get_ninputs(x));
     logpost(x->f_owner, 2+log, "             number of outputs: %i", (int)faust_io_manager_get_noutputs(x));
-    logpost(x->f_owner, 2+log, "             extra output: %s", faust_io_manager_has_extra_output(x) ? "true" : "false");
 }

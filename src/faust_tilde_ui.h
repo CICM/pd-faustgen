@@ -20,16 +20,14 @@ void faust_ui_manager_free(t_faust_ui_manager *x);
 
 void faust_ui_manager_clear(t_faust_ui_manager *x);
 
-char faust_ui_manager_has_passive_ui(t_faust_ui_manager *x);
+char faust_ui_manager_set_value(t_faust_ui_manager *x, t_symbol const *name, t_float const f);
 
-char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f);
-
-char faust_ui_manager_get(t_faust_ui_manager *x, t_symbol* name, t_float* f);
+char faust_ui_manager_get_value(t_faust_ui_manager const *x, t_symbol const *name, t_float* f);
 
 void faust_ui_manager_save_states(t_faust_ui_manager *x);
 
 void faust_ui_manager_restore_states(t_faust_ui_manager *x);
 
-void faust_ui_manager_print(t_faust_ui_manager* x, char const log);
+void faust_ui_manager_print(t_faust_ui_manager const *x, char const log);
 
 #endif

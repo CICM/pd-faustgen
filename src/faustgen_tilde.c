@@ -78,37 +78,44 @@ static void faustgen_tilde_compile(t_faustgen_tilde *x)
     filepath = faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name);
     if(filepath)
     {
+        llvm_dsp* instance;
+        llvm_dsp_factory* factory;
         char errors[MAXFAUSTSTRING];
         int noptions            = (int)faust_opt_manager_get_noptions(x->f_opt_manager);
         char const** options    = faust_opt_manager_get_options(x->f_opt_manager);
-        faustgen_tilde_delete_instance(x);
-        faustgen_tilde_delete_factory(x);
-        faust_ui_manager_clear(x->f_ui_manager);
         
-        x->f_dsp_factory = createCDSPFactoryFromFile(filepath, noptions, options, "", errors, -1);
+        factory = createCDSPFactoryFromFile(filepath, noptions, options, "", errors, -1);
         if(strnlen(errors, MAXFAUSTSTRING))
         {
             pd_error(x, "faustgen~: try to load %s", filepath);
             pd_error(x, "faustgen~: %s", errors);
-            x->f_dsp_factory = NULL;
-            
-            canvas_resume_dsp(dspstate);
-            return;
-        }
-
-        x->f_dsp_instance = createCDSPInstance(x->f_dsp_factory);
-        if(x->f_dsp_instance)
-        {
-            const int ninputs = getNumInputsCDSPInstance(x->f_dsp_instance);
-            const int noutputs = getNumOutputsCDSPInstance(x->f_dsp_instance);
-            logpost(x, 3, "\nfaustgen~: compilation from source '%s' succeeded", x->f_dsp_name->s_name);
-            faust_ui_manager_init(x->f_ui_manager, x->f_dsp_instance);
-            faust_io_manager_init(x->f_io_manager, ninputs, noutputs, faust_ui_manager_has_passive_ui(x->f_ui_manager));
-            
+            faustgen_tilde_delete_instance(x);
+            faustgen_tilde_delete_factory(x);
             canvas_resume_dsp(dspstate);
             return;
         }
         
+        
+        instance = createCDSPInstance(factory);
+        if(instance)
+        {
+            const int ninputs = getNumInputsCDSPInstance(instance);
+            const int noutputs = getNumOutputsCDSPInstance(instance);
+            logpost(x, 3, "\nfaustgen~: compilation from source '%s' succeeded", x->f_dsp_name->s_name);
+            faust_ui_manager_init(x->f_ui_manager, instance);
+            faust_io_manager_init(x->f_io_manager, ninputs, noutputs);
+            
+            faustgen_tilde_delete_instance(x);
+            faustgen_tilde_delete_factory(x);
+            
+            x->f_dsp_factory  = factory;
+            x->f_dsp_instance = instance;
+            canvas_resume_dsp(dspstate);
+            return;
+        }
+        
+        faustgen_tilde_delete_instance(x);
+        faustgen_tilde_delete_factory(x);
         pd_error(x, "faustgen~: memory allocation failed - instance");
         canvas_resume_dsp(dspstate);
         return;
@@ -184,28 +191,28 @@ static void faustgen_tilde_anything(t_faustgen_tilde *x, t_symbol* s, int argc, 
         if(!argc)
         {
             t_float value;
-            if(!faust_ui_manager_get(x->f_ui_manager, s, &value))
+            if(!faust_ui_manager_get_value(x->f_ui_manager, s, &value))
             {
                 t_atom av;
                 SETFLOAT(&av, value);
                 outlet_anything(faust_io_manager_get_extra_output(x->f_io_manager), s, 1, &av);
                 return;
             }
-            pd_error(x, "faustgen~: passive parameter '%s' not defined", s->s_name);
+            pd_error(x, "faustgen~: parameter '%s' not defined", s->s_name);
             return;
         }
         else if(argc == 1)
         {
             if(argv[0].a_type != A_FLOAT)
             {
-                pd_error(x, "faustgen~: active parameter requires a float value");
+                pd_error(x, "faustgen~: parameter requires a float value");
                 return;
             }
-            if(!faust_ui_manager_set(x->f_ui_manager, s, argv[0].a_w.w_float))
+            if(!faust_ui_manager_set_value(x->f_ui_manager, s, argv[0].a_w.w_float))
             {
                 return;
             }
-            pd_error(x, "faustgen~: active parameter '%s' not defined", s->s_name);
+            pd_error(x, "faustgen~: parameter '%s' not defined", s->s_name);
             return;
         }
         else
@@ -236,7 +243,7 @@ static void faustgen_tilde_anything(t_faustgen_tilde *x, t_symbol* s, int argc, 
                 {
                     pd_error(x, "faustgen~: active parameter requires a float value");
                 }
-                if(faust_ui_manager_set(x->f_ui_manager, gensym(name), argv[i+1].a_w.w_float))
+                if(faust_ui_manager_set_value(x->f_ui_manager, gensym(name), argv[i+1].a_w.w_float))
                 {
                     pd_error(x, "faustgen~: active parameter '%s' not defined", name);
                     return;
