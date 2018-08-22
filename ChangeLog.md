@@ -1,8 +1,9 @@
 ### v0.0.6
 - Preserve parameters values during recompilation
+- Fix autocompilation when DSP instance not initialized
 
 ### v0.0.5
-- Fix when no arguments
+- Fix when no argument is provided
 - Update deken script
 - Fix sources distribution
 
