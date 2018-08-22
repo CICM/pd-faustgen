@@ -193,7 +193,20 @@ char const** faust_opt_manager_get_options(t_faust_opt_manager* x)
     return (char const**)x->f_options;
 }
 
-char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* name)
+char faust_opt_has_double_precision(t_faust_opt_manager const *x)
+{
+    size_t i;
+    for(i = 0; i < x->f_noptions; ++i)
+    {
+        if(strncmp(x->f_options[i], "-double", 7))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* name)
 {
     if(sys_isabsolutepath(name))
     {

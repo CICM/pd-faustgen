@@ -26,5 +26,6 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* 
 
 void faust_opt_manager_print(t_faust_opt_manager const *x, char const log);
 
+char faust_opt_has_double_precision(t_faust_opt_manager const *x);
 
 #endif
