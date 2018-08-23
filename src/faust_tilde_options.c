@@ -231,7 +231,6 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* 
         sprintf(patht, "%s/%s", realdir, realname);
         sys_unbashfilename(patht, path);
         x->f_temp_path = gensym(path);
-        post("path: %s", path);
         return x->f_temp_path->s_name;
     }
     pd_error(x->f_owner, "faustgen~: invalid path or name");
