@@ -1,4 +1,3 @@
 - Mesure DSP time of the code
 - Use automatic optimizations with compile options
-- Check if FAUST supports in-place processing
 - Add a default temporary FAUST file when no argument
