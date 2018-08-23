@@ -1,30 +1,30 @@
-#N canvas 428 137 481 548 10;
+#N canvas 428 137 483 556 10;
 #X obj 12 15 cnv 15 360 17 empty empty faustgen~ 2 9 0 14 -233017 -66577
 0;
-#X obj 286 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 336 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 286 135 \; pd dsp \$1;
-#X obj 32 308 dac~ 1 2;
-#X obj 62 192 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
+#X msg 336 135 \; pd dsp \$1;
+#X obj 32 318 dac~ 1 2;
+#X obj 62 172 nbx 5 14 0 1 0 0 empty empty empty 0 -8 0 10 -262144
 -1 -1 0 256;
-#X obj 62 149 loadbang;
-#X msg 62 171 0;
-#X text 26 351 FAUST institution: GRAME;
-#X text 26 365 FAUST website: faust.grame.fr;
-#X text 132 380 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
+#X obj 62 129 loadbang;
+#X msg 62 151 0;
+#X text 26 361 FAUST institution: GRAME;
+#X text 26 375 FAUST website: faust.grame.fr;
+#X text 132 390 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
 ...;
-#X text 26 379 FAUST developers:;
-#X text 26 449 This object is inspired by faustgen~ for Max developed
+#X text 26 389 FAUST developers:;
+#X text 26 459 This object is inspired by faustgen~ for Max developed
 by Martin Di Rollo and Stéphane Letz., f 50;
 #X text 95 16 the FAUST compiler embedded in a Pd external;
-#X text 26 479 Another faust~ object has been developed by Albert Graef
+#X text 26 489 Another faust~ object has been developed by Albert Graef
 using the programming language "Pure" : https://github.com/agraef/pure-lang.
 , f 67;
-#X text 125 189 Control the parameters with their names, f 15;
-#X text 26 399 faustgen~ institutions: CICM - ANR MUSICOLL;
-#X text 26 427 faustgen~ developer: Pierre Guillot;
-#X msg 62 211 gain \$1;
-#X obj 31 128 osc~ 220;
+#X text 125 169 Control the parameters with their names, f 15;
+#X text 26 409 faustgen~ institutions: CICM - ANR MUSICOLL;
+#X text 26 437 faustgen~ developer: Pierre Guillot;
+#X msg 62 191 gain \$1;
+#X obj 31 108 osc~ 220;
 #N canvas 766 136 471 246 options 0;
 #X text 16 70 Change the compile options and recompile;
 #X msg 17 91 compileoptions -vec -vs 64;
@@ -42,12 +42,12 @@ the redering, f 55;
 #X connect 1 0 9 0;
 #X connect 5 0 9 0;
 #X connect 8 0 7 0;
-#X restore 287 185 pd options;
-#N canvas 287 129 524 202 recompilation 0;
+#X restore 337 185 pd options;
+#N canvas 287 129 410 324 recompilation 0;
 #X obj 17 75 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
 #X msg 17 134 autocompile \$1 100;
-#X obj 17 166 faustgen~ examples/dummy;
+#X obj 17 246 faustgen~ examples/dummy;
 #X text 14 11 The automatic compilation can be used during the Faust
 code edition to recompile the code each time the file has been modified.
 ;
@@ -55,14 +55,13 @@ code edition to recompile the code each time the file has been modified.
 changed., f 37;
 #X text 50 92 The second argument is the time between each check.,
 f 37;
-#X msg 155 134 compile;
-#X text 214 128 Reload and recompile the FAUST file manually, f 23
+#X msg 55 194 compile;
+#X text 114 188 Reload and recompile the FAUST file manually, f 23
 ;
-#X obj 339 90 switch~;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 6 0 2 0;
-#X restore 287 214 pd recompilation;
+#X restore 337 214 pd recompilation;
 #N canvas 575 109 646 630 control 0;
 #X obj 30 598 dac~ 1 2;
 #X msg 45 195 print;
@@ -154,14 +153,14 @@ the index 2, f 36;
 #X connect 28 0 29 0;
 #X connect 29 0 24 0;
 #X connect 33 0 35 0;
-#X restore 287 243 pd control lists;
-#X obj 103 305 snapshot~;
-#X obj 103 326 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+#X restore 337 243 pd control lists;
+#X obj 103 315 snapshot~;
+#X obj 103 336 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
 -262144 -1 -1 0 256;
-#X obj 103 284 metro 100;
-#X obj 103 264 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 103 294 metro 100;
+#X obj 103 274 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X text 26 413 faustgen~ website: github.com/CICM/pd-faustgen;
+#X text 26 423 faustgen~ website: github.com/CICM/pd-faustgen;
 #X obj 31 242 faustgen~ examples/gain;
 #X text 10 36 The first argument is the name of the FAUST DSP file
 to read. The path of the FAUST DSP file can be relative to the patch
@@ -169,6 +168,8 @@ or must be located in the Pd search paths. Extra arguments can be used
 to define compilation options \, see the FAUST documentation for further
 information. Use the debug level 3 to displays information about the
 code in the Pd console., f 72;
+#X text 177 233 Click on the object to open the code in your default
+text editor, f 22;
 #X connect 1 0 2 0;
 #X connect 4 0 17 0;
 #X connect 5 0 6 0;
