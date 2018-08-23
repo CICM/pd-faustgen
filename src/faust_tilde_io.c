@@ -208,17 +208,17 @@ void faust_io_manager_free(t_faust_io_manager* x)
     freebytes(x, sizeof(t_faust_io_manager));
 }
 
-size_t faust_io_manager_get_ninputs(t_faust_io_manager *x)
+size_t faust_io_manager_get_ninputs(t_faust_io_manager const *x)
 {
     return x->f_ninlets;
 }
 
-size_t faust_io_manager_get_noutputs(t_faust_io_manager *x)
+size_t faust_io_manager_get_noutputs(t_faust_io_manager const *x)
 {
     return x->f_noutlets;
 }
 
-char faust_io_manager_has_extra_output(t_faust_io_manager *x)
+char faust_io_manager_has_extra_output(t_faust_io_manager const *x)
 {
     return x->f_extra_outlet != NULL;
 }
