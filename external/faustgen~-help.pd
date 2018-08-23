@@ -1,7 +1,7 @@
 #N canvas 917 216 509 556 10;
 #X obj 12 15 cnv 15 360 17 empty empty faustgen~ 2 9 0 14 -233017 -66577
 0;
-#X obj 336 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 336 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X msg 336 135 \; pd dsp \$1;
 #X obj 32 318 dac~ 1 2;
@@ -59,7 +59,7 @@ text editor \, then recompile to listen to the changes, f 47;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 6 0 2 0;
-#X restore 327 301 pd recompilation;
+#X restore 327 298 pd recompilation;
 #X obj 103 315 snapshot~;
 #X obj 103 336 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
 -262144 -1 -1 0 256;
@@ -82,9 +82,9 @@ text editor, f 22;
 #X obj 249 396 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
 -262144 -1 -1 1 256;
 #X obj 305 396 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 2.23 256;
+-262144 -1 -1 3 256;
 #X obj 361 396 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 2.95 256;
+-262144 -1 -1 4 256;
 #X obj 22 352 faustgen~ examples/parameters;
 #X text 20 9 You can use the name of the parameters without any arguments
 to output their current values via the extra control outlet.;
@@ -97,9 +97,9 @@ to output their current values via the extra control outlet.;
 #X obj 288 261 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 375 262 nbx 5 14 0 3 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 2.23 256;
+-1 -1 3 256;
 #X obj 448 260 nbx 5 14 0 4 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 2.95 256;
+-1 -1 4 256;
 #X obj 209 200 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj 209 220 t b b, f 9;
