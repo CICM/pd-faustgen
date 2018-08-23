@@ -135,16 +135,20 @@ static void faustgen_tilde_compile_options(t_faustgen_tilde *x, t_symbol* s, int
 
 static void faustgen_tilde_open_texteditor(t_faustgen_tilde *x)
 {
-    char message[MAXPDSTRING];
+    if(x->f_dsp_instance)
+    {
+        char message[MAXPDSTRING];
 #ifdef _WIN32
+        sys_bashfilename(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), message);
 #elif __APPLE__
-    sprintf(message, "open -t %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
-    system(message);
+        sprintf(message, "open -t %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
 #else
-    sprintf(message, "xdg-open %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
-    system(message);
+        sprintf(message, "xdg-open %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
 #endif
-    
+        system(message);
+        return;
+    }
+    pd_error(x, "faustgen~: no FAUST DSP file defined");
 }
 
 /*
