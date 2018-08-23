@@ -9,11 +9,6 @@
 -1 -1 0 256;
 #X obj 62 149 loadbang;
 #X msg 62 171 0;
-#X text 10 36 The first argument is the name of the file FAUST DSP
-file to read. The path is relative to the patch. Extra arguments can
-be used to define compilation options \, see the FAUST documentation
-for further information. Use the debug level 3 to displays information
-about the code in the Pd console.;
 #X text 26 351 FAUST institution: GRAME;
 #X text 26 365 FAUST website: faust.grame.fr;
 #X text 132 380 Yann Orlarey \, Stéphane Letz \, Dominique Fober \,
@@ -29,7 +24,7 @@ using the programming language "Pure" : https://github.com/agraef/pure-lang.
 #X text 26 399 faustgen~ institutions: CICM - ANR MUSICOLL;
 #X text 26 427 faustgen~ developer: Pierre Guillot;
 #X msg 62 211 gain \$1;
-#X obj 31 118 osc~ 220;
+#X obj 31 128 osc~ 220;
 #N canvas 766 136 471 246 options 0;
 #X text 16 70 Change the compile options and recompile;
 #X msg 17 91 compileoptions -vec -vs 64;
@@ -166,17 +161,23 @@ the index 2, f 36;
 #X obj 103 284 metro 100;
 #X obj 103 264 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 31 242 faustgen~ examples/gain;
 #X text 26 413 faustgen~ website: github.com/CICM/pd-faustgen;
+#X obj 31 242 faustgen~ examples/gain;
+#X text 10 36 The first argument is the name of the FAUST DSP file
+to read. The path of the FAUST DSP file can be relative to the patch
+or must be located in the Pd search paths. Extra arguments can be used
+to define compilation options \, see the FAUST documentation for further
+information. Use the debug level 3 to displays information about the
+code in the Pd console., f 72;
 #X connect 1 0 2 0;
-#X connect 4 0 18 0;
+#X connect 4 0 17 0;
 #X connect 5 0 6 0;
 #X connect 6 0 4 0;
+#X connect 17 0 27 0;
 #X connect 18 0 27 0;
-#X connect 19 0 27 0;
-#X connect 23 0 24 0;
-#X connect 25 0 23 0;
-#X connect 26 0 25 0;
+#X connect 22 0 23 0;
+#X connect 24 0 22 0;
+#X connect 25 0 24 0;
 #X connect 27 0 3 0;
 #X connect 27 0 3 1;
-#X connect 27 0 23 0;
+#X connect 27 0 22 0;
