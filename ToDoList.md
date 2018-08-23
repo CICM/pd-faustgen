@@ -3,4 +3,3 @@
 - Check if FAUST supports in-place processing
 - Add method to open the FAUST file in the default text editor
 - Add a default temporary FAUST file when no argument
-- Look for the DSP file in all Pd's search paths

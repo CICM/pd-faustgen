@@ -1,7 +1,8 @@
 ### v0.0.6
-- Preserve parameters values during recompilation
+- Add support to preserve parameters values during recompilation
 - Fix autocompilation when DSP instance not initialized
 - Fix support for the double-float-precision option
+- Add support to look for the DSP file in all Pd's search paths
 
 ### v0.0.5
 - Fix when no argument is provided
