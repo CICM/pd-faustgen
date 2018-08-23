@@ -133,6 +133,20 @@ static void faustgen_tilde_compile_options(t_faustgen_tilde *x, t_symbol* s, int
     faustgen_tilde_compile(x);
 }
 
+static void faustgen_tilde_open_texteditor(t_faustgen_tilde *x)
+{
+    char message[MAXPDSTRING];
+#ifdef _WIN32
+#elif __APPLE__
+    sprintf(message, "open -t %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
+    system(message);
+#else
+    sprintf(message, "xdg-open %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
+    system(message);
+#endif
+    
+}
+
 /*
 static void faustgen_tilde_read(t_faustgen_tilde *x, t_symbol* s)
 {
@@ -482,14 +496,15 @@ void faustgen_tilde_setup(void)
     
     if(c)
     {
-        class_addmethod(c,      (t_method)faustgen_tilde_dsp,              gensym("dsp"),            A_CANT);
-        class_addmethod(c,      (t_method)faustgen_tilde_compile,          gensym("compile"),        A_NULL);
-        class_addmethod(c,      (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"), A_GIMME);
-        class_addmethod(c,      (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),    A_GIMME);
-        class_addmethod(c,      (t_method)faustgen_tilde_print_parameters, gensym("print"),          A_NULL);
+        class_addmethod(c,  (t_method)faustgen_tilde_dsp,              gensym("dsp"),               A_CANT, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_compile,          gensym("compile"),           A_NULL, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"),    A_GIMME, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),       A_GIMME, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_print_parameters, gensym("print"),             A_NULL, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_open_texteditor,  gensym("click"),             A_NULL, 0);
         
         //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
-        class_addanything(c,    (t_method)faustgen_tilde_anything);
+        class_addanything(c, (t_method)faustgen_tilde_anything);
         
         CLASS_MAINSIGNALIN(c, t_faustgen_tilde, f_dummy);
         logpost(NULL, 3, "Faust website: faust.grame.fr");
