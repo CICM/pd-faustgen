@@ -22,7 +22,7 @@ typedef struct _faust_opt_manager
     char*       f_default_include;
     size_t      f_noptions;
     char**      f_options;
-    t_symbol*   f_directory;
+    t_canvas*   f_canvas;
     t_symbol*   f_temp_path;
     char        f_use_default_include;
 }t_faust_opt_manager;
@@ -177,7 +177,7 @@ t_faust_opt_manager* faust_opt_manager_new(t_object* owner, t_canvas* canvas)
         x->f_options                = NULL;
         x->f_noptions               = 0;
         x->f_use_default_include    = 0;
-        x->f_directory              = canvas_getdir(canvas);
+        x->f_canvas                 = canvas;
         faust_opt_manager_get_default_include_path(x);
     }
     return x;
@@ -214,10 +214,10 @@ char faust_opt_has_double_precision(t_faust_opt_manager const *x)
 
 char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* name)
 {
-    if(x->f_directory && x->f_directory->s_name && name)
+    if(x->f_canvas && name)
     {
-        char patht[MAXFAUSTSTRING], path[MAXFAUSTSTRING], realdir[MAXPDSTRING], *bufptr;
-        int filedesc = open_via_path(x->f_directory->s_name, name, ".dsp", realdir, &bufptr, MAXPDSTRING, 0);
+        char patht[MAXFAUSTSTRING], path[MAXFAUSTSTRING], realdir[MAXPDSTRING], *realname;
+        int filedesc = canvas_open(x->f_canvas, name, ".dsp", realdir, &realname, MAXPDSTRING, 0);
         if(filedesc < 0)
         {
             pd_error(x->f_owner, "faustgen~: can't find the FAUST DSP file %s.dsp", name);
@@ -227,10 +227,11 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* 
         {
             close(filedesc);
         }
-        
-        sprintf(patht, "%s/%s.dsp", realdir, name);
+
+        sprintf(patht, "%s/%s", realdir, realname);
         sys_unbashfilename(patht, path);
         x->f_temp_path = gensym(path);
+        post("path: %s", path);
         return x->f_temp_path->s_name;
     }
     pd_error(x->f_owner, "faustgen~: invalid path or name");
