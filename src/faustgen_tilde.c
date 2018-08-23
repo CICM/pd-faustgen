@@ -197,11 +197,19 @@ static void faustgen_tilde_autocompile(t_faustgen_tilde *x, t_symbol* s, int arg
     }
 }
 
-static void faustgen_tilde_print_parameters(t_faustgen_tilde *x)
+static void faustgen_tilde_print(t_faustgen_tilde *x)
 {
-    faust_io_manager_print(x->f_io_manager, 0);
-    faust_opt_manager_print(x->f_opt_manager, 0);
-    faust_ui_manager_print(x->f_ui_manager, 0);
+    if(x->f_dsp_factory)
+    {
+        post("faustgen~: %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
+        faust_io_manager_print(x->f_io_manager, 0);
+        faust_opt_manager_print(x->f_opt_manager, 0);
+        faust_ui_manager_print(x->f_ui_manager, 0);
+    }
+    else
+    {
+        pd_error(x, "faustgen~: no FAUST DSP file defined");
+    }
 }
 
 
@@ -502,7 +510,7 @@ void faustgen_tilde_setup(void)
         class_addmethod(c,  (t_method)faustgen_tilde_compile,          gensym("compile"),           A_NULL, 0);
         class_addmethod(c,  (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"),    A_GIMME, 0);
         class_addmethod(c,  (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),       A_GIMME, 0);
-        class_addmethod(c,  (t_method)faustgen_tilde_print_parameters, gensym("print"),             A_NULL, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_print, gensym("print"),             A_NULL, 0);
         class_addmethod(c,  (t_method)faustgen_tilde_open_texteditor,  gensym("click"),             A_NULL, 0);
         
         //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
