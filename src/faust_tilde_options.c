@@ -8,6 +8,12 @@
 #include "faust_tilde_options.h"
 #include <string.h>
 
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 #define MAXFAUSTSTRING 4096
 
 typedef struct _faust_opt_manager
@@ -208,22 +214,24 @@ char faust_opt_has_double_precision(t_faust_opt_manager const *x)
 
 char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* name)
 {
-    if(sys_isabsolutepath(name))
+    if(x->f_directory && x->f_directory->s_name && name)
     {
-        return name;
-    }
-    else if(x->f_directory && x->f_directory->s_name && name)
-    {
-        char* file = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
-        if(file)
+        char patht[MAXFAUSTSTRING], path[MAXFAUSTSTRING], realdir[MAXPDSTRING], *bufptr;
+        int filedesc = open_via_path(x->f_directory->s_name, name, ".dsp", realdir, &bufptr, MAXPDSTRING, 0);
+        if(filedesc < 0)
         {
-            sprintf(file, "%s/%s.dsp", x->f_directory->s_name, name);
-            x->f_temp_path = gensym(file);
-            freebytes(file, MAXFAUSTSTRING * sizeof(char));
-            return x->f_temp_path->s_name;
+            pd_error(x->f_owner, "faustgen~: can't find the FAUST DSP file %s.dsp", name);
+            return NULL;
         }
-        pd_error(x->f_owner, "faustgen~: memory allocation failed - path");
-        return NULL;
+        else
+        {
+            close(filedesc);
+        }
+        
+        sprintf(patht, "%s/%s.dsp", realdir, name);
+        sys_unbashfilename(patht, path);
+        x->f_temp_path = gensym(path);
+        return x->f_temp_path->s_name;
     }
     pd_error(x->f_owner, "faustgen~: invalid path or name");
     return NULL;
