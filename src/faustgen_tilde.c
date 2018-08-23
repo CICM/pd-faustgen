@@ -423,7 +423,6 @@ static void faustgen_tilde_dsp(t_faustgen_tilde *x, t_signal **sp)
 
             if(faust_opt_has_double_precision(x->f_opt_manager))
             {
-                post("double precision");
                 faustgen_tilde_alloc_signals_double(x, ninputs, noutputs, nsamples);
                 dsp_add((t_perfroutine)faustgen_tilde_perform_double, 7,
                         (t_int)x->f_dsp_instance, (t_int)nsamples, (t_int)ninputs, (t_int)noutputs,
@@ -433,7 +432,6 @@ static void faustgen_tilde_dsp(t_faustgen_tilde *x, t_signal **sp)
             }
             else
             {
-                post("single precision");
                 faustgen_tilde_alloc_signals_single(x, ninputs, noutputs, nsamples);
                 dsp_add((t_perfroutine)faustgen_tilde_perform_single, 7,
                         (t_int)x->f_dsp_instance, (t_int)nsamples, (t_int)ninputs, (t_int)noutputs,
