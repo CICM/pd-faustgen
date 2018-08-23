@@ -3,6 +3,7 @@
 - Fix autocompilation when DSP instance not initialized
 - Fix support for the double-float-precision option
 - Add support to look for the DSP file in all Pd's search paths
+- Add support to open the FAUST file in the default text editor when object is clicked
 
 ### v0.0.5
 - Fix when no argument is provided
