@@ -506,12 +506,12 @@ void faustgen_tilde_setup(void)
     
     if(c)
     {
-        class_addmethod(c,  (t_method)faustgen_tilde_dsp,              gensym("dsp"),               A_CANT, 0);
-        class_addmethod(c,  (t_method)faustgen_tilde_compile,          gensym("compile"),           A_NULL, 0);
-        class_addmethod(c,  (t_method)faustgen_tilde_compile_options,  gensym("compileoptions"),    A_GIMME, 0);
-        class_addmethod(c,  (t_method)faustgen_tilde_autocompile,      gensym("autocompile"),       A_GIMME, 0);
-        class_addmethod(c,  (t_method)faustgen_tilde_print, gensym("print"),             A_NULL, 0);
-        class_addmethod(c,  (t_method)faustgen_tilde_open_texteditor,  gensym("click"),             A_NULL, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_dsp,               gensym("dsp"),              A_CANT, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_compile,           gensym("compile"),          A_NULL, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_compile_options,   gensym("compileoptions"),   A_GIMME, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_autocompile,       gensym("autocompile"),      A_GIMME, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_print,             gensym("print"),            A_NULL, 0);
+        class_addmethod(c,  (t_method)faustgen_tilde_open_texteditor,   gensym("click"),            A_NULL, 0);
         
         //class_addmethod(c,      (t_method)faustgen_tilde_read,             gensym("read"),           A_SYMBOL);
         class_addanything(c, (t_method)faustgen_tilde_anything);
