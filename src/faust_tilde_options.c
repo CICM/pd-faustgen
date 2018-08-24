@@ -216,21 +216,26 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* 
 {
     if(x->f_canvas && name)
     {
-        char patht[MAXFAUSTSTRING], path[MAXFAUSTSTRING], realdir[MAXPDSTRING], *realname;
+        char path[MAXFAUSTSTRING], realdir[MAXPDSTRING], *realname = NULL;
         int filedesc = canvas_open(x->f_canvas, name, ".dsp", realdir, &realname, MAXPDSTRING, 0);
         if(filedesc < 0)
         {
             pd_error(x->f_owner, "faustgen~: can't find the FAUST DSP file %s.dsp", name);
             return NULL;
         }
-        else
+        if(!realname)
         {
-            close(filedesc);
+            pd_error(x->f_owner, "faustgen~: can't find the real name of the FAUST DSP file %s.dsp", name);
+            return NULL;
         }
-
-        sprintf(patht, "%s/%s", realdir, realname);
-        sys_unbashfilename(patht, path);
+        sprintf(path, "%s/%s", realdir, realname);
         x->f_temp_path = gensym(path);
+		if(!x->f_temp_path)
+		{
+			pd_error(x->f_owner, "faustgen~: can't generate symbol for the FAUST DSP file %s.dsp", name);
+			return NULL;
+		}
+        //close(filedesc);
         return x->f_temp_path->s_name;
     }
     pd_error(x->f_owner, "faustgen~: invalid path or name");
