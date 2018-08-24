@@ -98,7 +98,6 @@ static void faustgen_tilde_compile(t_faustgen_tilde *x)
             return;
         }
         
-        
         instance = createCDSPInstance(factory);
         if(instance)
         {
@@ -117,6 +116,7 @@ static void faustgen_tilde_compile(t_faustgen_tilde *x)
             return;
         }
         
+        deleteCDSPFactory(factory);
         faustgen_tilde_delete_instance(x);
         faustgen_tilde_delete_factory(x);
         pd_error(x, "faustgen~: memory allocation failed - instance");
