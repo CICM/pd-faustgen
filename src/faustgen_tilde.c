@@ -18,8 +18,8 @@
 #include "faust_tilde_io.h"
 #include "faust_tilde_options.h"
 
+#define FAUSTGEN_VERSION_STR "0.1.0"
 #define MAXFAUSTSTRING 4096
-#define MAXFAUSTOPTIONS 128
 
 typedef struct _faustgen_tilde
 {
@@ -518,6 +518,7 @@ void faustgen_tilde_setup(void)
         logpost(NULL, 3, "Faust website: faust.grame.fr");
         logpost(NULL, 3, "Faust development: GRAME");
         
+        logpost(NULL, 3, "faustgen~ version: %s", FAUSTGEN_VERSION_STR);
         logpost(NULL, 3, "faustgen~ compiler version: %s", getCLibFaustVersion());
         logpost(NULL, 3, "faustgen~ default include directory: %s", class_gethelpdir(c));
         logpost(NULL, 3, "faustgen~ institutions: CICM - ANR MUSICOLL");
