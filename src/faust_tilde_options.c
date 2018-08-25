@@ -8,12 +8,6 @@
 #include "faust_tilde_options.h"
 #include <string.h>
 
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
 #define MAXFAUSTSTRING 4096
 
 typedef struct _faust_opt_manager
@@ -223,6 +217,8 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* 
             pd_error(x->f_owner, "faustgen~: can't find the FAUST DSP file %s.dsp", name);
             return NULL;
         }
+        sys_close(filedesc);
+        
         if(!realname)
         {
             pd_error(x->f_owner, "faustgen~: can't find the real name of the FAUST DSP file %s.dsp", name);
@@ -235,7 +231,6 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* 
 			pd_error(x->f_owner, "faustgen~: can't generate symbol for the FAUST DSP file %s.dsp", name);
 			return NULL;
 		}
-        //close(filedesc);
         return x->f_temp_path->s_name;
     }
     pd_error(x->f_owner, "faustgen~: invalid path or name");
