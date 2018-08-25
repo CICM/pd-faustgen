@@ -18,54 +18,95 @@
 
 typedef struct _faust_ui
 {
-    t_symbol*   p_name;
-    t_symbol*   p_longname;
-    int         p_type;
-    FAUSTFLOAT* p_zone;
-    FAUSTFLOAT  p_min;
-    FAUSTFLOAT  p_max;
-    FAUSTFLOAT  p_step;
-    FAUSTFLOAT  p_default;
-    FAUSTFLOAT  p_saved;
+    t_symbol*           p_name;
+    t_symbol*           p_longname;
+    int                 p_type;
+    FAUSTFLOAT*         p_zone;
+    FAUSTFLOAT          p_min;
+    FAUSTFLOAT          p_max;
+    FAUSTFLOAT          p_step;
+    FAUSTFLOAT          p_default;
+    FAUSTFLOAT          p_saved;
+    char                p_kept;
+    FAUSTFLOAT          p_tempv;
+    struct _faust_ui*   p_next;
 }t_faust_ui;
 
 typedef struct _faust_ui_manager
 {
     UIGlue      f_glue;
     t_object*   f_owner;
-    t_clock*    f_clock;
-    t_faust_ui* f_active_uis;
-    size_t      f_nactive_uis;
-    t_faust_ui* f_temp_ui;
-    t_faust_ui* f_passive_uis;
-    size_t      f_npassive_uis;
+    t_faust_ui* f_uis;
     t_symbol**  f_names;
     size_t      f_nnames;
     MetaGlue    f_meta_glue;
 }t_faust_ui_manager;
 
-
-static void faust_ui_manager_clear_active_uis(t_faust_ui_manager *x)
+static void faust_ui_manager_free_uis(t_faust_ui_manager *x)
 {
-    if(x->f_active_uis && x->f_nactive_uis)
+    t_faust_ui *c = x->f_uis;
+    while(c)
     {
-        freebytes(x->f_active_uis, x->f_nactive_uis * sizeof(t_faust_ui));
+        x->f_uis = c->p_next;
+        freebytes(c, sizeof(*c));
+        c = x->f_uis;
     }
-    x->f_active_uis    = NULL;
-    x->f_nactive_uis   = 0;
 }
 
-static void faust_ui_manager_clear_passive_uis(t_faust_ui_manager *x)
+static t_faust_ui* faust_ui_manager_get(t_faust_ui_manager const *x, t_symbol const *name)
 {
-    if(x->f_passive_uis && x->f_npassive_uis)
+    t_faust_ui *c = x->f_uis;
+    while(c)
     {
-        freebytes(x->f_passive_uis, x->f_npassive_uis * sizeof(t_faust_ui));
+        if(c->p_name == name || c->p_longname == name)
+        {
+            return c;
+        }
+        c = c->p_next;
     }
-    x->f_passive_uis   = NULL;
-    x->f_npassive_uis  = 0;
+    return NULL;
 }
 
-static void faust_ui_manager_clear_names(t_faust_ui_manager *x)
+static void faust_ui_manager_prepare_changes(t_faust_ui_manager *x)
+{
+    t_faust_ui *c = x->f_uis;
+    while(c)
+    {
+        c->p_kept  = 0;
+        c->p_tempv = *(c->p_zone);
+        c = c->p_next;
+    }
+}
+
+static void faust_ui_manager_finish_changes(t_faust_ui_manager *x)
+{
+    t_faust_ui *c = x->f_uis;
+    if(c)
+    {
+        t_faust_ui *n = c->p_next;
+        while(n)
+        {
+            if(!n->p_kept)
+            {
+                c->p_next = n->p_next;
+                freebytes(n, sizeof(*n));
+                n = c->p_next;
+            }
+            else
+            {
+                c = n;
+                n = c->p_next;
+            }
+        }
+        if(!x->f_uis->p_kept)
+        {
+            x->f_uis = x->f_uis->p_next;
+            freebytes(x->f_uis, sizeof(*x->f_uis));
+        }
+    }
+}
+
+static void faust_ui_manager_free_names(t_faust_ui_manager *x)
 {
     if(x->f_names && x->f_nnames)
     {
@@ -73,34 +114,6 @@ static void faust_ui_manager_clear_names(t_faust_ui_manager *x)
     }
     x->f_names  = NULL;
     x->f_nnames = 0;
-}
-
-static t_faust_ui* faust_ui_manager_get_active_uis(t_faust_ui_manager *x, t_symbol* name)
-{
-    size_t i;
-    for(i = 0; i < x->f_nactive_uis; ++i)
-    {
-        if(x->f_active_uis[i].p_name == name ||
-           x->f_active_uis[i].p_longname == name)
-        {
-            return x->f_active_uis+i;
-        }
-    }
-    return NULL;
-}
-
-static t_faust_ui* faust_ui_manager_get_passive_uis(t_faust_ui_manager *x, t_symbol* name)
-{
-    size_t i;
-    for(i = 0; i < x->f_npassive_uis; ++i)
-    {
-        if(x->f_passive_uis[i].p_name == name ||
-           x->f_passive_uis[i].p_longname == name)
-        {
-            return x->f_passive_uis+i;
-        }
-    }
-    return NULL;
 }
 
 static t_symbol* faust_ui_manager_get_long_name(t_faust_ui_manager *x, const char* label)
@@ -117,52 +130,42 @@ static t_symbol* faust_ui_manager_get_long_name(t_faust_ui_manager *x, const cha
     return gensym(name);
 }
 
-static void faust_ui_manager_add_params(t_faust_ui_manager *x, const char* label, int const type, FAUSTFLOAT* zone,
+static void faust_ui_manager_add_param(t_faust_ui_manager *x, const char* label, int const type, FAUSTFLOAT* zone,
                                         FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
 {
-    t_faust_ui *newmemory = NULL;
-    t_faust_ui *oldmemory = (type == FAUST_UI_TYPE_BARGRAPH) ? x->f_passive_uis : x->f_active_uis;
-    size_t size = (type == FAUST_UI_TYPE_BARGRAPH) ? x->f_npassive_uis : x->f_nactive_uis;
-    if(oldmemory)
+    FAUSTFLOAT saved, current;
+    t_symbol* name  = gensym(label);
+    t_symbol* lname = faust_ui_manager_get_long_name(x, label);
+    t_faust_ui *c   = faust_ui_manager_get(x, name);
+    if(c)
     {
-        newmemory = (t_faust_ui *)resizebytes(oldmemory, size * sizeof(t_faust_ui), (size + 1) * sizeof(t_faust_ui));
-        if(!newmemory)
+        saved   = c->p_saved;
+        current = c->p_tempv;
+    }
+    else
+    {
+        c = (t_faust_ui *)getbytes(sizeof(*c));
+        if(!c)
         {
             pd_error(x->f_owner, "faustgen~: memory allocation failed - ui glue");
             return;
         }
+        c->p_name   = name;
+        c->p_next   = x->f_uis;
+        x->f_uis    = c;
+        saved       = init;
+        current     = init;
     }
-    else
-    {
-        newmemory = (t_faust_ui *)getbytes(sizeof(t_faust_ui));
-        if(!newmemory)
-        {
-            pd_error(x->f_owner, "faustgen~: memory allocation failed - ui glue");
-            return;
-        }
-    }
-
-    newmemory[size].p_name      = gensym(label);
-    newmemory[size].p_longname  = faust_ui_manager_get_long_name(x, label);
-    newmemory[size].p_type      = type;
-    newmemory[size].p_zone      = zone;
-    newmemory[size].p_min       = min;
-    newmemory[size].p_max       = max;
-    newmemory[size].p_step      = step;
-    newmemory[size].p_default   = init;
-    newmemory[size].p_saved     = init;
-    *(newmemory[size].p_zone)   = init;
-    if(type == FAUST_UI_TYPE_BARGRAPH)
-    {
-        x->f_passive_uis  = (t_faust_ui *)newmemory;
-        x->f_npassive_uis = size + 1;
-    }
-    else
-    {
-        x->f_active_uis  = (t_faust_ui *)newmemory;
-        x->f_nactive_uis = size + 1;
-    }
-    
+    c->p_longname  = lname;
+    c->p_type      = type;
+    c->p_zone      = zone;
+    c->p_min       = min;
+    c->p_max       = max;
+    c->p_step      = step;
+    c->p_default   = init;
+    c->p_saved     = saved;
+    c->p_kept      = 1;
+    *(c->p_zone)   = current;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,18 +241,18 @@ static void faust_ui_manager_ui_close_box(t_faust_ui_manager* x)
 
 static void faust_ui_manager_ui_add_button(t_faust_ui_manager* x, const char* label, FAUSTFLOAT* zone)
 {
-    faust_ui_manager_add_params(x, label, FAUST_UI_TYPE_BUTTON, zone, 0, 0, 0, 0);
+    faust_ui_manager_add_param(x, label, FAUST_UI_TYPE_BUTTON, zone, 0, 0, 0, 0);
 }
 
 static void faust_ui_manager_ui_add_toggle(t_faust_ui_manager* x, const char* label, FAUSTFLOAT* zone)
 {
-    faust_ui_manager_add_params(x, label, FAUST_UI_TYPE_TOGGLE, zone, 0, 0, 1, 1);
+    faust_ui_manager_add_param(x, label, FAUST_UI_TYPE_TOGGLE, zone, 0, 0, 1, 1);
 }
 
 static void faust_ui_manager_ui_add_number(t_faust_ui_manager* x, const char* label, FAUSTFLOAT* zone,
                                             FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
 {
-    faust_ui_manager_add_params(x, label, FAUST_UI_TYPE_NUMBER, zone, init, min, max, step);
+    faust_ui_manager_add_param(x, label, FAUST_UI_TYPE_NUMBER, zone, init, min, max, step);
 }
 
 // PASSIVE UIS
@@ -258,7 +261,7 @@ static void faust_ui_manager_ui_add_number(t_faust_ui_manager* x, const char* la
 static void faust_ui_manager_ui_add_bargraph(t_faust_ui_manager* x, const char* label,
                                                         FAUSTFLOAT* zone, FAUSTFLOAT min, FAUSTFLOAT max)
 {
-    faust_ui_manager_add_params(x, label, FAUST_UI_TYPE_BARGRAPH, zone, 0, min, max, 0);
+    faust_ui_manager_add_param(x, label, FAUST_UI_TYPE_BARGRAPH, zone, 0, min, max, 0);
 }
 
 static void faust_ui_manager_ui_add_sound_file(t_faust_ui_manager* x, const char* label, const char* filename, struct Soundfile** sf_zone)
@@ -287,8 +290,6 @@ static void faust_ui_manager_meta_declare(t_faust_ui_manager* x, const char* key
 //                                      PUBLIC INTERFACE                                        //
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void faust_ui_manager_tick(t_faust_ui_manager* x);
-
 t_faust_ui_manager* faust_ui_manager_new(t_object* owner)
 {
     t_faust_ui_manager* ui_manager = (t_faust_ui_manager*)getbytes(sizeof(t_faust_ui_manager));
@@ -311,14 +312,10 @@ t_faust_ui_manager* faust_ui_manager_new(t_object* owner)
         ui_manager->f_glue.addSoundFile           = (addSoundFileFun)faust_ui_manager_ui_add_sound_file;
         ui_manager->f_glue.declare                = (declareFun)faust_ui_manager_ui_declare;
         
-        ui_manager->f_owner         = owner;
-        ui_manager->f_clock         = clock_new(ui_manager, (t_method)faust_ui_manager_tick);
-        ui_manager->f_active_uis    = NULL;
-        ui_manager->f_nactive_uis   = 0;
-        ui_manager->f_passive_uis   = NULL;
-        ui_manager->f_npassive_uis  = 0;
-        ui_manager->f_names         = NULL;
-        ui_manager->f_nnames        = 0;
+        ui_manager->f_owner     = owner;
+        ui_manager->f_uis       = NULL;
+        ui_manager->f_names     = NULL;
+        ui_manager->f_nnames    = 0;
         
         ui_manager->f_meta_glue.metaInterface = ui_manager;
         ui_manager->f_meta_glue.declare       = (metaDeclareFun)faust_ui_manager_meta_declare;
@@ -329,49 +326,40 @@ t_faust_ui_manager* faust_ui_manager_new(t_object* owner)
 void faust_ui_manager_free(t_faust_ui_manager *x)
 {
     faust_ui_manager_clear(x);
-    freebytes(x, sizeof(t_faust_ui_manager));
+    freebytes(x, sizeof(*x));
 }
 
 void faust_ui_manager_init(t_faust_ui_manager *x, void* dspinstance)
 {
-    faust_ui_manager_clear(x);
+    faust_ui_manager_prepare_changes(x);
     buildUserInterfaceCDSPInstance((llvm_dsp *)dspinstance, (UIGlue *)&(x->f_glue));
-    faust_ui_manager_clear_names(x);
+    faust_ui_manager_finish_changes(x);
+    faust_ui_manager_free_names(x);
     metadataCDSPInstance((llvm_dsp *)dspinstance, &x->f_meta_glue);
 }
 
 void faust_ui_manager_clear(t_faust_ui_manager *x)
 {
-    faust_ui_manager_clear_active_uis(x);
-    faust_ui_manager_clear_passive_uis(x);
-    faust_ui_manager_clear_names(x);
+    faust_ui_manager_free_uis(x);
+    faust_ui_manager_free_names(x);
 }
 
-static void faust_ui_manager_tick(t_faust_ui_manager* x)
+char faust_ui_manager_set_value(t_faust_ui_manager *x, t_symbol const *name, t_float const f)
 {
-    if(x->f_temp_ui)
-    {
-        *(x->f_temp_ui->p_zone) = 0;
-    }
-    x->f_temp_ui = NULL;
-}
-
-char faust_ui_manager_has_passive_ui(t_faust_ui_manager *x)
-{
-    return x->f_npassive_uis > 0;
-}
-
-char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f)
-{
-    t_faust_ui* ui = faust_ui_manager_get_active_uis(x, name);
+    t_faust_ui* ui = faust_ui_manager_get(x, name);
     if(ui)
     {
         if(ui->p_type == FAUST_UI_TYPE_BUTTON)
         {
-            *(ui->p_zone) = 0;
-            *(ui->p_zone) = 1;
-            x->f_temp_ui = ui;
-            clock_delay(x->f_clock, 1.5);
+            if(f > FLT_EPSILON)
+            {
+                *(ui->p_zone) = 0;
+                *(ui->p_zone) = 1;
+            }
+            else
+            {
+                *(ui->p_zone) = 0;
+            }
             return 0;
         }
         else if(ui->p_type == FAUST_UI_TYPE_TOGGLE)
@@ -399,9 +387,9 @@ char faust_ui_manager_set(t_faust_ui_manager *x, t_symbol* name, t_float f)
     return 1;
 }
 
-char faust_ui_manager_get(t_faust_ui_manager *x, t_symbol* name, t_float* f)
+char faust_ui_manager_get_value(t_faust_ui_manager const *x, t_symbol const *name, t_float* f)
 {
-    t_faust_ui* ui = faust_ui_manager_get_passive_uis(x, name);
+    t_faust_ui* ui = faust_ui_manager_get(x, name);
     if(ui)
     {
         *f = (t_float)(*(ui->p_zone));
@@ -412,32 +400,35 @@ char faust_ui_manager_get(t_faust_ui_manager *x, t_symbol* name, t_float* f)
 
 void faust_ui_manager_save_states(t_faust_ui_manager *x)
 {
-    size_t i;
-    for(i = 0; i < x->f_nactive_uis; ++i)
+    t_faust_ui *c = x->f_uis;
+    while(c)
     {
-        x->f_active_uis[i].p_saved = *(x->f_active_uis[i].p_zone);
+        c->p_saved = *(c->p_zone);
+        c = c->p_next;
     }
 }
 
 void faust_ui_manager_restore_states(t_faust_ui_manager *x)
 {
-    size_t i;
-    for(i = 0; i < x->f_nactive_uis; ++i)
+    t_faust_ui *c = x->f_uis;
+    while(c)
     {
-        *(x->f_active_uis[i].p_zone) = x->f_active_uis[i].p_saved;
+        *(c->p_zone) = c->p_saved;
+        c = c->p_next;
     }
 }
 
 void faust_ui_manager_restore_default(t_faust_ui_manager *x)
 {
-    size_t i;
-    for(i = 0; i < x->f_nactive_uis; ++i)
+    t_faust_ui *c = x->f_uis;
+    while(c)
     {
-        *(x->f_active_uis[i].p_zone) = x->f_active_uis[i].p_default;
+        *(c->p_zone) = c->p_default;
+        c = c->p_next;
     }
 }
 
-const char* faust_ui_manager_get_parameter_char(int type)
+static const char* faust_ui_manager_get_parameter_char(int const type)
 {
     if(type == FAUST_UI_TYPE_BUTTON)
         return "button";
@@ -449,32 +440,16 @@ const char* faust_ui_manager_get_parameter_char(int type)
         return "bargraph";
 }
 
-void faust_ui_manager_print(t_faust_ui_manager* x, char const log)
+void faust_ui_manager_print(t_faust_ui_manager const *x, char const log)
 {
-    size_t i;
-    logpost(x->f_owner, 2+log, "             active parameters: %i", (int)x->f_nactive_uis);
-    for(i = 0; i < x->f_nactive_uis; ++i)
+    t_faust_ui *c = x->f_uis;
+    while(c)
     {
-        logpost(x->f_owner, 2+log, "             %i: %s [path:%s - type:%s - init:%g - min:%g - max:%g - current:%g]", (int)i,
-                x->f_active_uis[i].p_name->s_name,
-                x->f_active_uis[i].p_longname->s_name,
-                faust_ui_manager_get_parameter_char(x->f_active_uis[i].p_type),
-                x->f_active_uis[i].p_default,
-                x->f_active_uis[i].p_min,
-                x->f_active_uis[i].p_max,
-                *x->f_active_uis[i].p_zone);
-    }
-    logpost(x->f_owner, 2+log, "             passive parameters: %i", (int)x->f_npassive_uis);
-    for(i = 0; i < x->f_npassive_uis; ++i)
-    {
-        logpost(x->f_owner, 2+log, "             %i: %s [path:%s - type:%s - init:%g - min:%g - max:%g - current:%g]", (int)i,
-                x->f_passive_uis[i].p_name->s_name,
-                x->f_passive_uis[i].p_longname->s_name,
-                faust_ui_manager_get_parameter_char(x->f_passive_uis[i].p_type),
-                x->f_passive_uis[i].p_default,
-                x->f_passive_uis[i].p_min,
-                x->f_passive_uis[i].p_max,
-                *x->f_passive_uis[i].p_zone);
+        logpost(x->f_owner, 2+log, "             parameter: %s [path:%s - type:%s - init:%g - min:%g - max:%g - current:%g]",
+                c->p_name->s_name, c->p_longname->s_name,
+                faust_ui_manager_get_parameter_char(c->p_type),
+                c->p_default, c->p_min, c->p_max, *c->p_zone);
+        c = c->p_next;
     }
 }
 

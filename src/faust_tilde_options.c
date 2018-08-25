@@ -16,7 +16,7 @@ typedef struct _faust_opt_manager
     char*       f_default_include;
     size_t      f_noptions;
     char**      f_options;
-    t_symbol*   f_directory;
+    t_canvas*   f_canvas;
     t_symbol*   f_temp_path;
     char        f_use_default_include;
 }t_faust_opt_manager;
@@ -171,7 +171,7 @@ t_faust_opt_manager* faust_opt_manager_new(t_object* owner, t_canvas* canvas)
         x->f_options                = NULL;
         x->f_noptions               = 0;
         x->f_use_default_include    = 0;
-        x->f_directory              = canvas_getdir(canvas);
+        x->f_canvas                 = canvas;
         faust_opt_manager_get_default_include_path(x);
     }
     return x;
@@ -193,30 +193,51 @@ char const** faust_opt_manager_get_options(t_faust_opt_manager* x)
     return (char const**)x->f_options;
 }
 
-char const* faust_opt_manager_get_full_path(t_faust_opt_manager* x, char const* name)
+char faust_opt_has_double_precision(t_faust_opt_manager const *x)
 {
-    if(sys_isabsolutepath(name))
+    size_t i;
+    for(i = 0; i < x->f_noptions; ++i)
     {
-        return name;
-    }
-    else if(x->f_directory && x->f_directory->s_name && name)
-    {
-        char* file = (char *)getbytes(MAXFAUSTSTRING * sizeof(char));
-        if(file)
+        if(!strncmp(x->f_options[i], "-double", 7))
         {
-            sprintf(file, "%s/%s.dsp", x->f_directory->s_name, name);
-            x->f_temp_path = gensym(file);
-            freebytes(file, MAXFAUSTSTRING * sizeof(char));
-            return x->f_temp_path->s_name;
+            return 1;
         }
-        pd_error(x->f_owner, "faustgen~: memory allocation failed - path");
-        return NULL;
+    }
+    return 0;
+}
+
+char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* name)
+{
+    if(x->f_canvas && name)
+    {
+        char path[MAXFAUSTSTRING], realdir[MAXPDSTRING], *realname = NULL;
+        int filedesc = canvas_open(x->f_canvas, name, ".dsp", realdir, &realname, MAXPDSTRING, 0);
+        if(filedesc < 0)
+        {
+            pd_error(x->f_owner, "faustgen~: can't find the FAUST DSP file %s.dsp", name);
+            return NULL;
+        }
+        sys_close(filedesc);
+        
+        if(!realname)
+        {
+            pd_error(x->f_owner, "faustgen~: can't find the real name of the FAUST DSP file %s.dsp", name);
+            return NULL;
+        }
+        sprintf(path, "%s/%s", realdir, realname);
+        x->f_temp_path = gensym(path);
+		if(!x->f_temp_path)
+		{
+			pd_error(x->f_owner, "faustgen~: can't generate symbol for the FAUST DSP file %s.dsp", name);
+			return NULL;
+		}
+        return x->f_temp_path->s_name;
     }
     pd_error(x->f_owner, "faustgen~: invalid path or name");
     return NULL;
 }
 
-void faust_opt_manager_print(t_faust_opt_manager* x, char const log)
+void faust_opt_manager_print(t_faust_opt_manager const *x, char const log)
 {
     size_t i;
     for(i = 0; i < x->f_noptions; ++i)

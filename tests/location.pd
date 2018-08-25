@@ -1,0 +1,23 @@
+#N canvas 471 124 627 394 10;
+#X obj 286 115 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 286 135 \; pd dsp \$1;
+#X obj 32 308 dac~ 1 2;
+#X obj 31 47 osc~ 220;
+#X msg 49 71 compile;
+#X obj 124 282 print;
+#X msg 70 95 compileoptions -single;
+#X msg 70 125 compileoptions -double;
+#X msg 70 155 compileoptions -single -double;
+#X obj 31 241 ../external/faustgen~ location, f 16;
+#X text 172 222 location.dsp must be located in the Pd search path
+, f 23;
+#X connect 0 0 1 0;
+#X connect 3 0 9 0;
+#X connect 4 0 9 0;
+#X connect 6 0 9 0;
+#X connect 7 0 9 0;
+#X connect 8 0 9 0;
+#X connect 9 0 2 0;
+#X connect 9 0 2 1;
+#X connect 9 1 5 0;

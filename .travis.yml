@@ -38,6 +38,7 @@ before_deploy:
 - cp -r src/ external/sources
 - cp README.md external/README.txt
 - cp LICENSE external/LICENSE.txt
+- chmod 0444 external/.default.dsp
 - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
 - mv external faustgen~
 - zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
