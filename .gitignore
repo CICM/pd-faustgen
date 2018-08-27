@@ -54,6 +54,7 @@ dkms.conf
 # CMake & Build System
 /build*/
 /llvm*/
+/external/libs/
 *.tar.gz
 *.zip
 *.dek
