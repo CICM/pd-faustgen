@@ -18,7 +18,7 @@
 The **faustgen~** object is an external with the [FAUST](http://faust.grame.fr/about/) just-in-time (JIT) compiler embedded that allows to load, compile and play FAUST files within the audio programming environment [Pure Data](http://msp.ucsd.edu/software.html). FAUST (Functional Audio Stream) is a functional programming language specifically designed for real-time signal processing and synthesis developed by the [GRAME](http://www.grame.fr/). The FAUST JIT compiler - built with [LLVM](https://llvm.org/) - brings together the convenience of a standalone interpreted language with the efficiency of a compiled language. The **faustgen~** object is a very first version with elementary features, any help and any contribution are welcome.
 
 <p align="center">
-<a href="https://vimeo.com/282672255"><img width="510" alt="video1" src="https://user-images.githubusercontent.com/1409918/44655622-1be76a80-a9f6-11e8-90dc-ce01d6734a28.png"></a> <a href="https://vimeo.com/286662395"><img width="510" alt="video2" src="https://user-images.githubusercontent.com/1409918/44655623-1be76a80-a9f6-11e8-86e0-4519609f2e4c.png"></a>
+<a href="https://vimeo.com/282672255"><img width="480" alt="video1" src="https://user-images.githubusercontent.com/1409918/44655622-1be76a80-a9f6-11e8-90dc-ce01d6734a28.png"></a> <a href="https://vimeo.com/286662395"><img width="480" alt="video2" src="https://user-images.githubusercontent.com/1409918/44655623-1be76a80-a9f6-11e8-86e0-4519609f2e4c.png"></a>
 </p>
 
 
