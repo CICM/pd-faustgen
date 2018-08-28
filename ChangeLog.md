@@ -1,4 +1,4 @@
-### v0.1.0
+### v0.1.1
 - Fix the method to open the FAUST file on Windows when the path contains a space  
 
 ### v0.1.0
