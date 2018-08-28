@@ -1,7 +1,8 @@
 
 <p align="center">
   <h1 align="center">
-    faustgen~
+  <img width="48" alt="FaustLogo" img src="http://faust.grame.fr/images/logo/LOGO_FAUST_SIMPLE_GRIS.png"/>
+    faustgen~ <img width="40" alt="FaustLogo" img src="https://raw.githubusercontent.com/pure-data/pure-data/master/src/pd.ico"/>
   </h1>
   <p align="center">
     The FAUST compiler embedded in a Pd external
