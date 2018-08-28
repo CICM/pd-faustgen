@@ -139,7 +139,9 @@ static void faustgen_tilde_open_texteditor(t_faustgen_tilde *x)
     {
         char message[MAXPDSTRING];
 #ifdef _WIN32
-        sys_bashfilename(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), message);
+		char temp[MAXPDSTRING];
+        sys_bashfilename(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), temp);
+		sprintf(message, "\"%s\"", temp);
 #elif __APPLE__
         sprintf(message, "open -t %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
 #else
