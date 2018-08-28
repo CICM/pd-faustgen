@@ -1,4 +1,7 @@
 ### v0.1.0
+- Fix the method to open the FAUST file on Windows when the path contains a space  
+
+### v0.1.0
 - Add support to preserve parameters values during recompilation
 - Fix autocompilation when DSP instance not initialized
 - Fix support for the double-float-precision option
