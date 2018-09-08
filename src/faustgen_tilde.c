@@ -205,7 +205,28 @@ static void faustgen_tilde_print(t_faustgen_tilde *x)
     {
         post("faustgen~: %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
         faust_io_manager_print(x->f_io_manager, 0);
-        faust_opt_manager_print(x->f_opt_manager, 0);
+        if(x->f_dsp_factory)
+        {
+            char* text = NULL;
+            text = getCTarget(x->f_dsp_factory);
+            if(text)
+            {
+                if(strnlen(text, 1) > 0)
+                {
+                    post("             target: %s", text);
+                }
+                free(text);
+            }
+            text = getCDSPFactoryCompileOptions(x->f_dsp_factory);
+            if(text)
+            {
+                if(strnlen(text, 1) > 0)
+                {
+                    post("             options: %s", text);
+                }
+                free(text);
+            }
+        }
         faust_ui_manager_print(x->f_ui_manager, 0);
     }
     else
