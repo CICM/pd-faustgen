@@ -309,7 +309,7 @@ t_faust_ui_manager* faust_ui_manager_new(t_object* owner)
         
         ui_manager->f_glue.addHorizontalBargraph  = (addHorizontalBargraphFun)faust_ui_manager_ui_add_bargraph;
         ui_manager->f_glue.addVerticalBargraph    = (addVerticalBargraphFun)faust_ui_manager_ui_add_bargraph;
-        ui_manager->f_glue.addSoundFile           = (addSoundFileFun)faust_ui_manager_ui_add_sound_file;
+        ui_manager->f_glue.addSoundfile           = (addSoundfileFun)faust_ui_manager_ui_add_sound_file;
         ui_manager->f_glue.declare                = (declareFun)faust_ui_manager_ui_declare;
         
         ui_manager->f_owner     = owner;
