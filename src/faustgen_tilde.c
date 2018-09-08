@@ -18,7 +18,7 @@
 #include "faust_tilde_io.h"
 #include "faust_tilde_options.h"
 
-#define FAUSTGEN_VERSION_STR "0.1.0"
+#define FAUSTGEN_VERSION_STR "0.1.2"
 #define MAXFAUSTSTRING 4096
 
 typedef struct _faustgen_tilde
