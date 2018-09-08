@@ -1,15 +1,6 @@
 ## Create Faust Lib
 message(STATUS "Faust Library")
 
-## For Windows use static runtime instead of default dynamic runtime
-if(MSVC)
-    set(CompilerFlags
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
-    foreach(CompilerFlag ${CompilerFlags})
-      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-    endforeach()
-endif()
 
 ## Save the llvm directory and change it for subdirectory
 if(DEFINED LLVM_DIR)
@@ -18,11 +9,12 @@ if(DEFINED LLVM_DIR)
 endif()
 
 ## Hardcoded targets for faust
-set(INCLUDE_STATIC      ON  CACHE STRING  "Include static library"      FORCE)
-set(INCLUDE_EXECUTABLE  OFF CACHE STRING  "Include runtime executable"  FORCE)
-set(INCLUDE_DYNAMIC     OFF CACHE STRING  "Include dynamic library"     FORCE)
-set(INCLUDE_OSC         OFF CACHE STRING  "Include Faust OSC library"   FORCE)
-set(INCLUDE_HTTP        OFF CACHE STRING  "Include Faust HTTPD library" FORCE)
+set(MSVC_STATIC         ON  CACHE STRING  "Use static runtimes with MSVC" FORCE)
+set(INCLUDE_STATIC      ON  CACHE STRING  "Include static library"        FORCE)
+set(INCLUDE_EXECUTABLE  OFF CACHE STRING  "Include runtime executable"    FORCE)
+set(INCLUDE_DYNAMIC     OFF CACHE STRING  "Include dynamic library"       FORCE)
+set(INCLUDE_OSC         OFF CACHE STRING  "Include Faust OSC library"     FORCE)
+set(INCLUDE_HTTP        OFF CACHE STRING  "Include Faust HTTPD library"   FORCE)
 
 ## Hardcoded backends for faust
 set(ASMJS_BACKEND  OFF                            CACHE STRING  "Include ASMJS backend" FORCE)
