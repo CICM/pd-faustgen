@@ -236,12 +236,3 @@ char const* faust_opt_manager_get_full_path(t_faust_opt_manager *x, char const* 
     pd_error(x->f_owner, "faustgen~: invalid path or name");
     return NULL;
 }
-
-void faust_opt_manager_print(t_faust_opt_manager const *x, char const log)
-{
-    size_t i;
-    for(i = 0; i < x->f_noptions; ++i)
-    {
-        logpost(x->f_owner, 2+log, "             option %i: %s", (int)i, x->f_options[i]);
-    }
-}
