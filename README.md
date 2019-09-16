@@ -1,7 +1,7 @@
 
 <p align="center">
   <h1 align="center">
-  <img width="40" alt="FaustLogo" img src="http://faust.grame.fr/images/logo/LOGO_FAUST_SIMPLE_GRIS.png"/> faustgen~ <img width="40" alt="PdLogo" img src="https://raw.githubusercontent.com/pure-data/pure-data/master/tcl/pd.ico"/>
+  <img width="50" alt="FaustLogo" img src="https://user-images.githubusercontent.com/1409918/64951909-41544a00-d87f-11e9-87dd-720e0f8e1570.png"/> faustgen~ <img width="40" alt="PdLogo" img src="https://user-images.githubusercontent.com/1409918/64951943-5335ed00-d87f-11e9-9b52-b4b6af47d7ba.png"/>
   </h1>
   <p align="center">
     The FAUST compiler embedded in a Pd external
@@ -36,7 +36,7 @@ The FAUST compiler requires LLVM 5.0.0 backend (or higher - 6.0.0). Once LLVM is
 
 #### Installing LLVM
 
-The fastest solution to install LLVM is to download the precompiled binaries from the [LLVM website](http://releases.llvm.org). For example, on the Travis CI for MacOS, we assume for example that the binaries are installed in the llvm folder at the root of the project:
+The fastest solution to install LLVM is to download the precompiled binaries from the [LLVM website](http://releases.llvm.org). For example, on the Travis CI for MacOS, we assume that the binaries are installed in the llvm folder at the root of the project:
 
 ```
 curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
@@ -47,7 +47,7 @@ or a for a linux system
 curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
 tar xvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
 ```
-You can also use HomeBrew or MacPorts on MacOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location.
+You can also use HomeBrew or MacPorts on macOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location.
 
 On Windows, you must compile from sources using the static runtime library. Compiling LLVM with the Microsoft Visual Compiler requires to use the static runtime library, for example:
 ```
