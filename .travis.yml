@@ -21,8 +21,14 @@ matrix:
     - cmake --build . --config Release --target faustgen_tilde_project
   - os: linux
     compiler: gcc
+    addons:
+      apt:
+        sources: ubuntu-toolchain-r-test
+        packages: g++-4.9
     env: release_arch=Linux-amd64-32
     install:
+    - export CXX=g++-4.9
+    - export CC=gcc-4.9
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
     - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
