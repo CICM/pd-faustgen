@@ -133,6 +133,10 @@ static void faustgen_tilde_compile_options(t_faustgen_tilde *x, t_symbol* s, int
     faustgen_tilde_compile(x);
 }
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 static void faustgen_tilde_open_texteditor(t_faustgen_tilde *x)
 {
     if(x->f_dsp_instance)
@@ -142,13 +146,23 @@ static void faustgen_tilde_open_texteditor(t_faustgen_tilde *x)
 		char temp[MAXPDSTRING];
         sys_bashfilename(faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name), temp);
 		sprintf(message, "\"%s\"", temp);
+        WinExec(message, SW_HIDE);
+        return;
 #elif __APPLE__
         sprintf(message, "open -t %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
+        if(system(message))
+        {
+            
+        }
+        return;
 #else
         sprintf(message, "xdg-open %s", faust_opt_manager_get_full_path(x->f_opt_manager, x->f_dsp_name->s_name));
-#endif
-        system(message);
+        if(system(message))
+        {
+            
+        }
         return;
+#endif
     }
     pd_error(x, "faustgen~: no FAUST DSP file defined");
 }
