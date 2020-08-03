@@ -13,8 +13,8 @@ matrix:
     env: release_arch=Darwin-amd64-32
     install:
     - git submodule update --init --recursive
-    - curl -o ./llvm.zip -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-macos-x64.zip
-    - tar xzf ./llvm.zip && mv llvm-macos-x64 llvm
+    - curl -o ./llvm.tar.xz -L https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-darwin-apple.tar.xz
+    - tar xzf ./llvm.tar.xz && mv clang+llvm-9.0.0-x86_64-darwin-apple llvm
     script:
     - mkdir build && cd build
     - cmake .. -GXcode -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
@@ -31,8 +31,8 @@ matrix:
     - export CC=gcc-4.9
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
-    - curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-    - tar xvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+    - curl -o ./llvm.tar.gz https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+    - tar xvf ./llvm.tar.gz && mv clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04 llvm
     script:
     - mkdir build && cd build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
