@@ -1,4 +1,4 @@
-os: Visual Studio 2015
+os: Visual Studio 2019
 
 environment:
   matrix:
@@ -6,19 +6,18 @@ environment:
   #  compiler: "Visual Studio 14 2015"
   #  configuration: Debug
   - platform: x64
-    compiler: "Visual Studio 14 2015 Win64"
+    compiler: "Visual Studio 16 2019"
     configuration: Release
     release_arch: "Windows-amd64-32"
 
 install:
   - git submodule update --init --recursive
-  - curl -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-windows-x64-mt.zip -o llvm.zip
+  - curl -L https://github.com/CICM/pd-faustgen/releases/download/v0.0.0/llvm-9.0.0-windows-x64-mt.zip -o llvm.zip
   - 7z x llvm.zip
-  - rename llvm-windows-x64-mt llvm
   - curl http://faust.grame.fr/images/faust-quick-reference.pdf -o ./external/faust-quick-reference.pdf
 build_script:
   - mkdir build && cd build
-  - cmake .. -G "%compiler%" -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
+  - cmake .. -G "%compiler%" -A x64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
   - msbuild faustgen~.sln /nologo /p:config=%configuration% /p:plateform=%platform%
 after_build:
   - cd %APPVEYOR_BUILD_FOLDER%
@@ -44,7 +43,7 @@ deploy:
   overwrite: true
   draft: true
   auth_token:
-    secure: 0Vv/0e24P2Oa/R/obFQBd824WDpAolXToTc1B0xOjM8TdXXkFdRkfRkPHDgCtoCR
+    secure: n/wNzOYdawEQPTt9OaxXu59bO9PKjKjzeZulk0yrmQduH6SLI7c0CduPQXBwjI1B
   artifact: /.*\.zip/
   on:
     appveyor_repo_tag: true

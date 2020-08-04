@@ -32,27 +32,27 @@ The **faustgen~** object is an external with the [FAUST](http://faust.grame.fr/a
 
 ## Compilation
 
-The FAUST compiler requires LLVM 5.0.0 backend (or higher - 6.0.0). Once LLVM is installed on your machine, you can use CMake to generate a project that will compile both the FAUST library and the Pure Data external. Then you can use Deken to release the external.
+The FAUST compiler requires LLVM 9.0.0 backend (or higher). Once LLVM is installed on your machine, you can use CMake to generate a project that will compile both the FAUST library and the Pure Data external. Then you can use Deken to release the external.
 
 #### Installing LLVM
 
 The fastest solution to install LLVM is to download the precompiled binaries from the [LLVM website](http://releases.llvm.org). For example, on the Travis CI for MacOS, we assume that the binaries are installed in the llvm folder at the root of the project:
 
 ```
-curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-x86_64-apple-darwin.tar.xz
-tar zxvf ./llvm.tar.gz && mv clang+llvm-5.0.0-x86_64-apple-darwin llvm
+curl -o ./llvm.tar.xz -L https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-darwin-apple.tar.xz
+tar xzf ./llvm.tar.xz && mv clang+llvm-9.0.0-x86_64-darwin-apple llvm
 ```
 or a for a linux system
 ```
-curl -o ./llvm.tar.gz http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu14.04.tar.xz
-tar xvf ./llvm.tar.gz && mv clang+llvm-5.0.0-linux-x86_64-ubuntu14.04 llvm
+curl -o ./llvm.tar.gz https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+tar xvf ./llvm.tar.gz && mv clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04 llvm
 ```
 You can also use HomeBrew or MacPorts on macOS or APT on Linux the compilation of the sources last around 50 minutes and in this case, you change the LLVM_DIR with the proper location.
 
 On Windows, you must compile from sources using the static runtime library. Compiling LLVM with the Microsoft Visual Compiler requires to use the static runtime library, for example:
 ```
-cd llvm-6.0.0.src && mkdir build && cd build
-cmake .. -G "Visual Studio 14 2015 Win64" -DLLVM_USE_CRT_DEBUG=MTd -DLLVM_USE_CRT_RELEASE=MT -DLLVM_BUILD_TESTS=Off -DCMAKE_INSTALL_PREFIX="./llvm" -Thost=x64
+cd llvm-9.0.0.src && mkdir build && cd build
+cmake .. -G "Visual Studio 16 2019" -DLLVM_USE_CRT_DEBUG=MTd -DLLVM_USE_CRT_RELEASE=MT -DLLVM_BUILD_TESTS=Off -DCMAKE_INSTALL_PREFIX="./llvm" -Thost=x64
 cmake --build . --target ALL_BUILD (--config Debug/Release)
 cmake --build . --target INSTALL (optional)
 ```
