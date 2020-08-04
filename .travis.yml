@@ -19,6 +19,16 @@ matrix:
     - mkdir build && cd build
     - cmake .. -GXcode -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
     - cmake --build . --config Release --target faustgen_tilde_project
+    before_deploy:
+    - cd $TRAVIS_BUILD_DIR
+    - cp -r faust/libraries external/libs
+    - cp -r src/ external/sources
+    - cp README.md external/README.txt
+    - cp LICENSE external/LICENSE.txt
+    - chmod 0444 external/.default.dsp
+    - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
+    - mv external faustgen~
+    - zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
   - os: linux
     compiler: gcc
     addons:
@@ -31,23 +41,24 @@ matrix:
     - export CC=gcc-4.9
     - git submodule update --init --recursive
     - sudo apt-get install -y pkg-config libedit-dev
-    - curl -o ./llvm.tar.gz https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
-    - tar xvf ./llvm.tar.gz && mv clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04 llvm
+    - curl -o ./llvm.tar.xz https://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
+    - tar xvf ./llvm.tar.xz && mv clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-14.04 llvm
     script:
     - mkdir build && cd build
     - cmake .. -DCMAKE_C_FLAGS=-m64 -DUSE_LLVM_CONFIG=off -DLLVM_DIR=./llvm/lib/cmake/llvm
       -DCMAKE_BUILD_TYPE=Release
     - cmake --build . --config Release --target faustgen_tilde_project
-before_deploy:
-- cd $TRAVIS_BUILD_DIR
-- cp -r faust/libraries external/libs
-- cp -r src/ external/sources
-- cp README.md external/README.txt
-- cp LICENSE external/LICENSE.txt
-- chmod 0444 external/.default.dsp
-- curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
-- mv external faustgen~
-- zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
+    before_deploy:
+    - cd $TRAVIS_BUILD_DIR
+    - cp -r faust/libraries external/libs
+    - cp -r src/ external/sources
+    - cp README.md external/README.txt
+    - cp LICENSE external/LICENSE.txt
+    - chmod 0444 external/.default.dsp
+    - curl -o ./external/faust-quick-reference.pdf http://faust.grame.fr/images/faust-quick-reference.pdf
+    - mv external faustgen~
+    - zip -r "faustgen_tilde-$release_arch-sources.zip" faustgen~
+    - ./make-dist.sh
 deploy:
   provider: releases
   skip_cleanup: true
@@ -58,7 +69,10 @@ deploy:
   tag_name: ${TRAVIS_TAG}
   api_key:
     secure: K5Fu30/Jahwit18UpJBti48aLE7Z1U3VmiZCgdnYBQHnNAyZ9g5IsILRegU9p7m1yY2AMQbl/eIybYDtfVldTSCdxEaeGta5Q+emV5TUzj/na9kNduZlXSaVgIzZ6rWtdRJQsaaBL7Q7F++o3AlDl6jvi8N41EbIpMy5Enkux4ZkGKvOftviBip5OTnkmM3MFZWGVOgnFV//DvMXBSLtHgSylSnq8jE++7DvyMlN6C9yZIGcBy7ZRpMGD7aqccCy2u41gQq286IQBPPfqmzcZOgC1s1jbM8+oD0Hl9e5LaA/D8tnrt2lZbfh5R+ULGgXd7BAGp/I/+ketCWEnMqg3bV1jTXglweIGmC+uTSAiu9hAfGW5DCzVYc4G15rnniy/HlXS7qCyTuow377HfqtRdqGe4lulSxvmIWGsCAgjXuXnaTSDR70Mer0g6bsNijDa5f28c68KCv9Kq6Oy8CMmGOAmUoO7Yp5y3jVUHlHpwxMukH35ScJaauEzzPqu0CbR/bx5+nGNIllkT7yzeOI+YMq6deLnakG/4iBqmWfgtTnTUDq1Q+hm+RtYjS0JQ5LKMKjMui+/UFSGZ1ZTer+NWhmL2sWXtYyYOPwLWY+AdDAHGOq386CsohMQ36seAiU3X5bC1icBK3tG93nrJEIucgVmDeAvsrHHX41FHW8dL4=
-  file: "faustgen_tilde-$release_arch-sources.zip"
+  file_glob: true
+  file:
+  - "faustgen_tilde-$release_arch-sources.zip"
+  - '*.tar.gz'
   on:
     repo: CICM/pd-faustgen
     tags: true
