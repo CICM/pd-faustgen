@@ -70,3 +70,7 @@ endif()
 if(MSVC)
     set_property(TARGET faustgen_tilde_project APPEND_STRING PROPERTY LINK_FLAGS " /ignore:4099 ")
 endif()
+
+file(GLOB lib_files ${PROJECT_SOURCE_DIR}/faust/libraries/*.lib ${PROJECT_SOURCE_DIR}/faust/libraries/old/*.lib)
+install(DIRECTORY external/ DESTINATION lib/pd/extra/faustgen~)
+install(FILES ${lib_files} DESTINATION lib/pd/extra/faustgen~/libs)
