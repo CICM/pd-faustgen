@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export PATH="~/bin:$PATH"
 echo -e "Deken manager for faustgen~"
 
 deken_prepare() {
