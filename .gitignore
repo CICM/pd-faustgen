@@ -64,3 +64,6 @@ dkms.conf
 *.pd_darwin
 *.pd_linux
 *.dll
+# deken
+*.dek
+*.dek.asc
