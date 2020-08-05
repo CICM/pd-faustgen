@@ -81,7 +81,23 @@ else()
 endif()
 
 message(STATUS "Installation goes to CMAKE_INSTALL_PREFIX/${INSTALL_DIR}")
+message(STATUS "(set the INSTALL_DIR variable to override)")
 
-file(GLOB lib_files ${PROJECT_SOURCE_DIR}/faust/libraries/*.lib ${PROJECT_SOURCE_DIR}/faust/libraries/old/*.lib)
+if(INSTALLED_FAUST)
+  ## Grab the .lib files from the installed Faust using the FAUSTLIB path,
+  ## /usr/share/faust by default. You can adjust this path if needed by
+  ## setting the FAUSTLIB variable accordingly.
+  find_path(FAUSTLIB all.lib PATH_SUFFIXES faust share/faust)
+  if(NOT FAUSTLIB)
+    set(FAUSTLIB "/usr/share/faust")
+    message(WARNING "Faust library files not found, assuming ${FAUSTLIB} (set the FAUSTLIB variable to override)")
+  else()
+    message(STATUS "Faust library files found at ${FAUSTLIB}")
+    message(STATUS "(set the FAUSTLIB variable to override)")
+  endif()
+  file(GLOB lib_files ${FAUSTLIB}/*.lib)
+else()
+  file(GLOB lib_files ${PROJECT_SOURCE_DIR}/faust/libraries/*.lib ${PROJECT_SOURCE_DIR}/faust/libraries/old/*.lib)
+endif()
 install(DIRECTORY external/ DESTINATION ${INSTALL_DIR})
 install(FILES ${lib_files} DESTINATION ${INSTALL_DIR}/libs)
