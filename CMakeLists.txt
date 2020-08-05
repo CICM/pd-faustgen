@@ -13,7 +13,21 @@ if(UNIX AND NOT APPLE)
     set(FAUST_LIBS  "stdc++"  CACHE STRING  "FAUST LIBRARIES" FORCE)
 endif()
 
+## Set this to ON to link against an installed libfaust rather than the
+## version we include. CAVEATS: Use at your own risk. The Faust version
+## provided by your system may be too old or too new to be used with
+## faustgen~. You also have to make sure that Faust's include files and
+## libfaust.so and/or libfaust.a are on the standard include and library
+## paths, respectively, otherwise the compilation will fail. If you plan to
+## upload the external to Deken, we recommend leaving this option OFF, since
+## that will gurantee that libfaust is linked statically into the external.
+set(INSTALLED_FAUST "OFF"  CACHE BOOL  "Use an installed Faust library")
+
+message(STATUS "Installed Faust library: ${INSTALLED_FAUST}")
+if(NOT INSTALLED_FAUST)
 include(FaustLib.cmake)
+endif()
+
 ## Create Faust~
 message(STATUS "faustgen~ external")
 
@@ -31,9 +45,13 @@ ${PROJECT_SOURCE_DIR}/src/faust_tilde_options.c)
 add_pd_external(faustgen_tilde_project faustgen~ "${faustgen_tilde_sources}")
 
 ## Link the Pure Data external with faustlib
-include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
-add_dependencies(faustgen_tilde_project staticlib)
-target_link_libraries(faustgen_tilde_project staticlib)
+if(INSTALLED_FAUST)
+  target_link_libraries(faustgen_tilde_project "-lfaust")
+else()
+  include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
+  add_dependencies(faustgen_tilde_project staticlib)
+  target_link_libraries(faustgen_tilde_project staticlib)
+endif()
 
 ## Link the Pure Data external with llvm
 find_package(LLVM REQUIRED CONFIG)
