@@ -71,6 +71,17 @@ if(MSVC)
     set_property(TARGET faustgen_tilde_project APPEND_STRING PROPERTY LINK_FLAGS " /ignore:4099 ")
 endif()
 
+## Installation directory. This is relative to CMAKE_INSTALL_PREFIX.
+## Default is lib/pd/extra/faustgen~ on Linux and other generic Unix-like
+## systems, or just faustgen~ on Mac and Windows.
+if(UNIX AND NOT APPLE)
+    set(INSTALL_DIR "lib/pd/extra/faustgen~" CACHE STRING "Destination directory for the external")
+else()
+    set(INSTALL_DIR "faustgen~" CACHE STRING "Destination directory for the external")
+endif()
+
+message(STATUS "Installation goes to CMAKE_INSTALL_PREFIX/${INSTALL_DIR}")
+
 file(GLOB lib_files ${PROJECT_SOURCE_DIR}/faust/libraries/*.lib ${PROJECT_SOURCE_DIR}/faust/libraries/old/*.lib)
-install(DIRECTORY external/ DESTINATION lib/pd/extra/faustgen~)
-install(FILES ${lib_files} DESTINATION lib/pd/extra/faustgen~/libs)
+install(DIRECTORY external/ DESTINATION ${INSTALL_DIR})
+install(FILES ${lib_files} DESTINATION ${INSTALL_DIR}/libs)
