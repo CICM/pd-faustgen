@@ -23,8 +23,16 @@ endif()
 ## that will gurantee that libfaust is linked statically into the external.
 set(INSTALLED_FAUST "OFF"  CACHE BOOL  "Use an installed Faust library")
 
+## In addition, set this to OFF in order to link to the shared libfaust
+## library. Default is static linking. Note that this option only has an
+## effect if INSTALLED_FAUST is ON. Static linking is always used when linking
+## with the included Faust version.
+set(STATIC_FAUST "ON"  CACHE BOOL  "Link the installed Faust library statically if possible")
+
 message(STATUS "Installed Faust library: ${INSTALLED_FAUST}")
-if(NOT INSTALLED_FAUST)
+if(INSTALLED_FAUST)
+message(STATUS "Installed Faust static linking: ${STATIC_FAUST}")
+else()
 include(FaustLib.cmake)
 endif()
 
@@ -46,7 +54,13 @@ add_pd_external(faustgen_tilde_project faustgen~ "${faustgen_tilde_sources}")
 
 ## Link the Pure Data external with faustlib
 if(INSTALLED_FAUST)
-  target_link_libraries(faustgen_tilde_project "-lfaust")
+  ## FIXME: The way we do static linking requires gcc at present, so disable
+  ## this option with MSVC for now.
+  if(STATIC_FAUST AND NOT MSVC)
+    target_link_libraries(faustgen_tilde_project "-Wl,-Bstatic" "-lfaust" "-Wl,-Bdynamic")
+  else()
+    target_link_libraries(faustgen_tilde_project "-lfaust")
+  endif()
 else()
   include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
   add_dependencies(faustgen_tilde_project staticlib)
@@ -62,6 +76,21 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 llvm_map_components_to_libnames(llvm_libs all)
 list(REMOVE_ITEM llvm_libs LTO)
+## Work around llvm_map_components_to_libnames producing an empty result at
+## least with some LLVM versions. In such a case, llvm-config can hopefully
+## provide us with the correct options. Note that this requires that
+## llvm-config can be found on PATH.
+if(NOT llvm_libs)
+  execute_process(COMMAND llvm-config --libs OUTPUT_VARIABLE llvm_config_libs OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT llvm_config_libs)
+    message(WARNING "Tried to get LLVM libraries from both cmake and llvm-config, but both came up empty (maybe try to set llvm_libs manually)")
+  else()
+    message(STATUS "Using fallback LLVM linker options (llvm-config --libs): ${llvm_config_libs}")
+    # Make sure that we get a proper cmake list in case llvm-config returned
+    # multiple libraries.
+    string(REPLACE " " ";" llvm_libs "${llvm_config_libs}")
+  endif()
+endif()
 target_link_libraries(faustgen_tilde_project ${llvm_libs})
 if(WIN32)
   target_link_libraries(faustgen_tilde_project ws2_32)
