@@ -83,7 +83,9 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 llvm_map_components_to_libnames(llvm_libs all)
-list(REMOVE_ITEM llvm_libs LTO)
+if(llvm_libs)
+  list(REMOVE_ITEM llvm_libs LTO)
+endif()
 ## Work around llvm_map_components_to_libnames producing an empty result at
 ## least with some LLVM versions. In such a case, llvm-config can hopefully
 ## provide us with the correct options. Note that this requires that
