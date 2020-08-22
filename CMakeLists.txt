@@ -123,13 +123,13 @@ message(STATUS "Installation goes to CMAKE_INSTALL_PREFIX/${INSTALL_DIR}")
 message(STATUS "(set the INSTALL_DIR variable to override)")
 
 if(INSTALLED_FAUST)
-  ## Grab the .lib files from the installed Faust using the FAUSTLIB path,
-  ## /usr/share/faust by default. You can adjust this path if needed by
-  ## setting the FAUSTLIB variable accordingly.
-  find_path(FAUSTLIB all.lib PATH_SUFFIXES faust share/faust)
-  if(NOT FAUSTLIB)
-    set(FAUSTLIB "/usr/share/faust")
-    message(WARNING "Faust library files not found, assuming ${FAUSTLIB} (set the FAUSTLIB variable to override)")
+  ## Grab the .lib files from the installed Faust using the FAUSTLIB
+  ## path. There's no default here if the search for the library files fails,
+  ## but you can adjust this path if needed by setting the FAUSTLIB variable
+  ## accordingly.
+  find_path(FAUSTLIB all.lib PATH_SUFFIXES faust share/faust REQUIRED)
+  if(NOT FAUSTLIB OR NOT EXISTS "${FAUSTLIB}/all.lib")
+    message(FATAL_ERROR "Faust library files not found, maybe you specified the wrong FAUSTLIB directory? Otherwise try using the included Faust instead (INSTALLED_FAUST=OFF).")
   else()
     message(STATUS "Faust library files found at ${FAUSTLIB}")
     message(STATUS "(set the FAUSTLIB variable to override)")
