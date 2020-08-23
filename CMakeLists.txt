@@ -16,11 +16,9 @@ endif()
 ## Set this to ON to link against an installed libfaust rather than the
 ## version we include. CAVEATS: Use at your own risk. The Faust version
 ## provided by your system may be too old or too new to be used with
-## faustgen~. You also have to make sure that Faust's include files and
-## libfaust.so and/or libfaust.a are on the standard include and library
-## paths, respectively, otherwise the compilation will fail. If you plan to
-## upload the external to Deken, we recommend leaving this option OFF, since
-## that will gurantee that libfaust is linked statically into the external.
+## faustgen~, in which case compilation will fail. If you plan to upload the
+## external to Deken, we recommend leaving this option OFF, since that will
+## gurantee that libfaust is linked statically into the external.
 set(INSTALLED_FAUST "OFF"  CACHE BOOL  "Use an installed Faust library")
 
 ## In addition, set this to OFF in order to link to the shared libfaust
@@ -67,7 +65,39 @@ if(INSTALLED_FAUST)
       find_library(FAUST_LIBRARY NAMES libfaust.so libfaust.dylib REQUIRED)
     endif()
   endif()
-  message(STATUS "Found installed Faust library at: ${FAUST_LIBRARY}")
+  # Double-check that the file actually exists, in case the user specified a
+  # wrong path.
+  if(FAUST_LIBRARY AND EXISTS ${FAUST_LIBRARY})
+    ## Based on FAUST_LIBRARY we can make an educated guess about the
+    ## locations of the Faust include and library directories for the specific
+    ## Faust installation we're using. These should work in most cases, but we
+    ## also do a more general search in standard locations as a fallback.
+    get_filename_component(FAUST_LIBRARY_DIR ${FAUST_LIBRARY} DIRECTORY)
+    if(FAUST_LIBRARY_DIR)
+      find_path(FAUST_INCLUDE_DIR dsp/llvm-c-dsp.h HINTS "${FAUST_LIBRARY_DIR}/../include/faust" NO_DEFAULT_PATH)
+      if(NOT FAUST_INCLUDE_DIR)
+	find_path(FAUST_INCLUDE_DIR dsp/llvm-c-dsp.h PATH_SUFFIXES faust include/faust REQUIRED)
+      endif()
+      find_path(FAUSTLIB all.lib HINTS "${FAUST_LIBRARY_DIR}/../share/faust" NO_DEFAULT_PATH)
+      if(NOT FAUSTLIB)
+	find_path(FAUSTLIB all.lib PATH_SUFFIXES faust share/faust REQUIRED)
+      endif()
+    endif()
+    message(STATUS "Found installed Faust library at: ${FAUST_LIBRARY}")
+    if(FAUST_INCLUDE_DIR AND EXISTS "${FAUST_INCLUDE_DIR}/dsp/llvm-c-dsp.h")
+      message(STATUS "Found installed Faust include files at: ${FAUST_INCLUDE_DIR}")
+    else()
+      message(FATAL_ERROR "Faust include files not found, maybe you specified the wrong FAUST_INCLUDE_DIR directory? Otherwise try using the included Faust instead (INSTALLED_FAUST=OFF).")
+    endif()
+    if(FAUSTLIB AND EXISTS "${FAUSTLIB}/all.lib")
+      message(STATUS "Found installed Faust library files at: ${FAUSTLIB}")
+    else()
+      message(FATAL_ERROR "Faust library files not found, maybe you specified the wrong FAUSTLIB directory? Otherwise try using the included Faust instead (INSTALLED_FAUST=OFF).")
+    endif()
+  else()
+    message(FATAL_ERROR "Faust library not found, maybe you specified the wrong FAUST_LIBRARY directory? Otherwise try using the included Faust instead (INSTALLED_FAUST=OFF).")
+  endif()
+  include_directories(${FAUST_INCLUDE_DIR})
   target_link_libraries(faustgen_tilde_project ${FAUST_LIBRARY})
 else()
   include_directories(${PROJECT_SOURCE_DIR}/faust/architecture)
@@ -123,17 +153,7 @@ message(STATUS "Installation goes to CMAKE_INSTALL_PREFIX/${INSTALL_DIR}")
 message(STATUS "(set the INSTALL_DIR variable to override)")
 
 if(INSTALLED_FAUST)
-  ## Grab the .lib files from the installed Faust using the FAUSTLIB
-  ## path. There's no default here if the search for the library files fails,
-  ## but you can adjust this path if needed by setting the FAUSTLIB variable
-  ## accordingly.
-  find_path(FAUSTLIB all.lib PATH_SUFFIXES faust share/faust REQUIRED)
-  if(NOT FAUSTLIB OR NOT EXISTS "${FAUSTLIB}/all.lib")
-    message(FATAL_ERROR "Faust library files not found, maybe you specified the wrong FAUSTLIB directory? Otherwise try using the included Faust instead (INSTALLED_FAUST=OFF).")
-  else()
-    message(STATUS "Faust library files found at ${FAUSTLIB}")
-    message(STATUS "(set the FAUSTLIB variable to override)")
-  endif()
+  ## Grab the .lib files from the installed Faust using the FAUSTLIB path.
   file(GLOB lib_files ${FAUSTLIB}/*.lib)
 else()
   file(GLOB lib_files ${PROJECT_SOURCE_DIR}/faust/libraries/*.lib ${PROJECT_SOURCE_DIR}/faust/libraries/old/*.lib)
