@@ -119,9 +119,11 @@ endif()
 ## Work around llvm_map_components_to_libnames producing an empty result at
 ## least with some LLVM versions. In such a case, llvm-config can hopefully
 ## provide us with the correct options. Note that this requires that
-## llvm-config can be found on PATH.
+## llvm-config can be found on PATH, otherwise you'll have to set the
+## LLVM_CONFIG_PROG variable.
 if(NOT llvm_libs)
-  execute_process(COMMAND llvm-config --libs OUTPUT_VARIABLE llvm_config_libs OUTPUT_STRIP_TRAILING_WHITESPACE)
+  find_program(LLVM_CONFIG_PROG "llvm-config" DOC "Use the given llvm-config executable" REQUIRED)
+  execute_process(COMMAND ${LLVM_CONFIG_PROG} --libs OUTPUT_VARIABLE llvm_config_libs OUTPUT_STRIP_TRAILING_WHITESPACE)
   if(NOT llvm_config_libs)
     message(WARNING "Tried to get LLVM libraries from both cmake and llvm-config, but both came up empty (maybe try to set llvm_libs manually)")
   else()
